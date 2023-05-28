@@ -1,5 +1,4 @@
 import { useContext, useEffect, useState } from "react"
-import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import TennatCard from "../TenantCard/tenantCard";
@@ -8,9 +7,6 @@ import { UserContext } from "../UserContext";
 import { Button } from "@mui/material";
 import Slider from '@mui/material/Slider';
 import Modal from '@mui/material/Modal';
-import MenuItem from '@mui/material/MenuItem';
-import Menu from '@mui/material/Menu';
-import SortIcon from '@mui/icons-material/Sort';
 
 
 
@@ -48,36 +44,40 @@ export default function LandingPage(props){
         console.log(datas.length)
         await datas.forEach( async (user) => {
             if(user.postedProperties.length != 0){
-                const res = await fetch(`https://crib-llc.herokuapp.com/properties/${user.postedProperties[0]}`, {method: "POST"})
-                const data = await res.json();
-                // console.log(data)
-                let sa = data.propertyInfo.loc.secondaryTxt
-                let lower_spaceless_sa = sa.toLowerCase().replaceAll(" ","")
-                
-                if(data.propertyInfo.price < price){
-                    //Check if it is in NY
-                    if(lower_spaceless_sa.indexOf("ny") != -1 || lower_spaceless_sa.indexOf("newyork") != -1){
+                await fetch(`https://crib-llc.herokuapp.com/properties/${user.postedProperties[0]}`, {method: "POST"})
+                .then( async (res) => {
+                    return await res.json()
+                })
+                .then ( data => {
+                    if(data.propertyInfo.price < price){
 
-                        if(!brooklynDL){
-                            if(lower_spaceless_sa.indexOf("brooklyn") != - 1){
-                                return
+                        let sa = data.propertyInfo.loc.secondaryTxt
+                        let lower_spaceless_sa = sa.toLowerCase().replaceAll(" ","")
+                        //Check if it is in NY
+                        if(lower_spaceless_sa.indexOf("ny") != -1 || lower_spaceless_sa.indexOf("newyork") != -1){
+    
+                            if(!brooklynDL){
+                                if(lower_spaceless_sa.indexOf("brooklyn") != - 1){
+                                    return
+                                }
                             }
-                        }
-                        if(!jerseyDL){
-                            if(lower_spaceless_sa.indexOf("jersey") != - 1 || lower_spaceless_sa.indexOf("nj") != -1){
-                                return
+                            if(!jerseyDL){
+                                if(lower_spaceless_sa.indexOf("jersey") != - 1 || lower_spaceless_sa.indexOf("nj") != -1){
+                                    return 
+                                }
                             }
-                        }
-                        if(!queensDL){
-                            if(lower_spaceless_sa.indexOf("queens") != - 1){
-                                return
+                            if(!queensDL){
+                                if(lower_spaceless_sa.indexOf("queens") != - 1){
+                                    return 
+                                }
                             }
+                           
+                            setTenants(tenants => [...tenants, user])
+                            
                         }
-                        console.log(data)
-                        setTenants(tenants => [...tenants, data])
-                        
                     }
-                }
+                })
+
             }
         })
        
@@ -148,8 +148,8 @@ export default function LandingPage(props){
                       
                         return (
                            
-                            <Col key={item.propertyInfo._id + index + item.userInfo._id} xs={12} sm={6} md={4} lg={4} style={{marginTop: 20}}>
-                                <TennatCard key={item.propertyInfo._id + index + item.userInfo._id + "card"}data={item}/>
+                            <Col key={index} xs={12} sm={6} md={4} lg={4} style={{marginTop: 20}}>
+                                <TennatCard data={item}/>
                             </Col> 
                         )
                     })

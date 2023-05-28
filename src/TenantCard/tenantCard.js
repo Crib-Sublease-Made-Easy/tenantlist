@@ -2,18 +2,26 @@ import { useEffect, useState } from "react";
 import { Button } from "@mui/material";
 
 export default function TennatCard(props) {
-
-    const tenant = props.data.userInfo
-    const prop = props.data.propertyInfo
-    
-    const [propData, setPropData] = useState([])
-    const [phoneNum, setPhoneNum] = useState(props.data.userInfo.phoneNumber)
+    const tenant = props.data
+    console.log(props)
+    const [prop, setProp] = useState(null)
+    const [phoneNum, setPhoneNum] = useState(props.data.phoneNumber)
     const [showPhoneNum, setShowPhoneNum] = useState(false)
     
+    useState(()=>{
+        fetchPropData()
+    },[])
 
-
-
-
+    async function fetchPropData() {
+       
+        await fetch(`https://crib-llc.herokuapp.com/properties/${props.data.postedProperties[0]}`, {method: "POST"})
+        .then( async (res) => {
+            return await res.json()
+        })
+        .then ( data => { 
+            setProp(data.propertyInfo)
+        })
+    }
     function getAge(ms){
         return Math.floor(ms / (1000*60*60*24*365));
     }
@@ -22,7 +30,10 @@ export default function TennatCard(props) {
 
     
     return(
+       
         <div style={{padding: 15, borderColor: '#ABABAB', borderStyle:'solid', borderRadius: 10, overflow:'hidden'}}>
+        {prop != null &&
+        <>
             <div style={{flexDirection:'row', display:'flex', justifyContent:'space-between', alignItems:'center', paddingBottom: 20}}>
                 <img key={tenant._id + "profilepic"} src={tenant.profilePic} style={{height: 60, width: 60, borderRadius: 30}}/>
                 <div style={{flexDirection:'row', display:'flex',}}>
@@ -67,9 +78,9 @@ export default function TennatCard(props) {
                 </Button>
                 <h5 style={{fontWeight: '600'}}>${prop.price} <span style={{fontWeight:'500', fontSize:15, color: '#333333'}}> /month</span></h5>
             </div>
-             
 
-
+        </>
+        }
         </div>
     )
 }
