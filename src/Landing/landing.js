@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react"
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import TennatCard from "../TenantCard/tenantCard";
-import { Alert, Box, Checkbox, Paper } from "@mui/material";
+import {Box, Checkbox, Paper } from "@mui/material";
 import { UserContext } from "../UserContext";
 import { Button } from "@mui/material";
 import Slider from '@mui/material/Slider';
@@ -49,7 +49,7 @@ export default function LandingPage(props){
                     return await res.json()
                 })
                 .then ( data => {
-                    if(data.propertyInfo.price < price){
+                    if(data.propertyInfo.price < price && data.propertyInfo.deleted == false){
 
                         let sa = data.propertyInfo.loc.secondaryTxt
                         let lower_spaceless_sa = sa.toLowerCase().replaceAll(" ","")
