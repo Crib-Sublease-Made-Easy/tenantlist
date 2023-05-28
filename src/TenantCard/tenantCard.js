@@ -31,7 +31,7 @@ export default function TennatCard(props) {
     
     return(
        
-        <div style={{padding: 15, borderColor: '#ABABAB', borderStyle:'solid', borderRadius: 10, overflow:'hidden'}}>
+        <div style={{padding: 15, borderColor: '#ABABAB', borderStyle:'solid', borderRadius: 10, overflow:'hidden', borderWidth:1}}>
         {prop != null &&
         <>
             <div style={{flexDirection:'row', display:'flex', justifyContent:'space-between', alignItems:'center', paddingBottom: 20}}>
