@@ -68,7 +68,7 @@ export default function TennatCard(props) {
                 }  
             </div>
             <div style={{paddingTop: 20, opacity: showPhoneNum ? 1 : 0 }}>
-                <p>Phone Number: <a onClick={()=>alert("messaged")}>{phoneNum}</a></p>
+                <p>Phone Number: <a href={`+1${phoneNum}`} onClick={()=>alert("messaged")}>+1{phoneNum}</a></p>
             </div>
 
            
