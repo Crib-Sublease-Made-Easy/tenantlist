@@ -68,7 +68,7 @@ export default function TennatCard(props) {
                 }  
             </div>
             <div style={{paddingTop: 20, opacity: showPhoneNum ? 1 : 0 }}>
-                <p>Phone Number: <a href={`tel:+1${phoneNum}`}>+1{phoneNum}</a></p>
+                <p>Send me a message: <a href={`tel:+1${phoneNum}`}>+1{phoneNum}</a></p>
             </div>
 
            
