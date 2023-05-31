@@ -146,7 +146,7 @@ export default function TennatCard(props) {
             </div>
 
             <Modal 
-            
+    
             open={open}
             onClose={handleClose}
             aria-labelledby="modal-modal-title"
@@ -156,10 +156,12 @@ export default function TennatCard(props) {
                 justifyContent: 'center',
                 flex: 1,
                 display: 'flex',
-                position: 'relative'
             }}
             >
-                <div style={{width: '90vw', height: '50vh', backgroundColor:'white', alignSelf:'center', maxWidth: 400, borderRadius:20, padding: 20}}>
+                <div style={{width: '90vw', height: '50vh', backgroundColor:'white', alignSelf:'center', maxWidth: 400, borderRadius:20, padding: 20, position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',}}>
                     <h4 style={{fontWeight:'700'}}>Enter your phone number</h4>
                     <p>We will keep you updated when new subleases around the area is posted.</p>
                     <div style={{marginTop: 20}}>
