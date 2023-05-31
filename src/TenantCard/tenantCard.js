@@ -40,11 +40,11 @@ export default function TennatCard(props) {
         let name = localStorage.getItem("name")
 
         if(pn == null){
-            setShowPhoneNum(true)
+            
             setOpen(true)
         }
         else if(name == null){
-            setShowPhoneNum(true)
+           
             setOpen(true)
         }
         else{
