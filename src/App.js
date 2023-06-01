@@ -7,9 +7,7 @@ import { useEffect, useState } from 'react';
 
 function App() {
 
-  useEffect(()=> {
-    getWebsite()
-  }, [])
+
 
   //Location base
   const [manhattanDL, setManhattanDL] = useState(true)
@@ -20,15 +18,6 @@ function App() {
   //Price base
   const [price, setPrice] = useState(10000)
 
-
-
-
-  async function getWebsite(){
-    let url = window.location.href;
-    console.log("THE WEBSITE IS" ,url)
-
-  }
-  
 
 
   return (
