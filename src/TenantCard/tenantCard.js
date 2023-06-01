@@ -286,13 +286,16 @@ export default function TennatCard(props) {
             </div>  
            
             <div style={{flexDirection:'row', display: 'flex', borderRadius:10, overflow:'scroll' }}>
-                {
+                {/* {
                     propData.imgList.map((item, index)=> {
                         return(
                             <img key={item + index + item._id} src={item} style={{marginLeft: index == 0 ? 0 : 20,  width:300, borderRadius: 10, objectFit:'cover'}}/>
                         )
                     })
-                }  
+                }   */}
+                
+                <img key={propData.imgList[0] + "propimage"} src={propData.imgList[0]} style={{marginLeft: 0,  width:'100%', borderRadius: 10, objectFit:'cover'}}/>
+                     
             </div>  
             
             <div style={{paddingTop: 20, opacity: showPhoneNum ? 1 : 0 }}>
