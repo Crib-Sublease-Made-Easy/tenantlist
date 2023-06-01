@@ -258,7 +258,7 @@ export default function TennatCard(props) {
         <>
            
             <div style={{flexDirection:'row', display:'flex', justifyContent:'space-between', alignItems:'center', paddingBottom: 20}}>
-                <LazyLoadImage effect="blur" key={tenantData._id + "profilepic"} src={tenantData.profilePic} style={{height: 60, width: 60, borderRadius: 30}}/>
+                <img  key={tenantData._id + "profilepic"} src={tenantData.profilePic} style={{height: 60, width: 60, borderRadius: 30}}/>
                 <div style={{flexDirection:'row', display:'flex',}}>
                     <h6 style={{fontWeight: '600'}}>{tenantData.firstName}</h6>
                     <h6 style={{fontWeight: '500', marginLeft: 20}}>{tenantData.gender}</h6>
