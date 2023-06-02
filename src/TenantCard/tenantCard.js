@@ -354,7 +354,7 @@ export default function TennatCard(props) {
                 display: 'flex',
             }}
             >
-                <div style={{width: '90vw', height: '85vh', backgroundColor:'white', alignSelf:'center', maxWidth: 400, borderRadius:20, padding: 20, position: 'absolute',
+                <div style={{width: '90vw', height: '90vh', backgroundColor:'white', alignSelf:'center', maxWidth: 400, borderRadius:20, padding: 20, position: 'absolute',
                 top: '50%',
                 left: '50%',
                 transform: 'translate(-50%, -50%)',}}>
