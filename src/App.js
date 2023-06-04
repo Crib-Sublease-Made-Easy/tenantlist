@@ -1,8 +1,14 @@
-import LandingPage from './Landing/landing';
+//Pages
+import LandingPage from './pages/Landing/landing';
+import TenantRequestPage from './pages/Tenant/tenantRequests';
+
+
 import NavBar from './NavBar/navbar';
 import './App.css';
 import {UserContext} from './UserContext';
 import { useEffect, useState } from 'react';
+import { Routes, Route } from "react-router-dom"
+
 
 
 function App() {
@@ -22,10 +28,13 @@ function App() {
 
   return (
     <UserContext.Provider value={{manhattanDL, setManhattanDL, queensDL, setQueensDL, brooklynDL, setBrooklynDL, jerseyDL, setJerseyDL, price, setPrice  }}>
-      <div>
-        <NavBar></NavBar>
-        <LandingPage/>
-      </div>
+      <NavBar/>
+      <Routes>
+        <Route path="/" element={ <LandingPage/> } />
+        <Route path="/subleasemyroomintro" element={ <TenantRequestPage/> } />
+      </Routes>
+      {/* <LandingPage/> */}
+      
     </UserContext.Provider>
   );
 }

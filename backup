@@ -1,9 +1,9 @@
 import { useContext, useEffect, useState } from "react"
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import TennatCard from "../TenantCard/tenantCard";
+import TennatCard from "../../TenantCard/tenantCard";
 import {Box, Checkbox, Menu, MenuItem, Paper } from "@mui/material";
-import { UserContext } from "../UserContext";
+import { UserContext } from "../../UserContext"
 import { Button } from "@mui/material";
 import Slider from '@mui/material/Slider';
 import Modal from '@mui/material/Modal';
@@ -181,8 +181,8 @@ export default function LandingPage(props){
     return(
         <div  style={{ height: '90vh', width: '100vw', paddingLeft:'2.5vw', paddingRight:'2.5vw', paddingTop: '2.5vh'}}>
             
-            <h2 style={{fontWeight:'700'}}>Hello there 👋🏻</h2>
-            <p style={{maxWidth: 400}}>We are Crib, a student startup for subleasing! We are students too so we understand how difficult subleasing can be. Check out the selected tenants below, be sure to check regularly since we update the list everyday!</p>
+            {/* <h2 style={{fontWeight:'700'}}>Hello there 👋🏻</h2>
+            <p style={{maxWidth: 400}}>We are Crib, a student startup for subleasing! We are students too so we understand how difficult subleasing can be. Check out the selected tenants below, be sure to check regularly since we update the list everyday!</p> */}
             <div style={{maxWidth: 400, flexDirection:'row', justifyContent:'space-between', alignItems:'center', display:'flex', flex: 1, alignContent:'center'}}>
                 <Button onClick={filterTenants} style={{backgroundColor:'#2D6674'}} variant="contained">
                     Filters
@@ -237,7 +237,7 @@ export default function LandingPage(props){
                             }
                             else{
                                 return (
-                                    <Col key={index} xs={12} sm={6} md={4} lg={4} style={{marginTop: 20}}>
+                                    <Col key={index} xs={12} sm={6} md={3} lg={3} style={{marginTop: 20}}>
                                         <TennatCard data={item}/>
                                     </Col> 
                                 )
