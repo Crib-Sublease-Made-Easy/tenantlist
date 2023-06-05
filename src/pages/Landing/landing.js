@@ -274,11 +274,15 @@ export default function LandingPage(props){
     }
 
     function handleMobileMapPinClick(p){
-        window.scrollTo(0,0)
         setMapSelectedProp(p)
         let lat = p.propertyInfo.loc[1]
         let lng = p.propertyInfo.loc[0]
         setGMCenter({lat, lng})
+        window.scrollTo({
+            top: 0,
+            left: 0,
+            behavior: "smooth",
+        });
     }
 
     return(
