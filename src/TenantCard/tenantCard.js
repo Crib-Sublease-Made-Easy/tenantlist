@@ -326,12 +326,12 @@ export default function TennatCard(props) {
                 }   */}
                     
                 </ul>
-                <IconButton onClick={()=>scrollImgList("-")} style={{position:'absolute', top:'50%' , left: 20, transform: 'translate(0, -50%)', backgroundColor: 'rgba(0,0,0,0.3)'}}>
+                {/* <IconButton onClick={()=>scrollImgList("-")} style={{position:'absolute', top:'50%' , left: 20, transform: 'translate(0, -50%)', backgroundColor: 'rgba(0,0,0,0.3)'}}>
                     <KeyboardArrowLeftIcon style={{color:'white'}}/>
                 </IconButton>
                 <IconButton onClick={()=>scrollImgList("+")} style={{position:'absolute', top:'50%' , right: 20, transform: 'translate(0, -50%)', backgroundColor: 'rgba(0,0,0,0.3)'}}>
                     <KeyboardArrowRightIcon style={{color:'white'}}/>
-                </IconButton>
+                </IconButton> */}
                 <Button size="small" variant="contained" style={{position:'absolute', bottom: 10, right: 10, backgroundColor:PRIMARYCOLOR, color: 'white', textTransform:'none', fontWeight:'500'}}>
                         {propData.type}
                     </Button>
