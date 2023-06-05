@@ -11,6 +11,9 @@ import 'react-lazy-load-image-component/src/effects/blur.css';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 
+//Infinite scroll for cards 
+import InfiniteScroll from 'react-infinite-scroll-component';
+
 
 
 import dayjs, { Dayjs } from "dayjs";
@@ -59,6 +62,9 @@ export default function TennatCard(props) {
 
     //Crib Connect User Modal
     const [cribConnectUserModal, setCribConnectUserModal] = useState(false)
+
+    //Crib Gallery Modal
+    const [galleryModalVis, setGalleryModalVis] = useState(false)
     
     function loadSubtenantInfo(){
         let sn = localStorage.getItem("subtenantName")
@@ -154,6 +160,7 @@ export default function TennatCard(props) {
             setCribConnectUserModal(true)
         }
 
+        
 
     //     //Handle Press
     }
@@ -287,17 +294,17 @@ export default function TennatCard(props) {
             if(mobile){
                 imgListRef.current.scrollLeft +=  windowWidth*0.95
             }
-            // else{
-            //     imgListRef.current.scrollLeft +=  windowHeight*0.4
-            // }
+            else{
+                imgListRef.current.scrollLeft +=  windowWidth*0.5
+            }
         }
         if(op == "-"){
             if(mobile){
                 imgListRef.current.scrollLeft -=  windowWidth*0.95
             }
-            // else{
-            //     imgListRef.current.scrollLeft -=  windowHeight*0.4
-            // }
+            else{
+                imgListRef.current.scrollLeft -=   windowWidth*0.5
+            }
             
         }
     }
@@ -306,15 +313,15 @@ export default function TennatCard(props) {
     return(
         <LocalizationProvider dateAdapter={AdapterDayjs}>
         
-        <div   style={{ borderColor: '#ABABAB',  borderRadius: 10, height: mobile ? 'auto' : '40vh', width: mobile ? '100vw' : '48vw', marginTop: props.index == 0 ? 0 :  '5vh', flexDirection:  mobile ? 'column' : 'row', display:'flex', backgroundColor:'white',}}>
+        <div   style={{ borderColor: '#ABABAB',  borderRadius: 10, height: mobile ? 'auto' : '40vh', width: mobile ? '95vw' : '48vw', marginTop: props.index == 0 ? 0 :  '5vh', flexDirection:  mobile ? 'column' : 'row', display:'flex', backgroundColor:'white', marginLeft: mobile ? '2.5vw' : 0, marginRight: mobile ? 'auto' : 0,}}>
         
             <>
-            <div style={{position:'relative'}}>
-                
-                <ul ref={imgListRef} style={{flexDirection:'row', display: 'flex', overflow:'scroll', height:'45vh', width: mobile ? '95vw' : '40vh', borderRadius:10,  marginLeft:'auto', marginRight:'auto', paddingLeft:0,}}>
-                <li>
-                    <img key={propData.imgList[0]} src={propData.imgList[0]} style={{width: mobile ? '95vw' : '40vh', maxHeight: 'auto', borderRadius:10 }}/>
-                </li>
+            <div style={{position:'relative', flexWrap:'wrap'}}>
+                 
+                 <ul ref={imgListRef} style={{flexDirection:'row', display: 'flex', overflow:'scroll', height:'45vh', width: mobile ? '100%' : '40vh', borderRadius:10,  marginLeft:'auto', marginRight:'auto', paddingLeft:0,}}>
+                    <li>
+                        <img key={propData.imgList[0]} src={propData.imgList[0]} style={{width: mobile ? '95vw' : '40vh', height: mobile ? '100%' : 'auto', borderRadius:10, objectFit:'cover' }}/>
+                    </li>
                 
                 {/* {
                     propData.imgList.map((item, index)=> {
@@ -333,9 +340,9 @@ export default function TennatCard(props) {
                 <IconButton onClick={()=>scrollImgList("+")} style={{position:'absolute', top:'50%' , right: 20, transform: 'translate(0, -50%)', backgroundColor: 'rgba(0,0,0,0.3)'}}>
                     <KeyboardArrowRightIcon style={{color:'white'}}/>
                 </IconButton> */}
-                <Button size="small" variant="contained" style={{position:'absolute', bottom: 10, right: 10, backgroundColor:PRIMARYCOLOR, color: 'white', textTransform:'none', fontWeight:'500'}}>
-                        {propData.type}
-                    </Button>
+                <Button onClick={()=>setGalleryModalVis(true)} size="small" variant="contained" style={{position:'absolute', bottom: 10, right: 10, backgroundColor:PRIMARYCOLOR, color: 'white', textTransform:'none', fontWeight:'500'}}>
+                    Gallery
+                </Button>
                 <Button onClick={()=>props.mapScrollToPin()} size="small" variant="contained" style={{position:'absolute', bottom: 10, left: 10, backgroundColor:'white', color: PRIMARYCOLOR, display: mobile ? 'none' : 'block'}}>
                     Show in map
                 </Button>
@@ -568,6 +575,50 @@ export default function TennatCard(props) {
                         </div>
 
 
+                    </div>
+                </Modal>
+                <Modal 
+                open={galleryModalVis}
+                onClose={() => setGalleryModalVis(false)}
+                aria-labelledby="Gallery-Modal"
+                aria-describedby="Show-proeprty-images"
+                style={{
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flex: 1,
+                    display: 'flex',
+                }}
+                >
+                    <div style={{width: mobile ? '95vw' : '70vw',  backgroundColor:'white', alignSelf:'center', borderRadius:20, padding: 10, position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',}}>
+                        <div style={{display:'flex', flex: 1}}>
+                            <h6 style={{fontWeight:'500', marginLeft:'auto', marginRight:'auto'}}>Image Gallery</h6>
+                        </div>
+                        <div style={{position:'relative'}}>
+                            <ul ref={imgListRef} style={{flexDirection:'row', display: 'flex', overflow:'scroll', height:'auto', width: mobile ? '100%' : '50vw', borderRadius:10,  marginLeft:'auto', marginRight:'auto', paddingLeft:0,}}>
+                            
+                                {
+                                propData.imgList.map((item, index)=> {
+                                    return(
+                                        <li>
+                                            <img key={item + index} src={item} style={{width: mobile ? '95vw' : '50vw', maxHeight: 'auto', borderRadius:10 }}/>
+                                        </li>
+                                    )
+                                })
+                                }   
+                                
+                            </ul>
+                            <IconButton onClick={()=>scrollImgList("-")} style={{position:'absolute', top:'50%' , left: 10, transform: 'translate(0, -50%)', backgroundColor: 'rgba(0,0,0,0.3)'}}>
+                                <KeyboardArrowLeftIcon style={{color:'white'}}/>
+                            </IconButton>
+                            <IconButton onClick={()=>scrollImgList("+")} style={{position:'absolute', top:'50%' , right: 10, transform: 'translate(0, -50%)', backgroundColor: 'rgba(0,0,0,0.3)'}}>
+                                <KeyboardArrowRightIcon style={{color:'white'}}/>
+                            </IconButton>
+                        </div>
+
+                    
                     </div>
                 </Modal>
                 

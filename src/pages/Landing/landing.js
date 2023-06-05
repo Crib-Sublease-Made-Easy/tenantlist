@@ -14,6 +14,9 @@ import Lottie from "lottie-react";
 import PropertySearching from '../../propertySearching.json'
 import NoPropertiesFound from '../../noSearchResult.json'
 
+//Infinite scroll for cards 
+import InfiniteScroll from 'react-infinite-scroll-component';
+
 const PRIMARYCOLOR = '#2D6674';
 
 const defaultProps = {
@@ -79,7 +82,7 @@ export default function LandingPage(props){
         // console.log(datas)
         setfilterModal(false)   
         setLoading(true)
-        await fetch("https://crib-llc.herokuapp.com/properties/getAllNewYorkPosting?&latitude=40.730610&longitude=-73.935242")
+        await fetch("https://crib-llc.herokuapp.com/properties/getAllNewYorkPosting?&page=0&latitude=40.730610&longitude=-73.935242")
         .then((res) => {return res.json()})
         .then( async data => {
            
@@ -284,7 +287,7 @@ export default function LandingPage(props){
                 <div style={{height:'80vh', overflow:'scroll', display:'flex', width: mobile ? '100vw' : '50vw', overflowX:'hidden',  }}>
                     {loading ? 
                     <div style={{display:'flex', flex: 1}}>
-                        <Lottie animationData={PropertySearching} loop/>
+                        <Lottie style={{margin:'auto'}} animationData={PropertySearching} loop/>
                     </div>
                     :
 
@@ -294,27 +297,32 @@ export default function LandingPage(props){
                         <Lottie animationData={NoPropertiesFound} loop style={{width:mobile? '80vw' : '30vw', margin:'auto'}}/>
                     </div>
                     :
-                    <ul style={{paddingLeft: mobile ? 0 : '1vw', }}>
-                        {NYProps.map((item, index) => {
-                            const ref = React.createRef(null);
-                            MapPinsHashmap.set(item.propertyInfo._id, ref)
+
+                   
+                        <ul style={{paddingLeft: mobile ? 0 : '1vw', }}>
+                         {NYProps.map((item, index) => {
+                                const ref = React.createRef(null);
+                                MapPinsHashmap.set(item.propertyInfo._id, ref)
+                                
+                                if(item.userInfo._id == undefined){
+                                    return null
+                                }
+                                else{
+                                    return (
+                                        <li
+                                        key={item.propertyInfo._id}
+                                        ref={ref}
+                                        >  
+                                            <TennatCard data={item} index={index} mapScrollToPin={()=>HandleMapScrollToWithCoor(item.propertyInfo.loc.coordinates)}/>
+                                        </li>
+                                    )
+                                }
                             
-                            if(item.userInfo._id == undefined){
-                                return null
-                            }
-                            else{
-                                return (
-                                    <li
-                                    key={item.propertyInfo._id}
-                                    ref={ref}
-                                    >  
-                                        <TennatCard data={item} index={index} mapScrollToPin={()=>HandleMapScrollToWithCoor(item.propertyInfo.loc.coordinates)}/>
-                                    </li>
-                                )
-                            }
+                            })}
+                        </ul>
                         
-                        })}
-                    </ul>
+                            
+                  
                     }
                 </div>
                 <div >
