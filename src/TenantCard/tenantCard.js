@@ -318,7 +318,7 @@ export default function TennatCard(props) {
                     propData.imgList.map((item, index)=> {
                         return(
                             <li>
-                                <img key={item + index + item._id} src={item} style={{width: mobile ? '95vw' : '40vh', maxHeight: mobile ? 'auto' : 'auto', borderRadius:10 }}/>
+                                <img key={item + index + item._id} src={item} style={{width: mobile ? '95vw' : '40vh', maxHeight: 'auto', borderRadius:10 }}/>
                             </li>
                         )
                     })

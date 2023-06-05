@@ -294,7 +294,7 @@ export default function LandingPage(props){
                     :
                     <ul style={{paddingLeft: mobile ? 0 : '1vw', }}>
                         {NYProps.map((item, index) => {
-                            const ref = React.createRef();
+                            const ref = React.createRef(null);
                             MapPinsHashmap.set(item.propertyInfo._id, ref)
                             
                             if(item.userInfo._id == undefined){
