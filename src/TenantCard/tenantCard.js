@@ -229,7 +229,7 @@ export default function TennatCard(props) {
         }
         
         //Add to contacts
-        addToContactList()
+        addToContactList(subtenantName, subtenantPhoneNumber)
 
         //Send message to the tenant
         sendMessageToTenant()
