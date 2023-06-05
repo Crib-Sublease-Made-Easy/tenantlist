@@ -312,9 +312,10 @@ export default function TennatCard(props) {
             <div style={{position:'relative'}}>
                 
                 <ul ref={imgListRef} style={{flexDirection:'row', display: 'flex', overflow:'scroll', height:'45vh', width: mobile ? '95vw' : '40vh', borderRadius:10,  marginLeft:'auto', marginRight:'auto', paddingLeft:0,}}>
-                    
+                <img key={propData.imgList[0]} src={propData.imgList[0]} style={{width: mobile ? '95vw' : '40vh', maxHeight: 'auto', borderRadius:10 }}/>
+
                 
-                {
+                {/* {
                     propData.imgList.map((item, index)=> {
                         return(
                             <li>
@@ -322,7 +323,7 @@ export default function TennatCard(props) {
                             </li>
                         )
                     })
-                }  
+                }   */}
                     
                 </ul>
                 <IconButton onClick={()=>scrollImgList("-")} style={{position:'absolute', top:'50%' , left: 20, transform: 'translate(0, -50%)', backgroundColor: 'rgba(0,0,0,0.3)'}}>
