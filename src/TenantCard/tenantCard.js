@@ -287,17 +287,17 @@ export default function TennatCard(props) {
             if(mobile){
                 imgListRef.current.scrollLeft +=  windowWidth*0.95
             }
-            else{
-                imgListRef.current.scrollLeft +=  windowHeight*0.4
-            }
+            // else{
+            //     imgListRef.current.scrollLeft +=  windowHeight*0.4
+            // }
         }
         if(op == "-"){
             if(mobile){
                 imgListRef.current.scrollLeft -=  windowWidth*0.95
             }
-            else{
-                imgListRef.current.scrollLeft -=  windowHeight*0.4
-            }
+            // else{
+            //     imgListRef.current.scrollLeft -=  windowHeight*0.4
+            // }
             
         }
     }
