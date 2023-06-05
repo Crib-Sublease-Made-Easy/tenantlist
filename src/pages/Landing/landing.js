@@ -14,12 +14,6 @@ import Lottie from "lottie-react";
 import PropertySearching from '../../propertySearching.json'
 import NoPropertiesFound from '../../noSearchResult.json'
 
-
-
-
-
-
-
 const PRIMARYCOLOR = '#2D6674';
 
 const defaultProps = {
@@ -247,10 +241,8 @@ export default function LandingPage(props){
             
             {/* <h2 style={{fontWeight:'700'}}>Hello there 👋🏻</h2>
             <p style={{maxWidth: 400}}>We are Crib, a student startup for subleasing! We are students too so we understand how difficult subleasing can be. Check out the selected tenants below, be sure to check regularly since we update the list everyday!</p> */}
-            <div style={{maxWidth: mobile ? '98vw' : '95vw', flexDirection:'row', justifyContent:'space-between', alignItems:'center', display:'flex', flex: 1,  height:'10vh', marginLeft:'auto', marginRight:'auto'}}>
+            <div style={{maxWidth: mobile ? '95vw' : '95vw', flexDirection:'row', justifyContent:'space-between', alignItems:'center', display:'flex', flex: 1,  height:'10vh', marginLeft:'auto', marginRight:'auto'}}>
               
-               
-                
                 <p style={{alignSelf:'center', textAlign:'center',  fontWeight:'600'}}>{loading ? "Finding subleases..." : `${NYProps.length} subleases found`}</p>
                 
                 <div style={{flexDirection:'row'}}>

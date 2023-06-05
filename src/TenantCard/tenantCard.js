@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Modal, TextField, Select, MenuItem, InputLabel, FormControl} from "@mui/material";
+import { useEffect, useRef, useState } from "react";
+import { Modal, TextField, Select, MenuItem, InputLabel, FormControl, IconButton} from "@mui/material";
 import Button from '@mui/material/Button';
 
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -8,6 +8,8 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 
 
 
@@ -31,6 +33,8 @@ export default function TennatCard(props) {
     // const tenant = props.data.userInfo
     const tenantData = props.data.userInfo
     const propData = props.data.propertyInfo
+
+    const imgListRef = useRef(null)
 
     const [subleaseArea, setSubleaseArea] = useState('')
    
@@ -276,6 +280,28 @@ export default function TennatCard(props) {
         setRequestAvailabilityModalVis(false)
     }
 
+    function scrollImgList(op){
+        let windowWidth = window.innerWidth;
+        let windowHeight = window.innerHeight;
+        if(op == "+"){
+            if(mobile){
+                imgListRef.current.scrollLeft +=  windowWidth*0.95
+            }
+            else{
+                imgListRef.current.scrollLeft +=  windowHeight*0.4
+            }
+        }
+        if(op == "-"){
+            if(mobile){
+                imgListRef.current.scrollLeft -=  windowWidth*0.95
+            }
+            else{
+                imgListRef.current.scrollLeft -=  windowHeight*0.4
+            }
+            
+        }
+    }
+
     
     return(
         <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -283,21 +309,34 @@ export default function TennatCard(props) {
         <div   style={{ borderColor: '#ABABAB',  borderRadius: 10, height: mobile ? 'auto' : '40vh', width: mobile ? '100vw' : '48vw', marginTop: props.index == 0 ? 0 :  '5vh', flexDirection:  mobile ? 'column' : 'row', display:'flex', backgroundColor:'white',}}>
         
             <>
-            <div style={{flexDirection:'row', display: 'flex', overflow:'scroll', height:'40vh', width: mobile ? '98vw' : '42vh', borderRadius:10, position:'relative', marginLeft:'auto', marginRight:'auto'}}>
-                <Button onClick={()=>props.mapScrollToPin()} size="small" variant="contained" style={{position:'absolute', bottom: 10, left: 10, backgroundColor:'white', color: PRIMARYCOLOR, display: mobile ? 'none' : 'block'}}>
-                    Show in map
-                </Button>
-                <Button size="small" variant="contained" style={{position:'absolute', bottom: 10, right: 10, backgroundColor:PRIMARYCOLOR, color: 'white', textTransform:'none', fontWeight:'500'}}>
-                    {propData.type}
-                </Button>
+            <div style={{position:'relative'}}>
+                
+                <ul ref={imgListRef} style={{flexDirection:'row', display: 'flex', overflow:'scroll', height:'45vh', width: mobile ? '95vw' : '40vh', borderRadius:10,  marginLeft:'auto', marginRight:'auto', paddingLeft:0,}}>
+                    
+                
                 {
                     propData.imgList.map((item, index)=> {
                         return(
-                            <img key={item + index + item._id} src={item} style={{width: mobile ? '95vw' : '40vh',  }}/>
+                            <li>
+                                <img key={item + index + item._id} src={item} style={{width: mobile ? '95vw' : '40vh', maxHeight: mobile ? 'auto' : 'auto', borderRadius:10 }}/>
+                            </li>
                         )
                     })
                 }  
-                
+                    
+                </ul>
+                <IconButton onClick={()=>scrollImgList("-")} style={{position:'absolute', top:'50%' , left: 20, transform: 'translate(0, -50%)', backgroundColor: 'rgba(0,0,0,0.3)'}}>
+                    <KeyboardArrowLeftIcon style={{color:'white'}}/>
+                </IconButton>
+                <IconButton onClick={()=>scrollImgList("+")} style={{position:'absolute', top:'50%' , right: 20, transform: 'translate(0, -50%)', backgroundColor: 'rgba(0,0,0,0.3)'}}>
+                    <KeyboardArrowRightIcon style={{color:'white'}}/>
+                </IconButton>
+                <Button size="small" variant="contained" style={{position:'absolute', bottom: 10, right: 10, backgroundColor:PRIMARYCOLOR, color: 'white', textTransform:'none', fontWeight:'500'}}>
+                        {propData.type}
+                    </Button>
+                <Button onClick={()=>props.mapScrollToPin()} size="small" variant="contained" style={{position:'absolute', bottom: 10, left: 10, backgroundColor:'white', color: PRIMARYCOLOR, display: mobile ? 'none' : 'block'}}>
+                    Show in map
+                </Button>
             </div>
             <div style={{display:'flex',paddingLeft: 15, paddingRight: 15, flexDirection:'column', position:'relative', justifyContent:'space-between', paddingTop: mobile ? '2vh' : 0, flex: 1 }}>
                 <div>
@@ -305,6 +344,7 @@ export default function TennatCard(props) {
 
                     <div style={{flexDirection: 'row', display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap'}}>
                         <p style={{fontSize: '1rem', fontWeight:'500', color:'#333333'}}>{new Date(propData.availableFrom).getTime() < new Date().getTime() ? "Now" : new Date(propData.availableFrom).toLocaleString().split(",")[0]} - {new Date(propData.availableTo).toLocaleString().split(",")[0]}</p>
+                        <p>{propData.amenities.includes("Utilities_Included") ? "Utilities included" : null}</p>
                         {/* <p style={{fontSize: '1rem', fontWeight:'600'}}>{propData.type}</p> */}
                     </div>
                     {/* <p style={{fontSize: '1rem', fontWeight:'600'}}>{propData.loc.streetAddr}</p> */}
