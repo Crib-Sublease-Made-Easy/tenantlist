@@ -283,7 +283,9 @@ export default function LandingPage(props){
             <div style={{flexDirection: mobile ? 'column' : 'row', display:'flex', width:'100vw',  }}>
                 <div style={{height:'80vh', overflow:'scroll', display:'flex', width: mobile ? '100vw' : '50vw', overflowX:'hidden',  }}>
                     {loading ? 
-                    <Lottie animationData={PropertySearching} loop/>
+                    <div style={{display:'flex', flex: 1}}>
+                        <Lottie animationData={PropertySearching} loop/>
+                    </div>
                     :
 
                     NYProps.length == 0 ?
