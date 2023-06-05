@@ -274,6 +274,7 @@ export default function LandingPage(props){
     }
 
     function handleMobileMapPinClick(p){
+        window.scrollTo(0,0)
         setMapSelectedProp(p)
         let lat = p.propertyInfo.loc[1]
         let lng = p.propertyInfo.loc[0]
