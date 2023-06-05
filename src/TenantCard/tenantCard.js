@@ -11,10 +11,6 @@ import 'react-lazy-load-image-component/src/effects/blur.css';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 
-//Infinite scroll for cards 
-import InfiniteScroll from 'react-infinite-scroll-component';
-
-
 
 import dayjs, { Dayjs } from "dayjs";
 import { PRIMARYCOLOR } from "../sharedUtils";
