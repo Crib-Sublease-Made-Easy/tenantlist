@@ -33,11 +33,11 @@ export default function WelcomePage(){
                 {!mobile &&
                 <h5 style={{fontFamily: OPENSANS, fontWeight:'600', marginTop:'3vh'}}>🔍 More than 100+ New York subleases to discover</h5>
                 }
-                <div style={{flexDirection: mobile ? 'column' : 'row', display:'flex', marginTop: mobile ? '5vh' : '5vh' }}>
+                <div style={{flexDirection: mobile ? 'column' : 'row', display:'flex', marginTop: mobile ? '3vh' : '5vh' }}>
                     <Button onClick={()=> handleNav('/discoverSubleases')} style={{backgroundColor: PRIMARYCOLOR, color: 'white', padding: 10, textTransform:'none', outline:'none'}}> 
                         <p style={{marginBottom:0, fontFamily: OPENSANS, fontWeight:'700'}}>Find a sublease</p>
                     </Button>
-                    <Button onClick={()=>handleNav('/propertyPosting    ')} variant="outlined" style={{color: PRIMARYCOLOR, padding: 10, borderColor: PRIMARYCOLOR, marginLeft: mobile ? 0 : '2vh', textTransform:'none', marginTop: mobile ? '2vh' : 0, outline:'none'}}>
+                    <Button onClick={()=>handleNav('/propertyPosting')} variant="outlined" style={{color: PRIMARYCOLOR, padding: 10, borderColor: PRIMARYCOLOR, marginLeft: mobile ? 0 : '2vh', textTransform:'none', marginTop: mobile ? '2vh' : 0, outline:'none'}}>
                         <p style={{marginBottom:0, fontFamily: OPENSANS, fontWeight:'700'}}>Post a sublease</p>
                     </Button>
                 </div>
@@ -45,7 +45,7 @@ export default function WelcomePage(){
             </div>
             <div style={{flexDirection:'column', justifyContent:'flex-start', height:'auto'}}>
                 <div style={{ alignItems:'center', display:'flex'}}>
-                    <img src={WelcomeImage} style={{width: mobile ? '90vw' : '50vw', height:'auto', alignSelf:'center'}} />
+                    <img src={WelcomeImage} style={{width: mobile ? '80vw' : '50vw', height:'auto', alignSelf:'center', marginLeft:'auto', marginRight:'auto'}} />
                 </div>
             </div>
 

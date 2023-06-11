@@ -332,7 +332,7 @@ export default function LandingPage(props){
 
     return(
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <div style={{ height: '90vh', width: '100vw'}}>
+        <div style={{ height: '90vh', width: '100vw', overflowY: 'hidden'}}>
             
             {/* <h2 style={{fontWeight:'700'}}>Hello there 👋🏻</h2>
             <p style={{maxWidth: 400}}>We are Crib, a student startup for subleasing! We are students too so we understand how difficult subleasing can be. Check out the selected tenants below, be sure to check regularly since we update the list everyday!</p> */}
@@ -395,7 +395,7 @@ export default function LandingPage(props){
                 </Menu>
             </div>
             <div style={{flexDirection: mobile ? 'column' : 'row', display:'flex', width:'100vw', paddingLeft: mobile ? 0 : '5vw', paddingRight: mobile ? 0 : '5vw'  }}>
-                <div style={{height:'80vh', overflow:'scroll', display:'flex', width: mobile ? '100vw' : '50vw', overflowX:'hidden',  }}>
+                <div style={{height:'80vh', overflowY:'scroll', display:'flex', width: mobile ? '100vw' : '50vw', overflowX:'hidden',  }}>
                     {loading ? 
                     <div style={{display:'flex', flex: 1}}>
                         <Lottie style={{margin:'auto'}} animationData={PropertySearching} loop/>
@@ -410,7 +410,7 @@ export default function LandingPage(props){
                     :
 
                    
-                        <ul ref={tenantListRef} style={{paddingLeft: 0 }}>
+                        <ul ref={tenantListRef} style={{paddingLeft: 0, marginLeft: mobile ? 'auto' : 0, marginRight: mobile ? 'auto' : 0 }}>
                          {NYProps.map((item, index) => {
                                 const ref = React.createRef(null);
                                 MapPinsHashmap.set(item.propertyInfo._id, ref)
@@ -555,7 +555,7 @@ export default function LandingPage(props){
                     display: 'flex',
                 }}
                 >
-                    <div style={{width: '100vw', height:'100vh', backgroundColor:'white', alignSelf:'center', position: 'absolute', paddingTop:'5vh',
+                    <div style={{width: '100vw', height:'100vh', backgroundColor:'white', alignSelf:'center', position: 'absolute', paddingTop: '7vh',
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)'}}>
@@ -571,7 +571,7 @@ export default function LandingPage(props){
                                 </div>
                             </div>
                        </div>
-                        <div style={{height:'50vh', width:'100%',  overflow:'hidden'}}>
+                        <div style={{height:'40vh', width:'100%',  overflow:'hidden'}}>
                             <GoogleMap
                             onGoogleApiLoaded={onGoogleApiLoaded}
                             apiKey="AIzaSyBbZGuUw4bqWirb1UWSzu9R6_r13rPj-eI"

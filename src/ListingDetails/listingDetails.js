@@ -44,6 +44,7 @@ export default function ListingDetails(){
     const [loading, setLoading] = useState(false)
     const [propData, setPropData] = useState(null)
     const [tenantData, setTenantData] = useState(null)
+    const [subleaseLocation, setSubleaseLocation] = useState("Manhattan")
 
     const [mapReady, setMapReady] = useState(false)
 
@@ -56,6 +57,7 @@ export default function ListingDetails(){
 
     const [requestSuccessModal, setRequestSuccessModal] = useState(false)
 
+    let GoogleMapRef = useRef(null)
 
     //Image ul ref 
     const imgListRef = useRef(null)
@@ -63,6 +65,11 @@ export default function ListingDetails(){
     useEffect(()=>{
         fetchProp()
     },[])
+
+    const onGoogleApiLoaded = ({ map, maps }) => {
+        GoogleMapRef.current = map
+        setMapReady(true)
+    }
 
     async function requestToBook(){
         
@@ -279,6 +286,23 @@ export default function ListingDetails(){
         }
     }
 
+    function getArea(){
+        let sa = propData.loc.secondaryTxt;
+
+        let spaceless = sa.toLowerCase().replaceAll(" ","")
+        if(spaceless.indexOf("nj") != -1){
+            return "New Jersey"
+        }
+        else if(spaceless.indexOf("queens") != -1){
+            return "Queens"
+        }
+        else if(spaceless.indexOf("brooklyn") != -1){
+            return "Brooklyn"
+        }
+        return "Manhattan"
+        
+    }
+
     return(
         <LocalizationProvider dateAdapter={AdapterDayjs}>
             {propData == null || tenantData == null ?
@@ -286,12 +310,12 @@ export default function ListingDetails(){
             :
             <div>
                 {mobilePage == 0 ?
-                <div style={{position:'relative',  display:'block', width: mobile ? '100vw' : 'auto', height: mobile ? '80vh' : '90vh', paddingTop: mobile ? 0 : '3vh', overflow:'scroll' }}>
+                <div style={{position:'relative',  display:'block', width: mobile ? '100vw' : 'auto', height: mobile ? '80vh' : '90vh', paddingTop: mobile ? 0 : '3vh', overflow:'scroll', }}>
                     
                     <div style={{paddingTop:15, paddingBottom:15, width:'90vw', marginLeft:'auto', marginRight:'auto'}}>
                         <p onClick={()=> navigate("/discoverSubleases")} style={{textDecorationLine:'underline', fontFamily: OPENSANS, fontWeight:'600', color: MEDIUMGREY, fontSize:'0.9rem'}}>Browse other listings</p>
 
-                        <p style={{fontWeight:'700', fontFamily: OPENSANS, fontSize:'1.5rem', marginBottom: 5}}>{propData.type} in Manhattan</p>
+                        <p style={{fontWeight:'700', fontFamily: OPENSANS, fontSize:'1.5rem', marginBottom: 5}}>{propData.type} in {getArea()}</p>
                         <div style={{flexDirection:'row', display:'flex', justifyContent:'space-between', alignItems:'center'}}>
                             <div style={{flexDirection: mobile ? 'column-reverse' : 'row', display:'flex'}}>
                                 <p style={{fontWeight:'500', fontFamily: OPENSANS,}}>Available from: {new Date(propData.availableFrom).getTime() < new Date().getTime() ? "Now" : new Date(propData.availableFrom).toLocaleString().split(",")[0]} - {new Date(propData.availableTo).toLocaleString().split(",")[0]}</p>
@@ -411,11 +435,11 @@ export default function ListingDetails(){
                             <div style={{ paddingTop: '4vh', paddingBottom:'6vh',  borderBottomStyle:'solid', borderBottomWidth:0.5, borderColor:'#E0E0E0', flexDirection:'row'}}>
                                 <p style={{fontWeight:'700', fontFamily: OPENSANS, fontSize:'1.2rem', marginBottom: 10}}>Location</p>
                                 <div style={{paddingTop:'2vh'}}>
-                                    <div style={{height: '25vh', width: mobile ? '100%' : '45vw', borderRadius: MEDIUMROUNDED, backgroundColor:'#E0E0E0', overflow:'hidden'}}>
-                                        
+                                    <div style={{height: '25vh', width: mobile ? '90vw' : '45vw', borderRadius: MEDIUMROUNDED, backgroundColor:'#E0E0E0', overflow:'hidden'}}>
+                                    {/* {propData != null &&
                                         <GoogleMap
-                                            
-                                           
+                                            ref={GoogleMapRef}
+                                            onGoogleApiLoaded={onGoogleApiLoaded}
                                             apiKey="AIzaSyBbZGuUw4bqWirb1UWSzu9R6_r13rPj-eI"
                                             defaultCenter={{
                                                 lat: propData.loc.coordinates[1],
@@ -430,7 +454,10 @@ export default function ListingDetails(){
                                         
                                         
                                         </GoogleMap>
+                                    } */}
                                         
+                                        
+
                                     </div>
                                 </div>
                             </div>
@@ -551,9 +578,10 @@ export default function ListingDetails(){
                     <IconButton onClick={()=>scrollImgList("+")} style={{position:'absolute', top:'50%' , right: 20, transform: 'translate(0, -50%)', backgroundColor: 'rgba(0,0,0,0.3)'}}>
                         <KeyboardArrowRightIcon style={{color:'white'}}/>
                     </IconButton> */}
+                
                 </div>
                 :
-                <div style={{width:'100%', height:'80vh', paddingLeft:'2.5vw', paddingRight:'2.5vw', paddingTop:'3vh'}}>
+                <div style={{width:'100%', height:'80vh', paddingLeft:'2.5vw', paddingRight:'2.5vw', paddingTop:'3vh', overflow:'scroll', paddingBottom:'20vh'}}>
                     <p onClick={()=> setMobilePage(0)} style={{textDecorationLine:'underline', fontFamily: OPENSANS, fontWeight:'600', color: MEDIUMGREY, fontSize:'0.9rem'}}>Back to listing</p>
                     <>
                         <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize:'1.2rem',}}>Send {tenantData.firstName} a request to sublease</p>
@@ -613,11 +641,12 @@ export default function ListingDetails(){
                    
 
                     </>
+                   
                 </div>
                 }
                 {
                     mobile &&
-                    <div style={{height:'10vh', borderTopWidth:'0.5px', borderTopStyle:'solid', borderTopColor: EXTRALIGHT, paddingLeft:'5vw', paddingRight:'5vw', alignItems:'center', display:'flex', justifyContent:'space-between'}}>
+                    <div style={{height:'10vh', borderTopWidth:'1px', borderTopStyle:'solid', borderTopColor: EXTRALIGHT, paddingLeft:'5vw', paddingRight:'5vw', alignItems:'center', display:'flex', justifyContent:'space-between', position:'absolute', bottom:'-1vh',  width:'100%', zIndex:999, backgroundColor:'white'}}>
                         <p style={{marginBottom:0, fontWeight:'600', fontSize:'1.1rem', fontFamily: OPENSANS}}>${propData.price} /month</p>
                         <Button disabled={loading} onClick={handleMobileRequestToBook} variant="contained" style={{backgroundColor: PRIMARYCOLOR, outline: 'none', color: 'white', textTransform:'none', height: '5vh', width:'40vw'}}>
                             {loading ?

@@ -469,17 +469,16 @@ export default function TennatCard(props) {
     return(
         <LocalizationProvider dateAdapter={AdapterDayjs}>
         
-        <Link target={'_blank'} to={`/listingDetails/${propData._id}`} style={{ color:'black', borderColor: LIGHTGREY, borderWidth: mobile ? 0 :  '1px', borderStyle:'solid',  borderRadius: 10, height: mobile ? 'auto' : '30vh', width: mobile ? '95vw' : '48vw', marginTop: props.index == 0 ? 0 : mobile ? '7vh' : '3vh', flexDirection:  mobile ? 'column' : 'row', display:'flex', backgroundColor:'white', marginLeft: mobile ? 'auto' : 0, marginRight: mobile ? 'auto' : 0, paddingLeft: mobile ?'2.5vw': 0, textDecorationLine:'none',}}>
+        <Link target={'_blank'} to={`/listingDetails/${propData._id}`} style={{ color:'black', borderColor: LIGHTGREY, borderWidth: mobile ? 0 :  '1px', borderStyle:'solid',  borderRadius: 10, height: mobile ? 'auto' : '30vh', width: mobile ? '90vw' : '48vw', marginTop: props.index == 0 ? 0 : mobile ? '7vh' : '3vh', flexDirection:  mobile ? 'column' : 'row', display:'flex', textDecorationLine:'none', alignSelf:'center', paddingLeft: mobile ? 'auto' : 0 , paddingRight: mobile ? 'auto' : 0 }}>
         
             <>
-            <div  style={{position:'relative',  display:'block', width: mobile ? '95vw' : 'auto', }}>
+            <div  style={{position:'relative',  display:'block', width: mobile ? '90vw' : 'auto', overflow:'hidden'}}>
                  
-                 <ul ref={imgListRef} style={{flexDirection:'row', display: 'flex', overflow:'scroll', height: mobile ? '45vh' : "100%",  width: mobile ? '95vw' : '100%', marginLeft:'auto', marginRight:'auto', paddingLeft:0,}}>
-                    <li>
-                        <img key={propData.imgList[0]} src={propData.imgList[0]} style={{width: mobile ? '95vw' : '40vh', height: mobile ? '95vw' : '100%', borderTopLeftRadius:10, borderBottomLeftRadius: 10, borderTopRightRadius: mobile ? MEDIUMROUNDED : 0, borderBottomRightRadius: mobile ? MEDIUMROUNDED : 0, objectFit:'cover' }}/>
-                    </li>
+                 
+                <img key={propData.imgList[0]} src={propData.imgList[0]} style={{width: mobile ? '90vw' : '40vh', height: mobile ? '90vw' : '30vh', borderTopLeftRadius:10, borderBottomLeftRadius: 10, borderTopRightRadius: mobile ? MEDIUMROUNDED : 0, borderBottomRightRadius: mobile ? MEDIUMROUNDED : 0, objectFit:'cover' }}/>
+                
             
-                </ul>
+               
                 {/* <IconButton onClick={()=>scrollImgList("-")} style={{position:'absolute', top:'50%' , left: 20, transform: 'translate(0, -50%)', backgroundColor: 'rgba(0,0,0,0.3)'}}>
                     <KeyboardArrowLeftIcon style={{color:'white'}}/>
                 </IconButton>
@@ -493,7 +492,7 @@ export default function TennatCard(props) {
                     Show in map
                 </Button> */}
             </div>
-            <div onTouchin style={{ display:'flex', flexDirection:'column', position:'relative', justifyContent:'space-between',  flex: 1, marginLeft:'auto', marginRight:'auto', width: mobile ? '95vw' : '48vw', padding: mobile ? 0 : '1vw' }}>
+            <div onTouchin style={{ display:'flex', flexDirection:'column', position:'relative', justifyContent:'space-between',  flex: 1, width: mobile ? '90vw' : '48vw', padding: mobile ? 0 : '1vw', paddingTop: mobile ? '3vh' : 0 }}>
                 <div style={{display:'flex', flexDirection:'column', justifyContent:'space-between', flex:1}}>
                     <div >
                         {/* <p style={{fontSize: '0.9rem', fontWeight:'600', marginBottom:0}}>{propData.type} for rent</p> */}
