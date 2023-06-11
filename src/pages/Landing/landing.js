@@ -336,7 +336,7 @@ export default function LandingPage(props){
             
             {/* <h2 style={{fontWeight:'700'}}>Hello there 👋🏻</h2>
             <p style={{maxWidth: 400}}>We are Crib, a student startup for subleasing! We are students too so we understand how difficult subleasing can be. Check out the selected tenants below, be sure to check regularly since we update the list everyday!</p> */}
-            <div style={{width: '100vw', paddingLeft: mobile ? '2.5vw' : '5vw', paddingRight: mobile ? '2.5vw' : '5vw', flexDirection:'row', justifyContent:'space-between', alignItems:'center', display:'flex', flex: 1,  height:'10vh'}}>
+            <div style={{width: '100vw', paddingLeft: '5vw', paddingRight: '5vw', flexDirection:'row', justifyContent:'space-between', alignItems:'center', display:'flex', flex: 1,  height:'10vh'}}>
                 <div style={{marginTop:'auto', marginBottom:'auto', width: '40vw'}}>
                     {/* <small style={{alignSelf:'center', textAlign:'center',  fontWeight:'600', marginTop:'auto', marginBottom:'auto', fontFamily: OPENSANS}}>{loading ? "Finding subleases..." : `${NYProps.length}+ subleases found`}</small> */}
                     <p style={{fontSize: mobile ? '0.9rem' : '1rem', marginBottom:0, fontWeight:'700',fontFamily: OPENSANS, color: PRIMARYCOLOR}}>{loading ? "Finding subleases..." : `${NYProps.length}+ subleases found`}</p>
