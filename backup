@@ -237,7 +237,7 @@ export default function LandingPage(props){
                             }
                             else{
                                 return (
-                                    <Col key={index} xs={12} sm={6} md={3} lg={3} style={{marginTop: 20}}>
+                                    <Col key={"props" + index} xs={12} sm={6} md={3} lg={3} style={{marginTop: 20}}>
                                         <TennatCard data={item}/>
                                     </Col> 
                                 )

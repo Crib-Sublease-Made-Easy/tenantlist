@@ -1,19 +1,25 @@
 import { useEffect, useRef, useState } from "react";
-import { Modal, TextField, Select, MenuItem, InputLabel, FormControl, IconButton} from "@mui/material";
+import { Modal, TextField, Select, MenuItem, InputLabel, FormControl, IconButton, TypeSelect, Checkbox} from "@mui/material";
 import Button from '@mui/material/Button';
 
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-
+import dayjs, { Dayjs } from "dayjs";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import DoneIcon from '@mui/icons-material/Done';
+import BedIcon from '@mui/icons-material/Bed';
+import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
+import WifiIcon from '@mui/icons-material/Wifi';
 
 
-import dayjs, { Dayjs } from "dayjs";
-import { PRIMARYCOLOR } from "../sharedUtils";
+import { EXTRALIGHT, LIGHTGREY, MEDIUMGREY, MEDIUMROUNDED, OPENSANS, PRIMARYCOLOR } from "../sharedUtils";
+import { Link } from "react-router-dom";
+import { Wifi } from "@mui/icons-material";
 
 
 export default function TennatCard(props) {
@@ -50,11 +56,20 @@ export default function TennatCard(props) {
     const [subtenantGender, setSubtenantGender] = useState(null)
     const [subtenantName, setSubtenantName] = useState("")
     const [subtenantDescription, setSubtenantDescription] = useState("")
-    const [subtenantAge, setSubtenantAge] = useState("")
+    const [subtenantAge, setSubtenantAge] = useState(null)
+    const [subtenantLocation, setSubtenantLocation] = useState("")
     const [subtenantPhoneNumber, setSubtenantPhoneNumber] = useState("")
     const [subtenantStartDate, setSubtenantStartDate] = useState(null)
     const [subtenantEndDate, setSubtenantEndDate] = useState(null)
     const [subtenantBudget, setSubtenantBudget] = useState(0)
+    const [subtenantLocationM, setSubtenantLocatioM] = useState(true)
+    const [subtenantLocationB, setSubtenantLocatioB] = useState(true)
+    const [subtenantLocationQ, setSubtenantLocatioQ] = useState(true)
+    const [subtenantLocationJ, setSubtenantLocatioJ] = useState(true)
+    
+    
+    const [requestPage, setRequestPage] = useState(0);
+
 
     //Crib Connect User Modal
     const [cribConnectUserModal, setCribConnectUserModal] = useState(false)
@@ -305,30 +320,165 @@ export default function TennatCard(props) {
         }
     }
 
+    function generateAges(){
+        let ageArr = []
+        
+        for(let i = 18 ; i < 50 ; i++){
+            ageArr.push(i)
+        }
+        
+        return(
+            ageArr.map((item)=>{
+                return(
+                    <MenuItem key={"subtenantAge" + item} onClick={()=> setSubtenantAge(item)} value={item}>{item}</MenuItem>
+                )
+            })
+        )
+    }
+
+    function handleRequestForm(){
+        if(requestPage == 0){
+            if(subtenantName.trim() == ""){
+                alert("Please enter your name.")
+                return;
+            }
+            if(subtenantPhoneNumber.trim() == ""){
+                alert("Please enter your phone number.")
+                return;
+            }
+            if(subtenantAge == null || subtenantAge == undefined){
+                alert("Please enter your Age.")
+                return;
+            }
+            if(subtenantDescription.trim() == ""){
+                alert("Please enter a short bio.")
+                return
+            }
+            setRequestPage(1)
+        }
+        else{
+            //actual submit
+            var input = document.getElementById('searchTextField').value
+            console.log(input)
+            if(input.trim() == ""){
+                alert("Please select a location")
+                return
+            }
+            if(subtenantBudget == 0){
+                alert("Please enter a valid budget")
+                return 
+            }
+            if(subtenantStartDate == null || subtenantEndDate == null){
+                alert("Please enter a sublease dates")
+                return
+            }
+            if( new Date(subtenantEndDate).getTime() < new Date(subtenantStartDate).getTime()){
+                alert("End date cannot be earlier than start date")
+                return
+            }
+            if( new Date(subtenantStartDate).getTime() < new Date().getTime()){
+                alert("Please enter a valid start date")
+                return
+            }
+            if(!(subtenantLocationM || subtenantLocationB || subtenantLocationJ || subtenantLocationQ)){
+                alert("Please select as least one area that works for you.")
+                return
+            }
+            console.log(subtenantLocationM)
+            console.log(subtenantLocationB)
+            console.log(subtenantLocationJ)
+            console.log(subtenantLocationQ)
+            addToContactList(subtenantName, subtenantPhoneNumber)
+            handleRequestFormSubmit()
+        }
+    }
+
+    async function handleRequestFormSubmit(){
+        await fetch('https://maps.googleapis.com/maps/api/geocode/json?address='+subtenantLocation+'&key=AIzaSyBbZGuUw4bqWirb1UWSzu9R6_r13rPj-eI', {
+        method: 'GET'
+        }).then(res => res.json()).then(async jsonresp => {
+            let coor = [jsonresp.results[0].geometry.location.lng, jsonresp.results[0].geometry.location.lat]
+            return coor
+        })
+        .then(async (coor) => {
+            let dl = []
+            if(subtenantLocationB){
+                dl.push("Brooklyn")
+            }
+            if(subtenantLocationM){
+                dl.push("Manhattan")
+            }
+            if(subtenantLocationJ){
+                dl.push("Jersey")
+            }
+            if(subtenantLocationQ){
+                dl.push("Queens")
+            }
+            console.log(coor)
+            await fetch('https://crib-llc.herokuapp.com/subtenants/create', {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                "name": subtenantName,
+                "subleaseStart": new Date(subtenantStartDate),
+                "subleaseEnd": new Date(subtenantEndDate),
+                "budget":  subtenantBudget,
+                "bio": subtenantDescription,
+                "phoneNumber": subtenantPhoneNumber,
+                "age": subtenantAge,
+                "gender": subtenantGender,
+                "sharedRoomFlexibility": true,
+                "roommatesFlexibility": true,
+                "location": subtenantLocation,
+                "coords": coor,
+                "deleted": "false",
+                "type": "room",
+                "desiredArea": dl   
+            })
+
+            }).then(res => {
+            
+            // Modal for form submitted
+            setRequestAvailabilityModalVis(false)
+            setCribConnectUserModal(true)
+            })
+        })
+    }
+
+
+
+    function loadPlaces(){
+        const google = window.google;
+        var input = document.getElementById('searchTextField');
+        setSubtenantLocation(input.value)
+        new google.maps.places.Autocomplete(input);
+
+        setSubtenantLocation(input.value)
+        console.log(input.value)
+    }
+
+    function handleRequestFormGoBack(){
+        var input = document.getElementById('searchTextField').value;
+        setSubtenantLocation(input) 
+        setRequestPage(0)
+    }
+
     
     return(
         <LocalizationProvider dateAdapter={AdapterDayjs}>
         
-        <div   style={{ borderColor: '#ABABAB',  borderRadius: 10, height: mobile ? 'auto' : '40vh', width: mobile ? '95vw' : '48vw', marginTop: props.index == 0 ? 0 :  '5vh', flexDirection:  mobile ? 'column' : 'row', display:'flex', backgroundColor:'white', marginLeft: mobile ? '2.5vw' : 0, marginRight: mobile ? 'auto' : 0,}}>
+        <Link target={'_blank'} to={`/listingDetails/${propData._id}`} style={{ color:'black', borderColor: LIGHTGREY, borderWidth: mobile ? 0 :  '1px', borderStyle:'solid',  borderRadius: 10, height: mobile ? 'auto' : '30vh', width: mobile ? '95vw' : '48vw', marginTop: props.index == 0 ? 0 : mobile ? '7vh' : '3vh', flexDirection:  mobile ? 'column' : 'row', display:'flex', backgroundColor:'white', marginLeft: mobile ? 'auto' : 0, marginRight: mobile ? 'auto' : 0, paddingLeft: mobile ?'2.5vw': 0, textDecorationLine:'none',}}>
         
             <>
-            <div style={{position:'relative', flexWrap:'wrap'}}>
+            <div  style={{position:'relative',  display:'block', width: mobile ? '95vw' : 'auto', }}>
                  
-                 <ul ref={imgListRef} style={{flexDirection:'row', display: 'flex', overflow:'scroll', height:'45vh', width: mobile ? '100%' : '40vh', borderRadius:10,  marginLeft:'auto', marginRight:'auto', paddingLeft:0,}}>
+                 <ul ref={imgListRef} style={{flexDirection:'row', display: 'flex', overflow:'scroll', height: mobile ? '45vh' : "100%",  width: mobile ? '95vw' : '100%', marginLeft:'auto', marginRight:'auto', paddingLeft:0,}}>
                     <li>
-                        <img key={propData.imgList[0]} src={propData.imgList[0]} style={{width: mobile ? '95vw' : '40vh', height: mobile ? '100%' : 'auto', borderRadius:10, objectFit:'cover' }}/>
+                        <img key={propData.imgList[0]} src={propData.imgList[0]} style={{width: mobile ? '95vw' : '40vh', height: mobile ? '95vw' : '100%', borderTopLeftRadius:10, borderBottomLeftRadius: 10, borderTopRightRadius: mobile ? MEDIUMROUNDED : 0, borderBottomRightRadius: mobile ? MEDIUMROUNDED : 0, objectFit:'cover' }}/>
                     </li>
-                
-                {/* {
-                    propData.imgList.map((item, index)=> {
-                        return(
-                            <li>
-                                <img key={item + index} src={item} style={{width: mobile ? '95vw' : '40vh', maxHeight: 'auto', borderRadius:10 }}/>
-                            </li>
-                        )
-                    })
-                }   */}
-                    
+            
                 </ul>
                 {/* <IconButton onClick={()=>scrollImgList("-")} style={{position:'absolute', top:'50%' , left: 20, transform: 'translate(0, -50%)', backgroundColor: 'rgba(0,0,0,0.3)'}}>
                     <KeyboardArrowLeftIcon style={{color:'white'}}/>
@@ -336,28 +486,54 @@ export default function TennatCard(props) {
                 <IconButton onClick={()=>scrollImgList("+")} style={{position:'absolute', top:'50%' , right: 20, transform: 'translate(0, -50%)', backgroundColor: 'rgba(0,0,0,0.3)'}}>
                     <KeyboardArrowRightIcon style={{color:'white'}}/>
                 </IconButton> */}
-                <Button onClick={()=>setGalleryModalVis(true)} size="small" variant="contained" style={{position:'absolute', bottom: 10, right: 10, backgroundColor:PRIMARYCOLOR, color: 'white', textTransform:'none', fontWeight:'500'}}>
-                    Gallery
-                </Button>
-                <Button onClick={()=>props.mapScrollToPin()} size="small" variant="contained" style={{position:'absolute', bottom: 10, left: 10, backgroundColor:'white', color: PRIMARYCOLOR, display: mobile ? 'none' : 'block'}}>
+                {/* <Button disabled size="small" variant="contained" style={{position:'absolute', bottom: 10, right: 10, backgroundColor:PRIMARYCOLOR, color: 'white', textTransform:'none', fontWeight:'500'}}>
+                {propData.type}
+                </Button> */}
+                {/* <Button onClick={()=>props.mapScrollToPin()} size="small" variant="contained" style={{position:'absolute', bottom: 10, left: 10, backgroundColor:'white', color: PRIMARYCOLOR, display: mobile ? 'none' : 'block'}}>
                     Show in map
-                </Button>
+                </Button> */}
             </div>
-            <div style={{display:'flex',paddingLeft: 15, paddingRight: 15, flexDirection:'column', position:'relative', justifyContent:'space-between', paddingTop: mobile ? '2vh' : 0, flex: 1 }}>
-                <div>
-                    <p style={{fontSize: '1rem', fontWeight:'600',}}>{propData.loc.streetAddr}, {subleaseArea}</p>
+            <div onTouchin style={{ display:'flex', flexDirection:'column', position:'relative', justifyContent:'space-between',  flex: 1, marginLeft:'auto', marginRight:'auto', width: mobile ? '95vw' : '48vw', padding: mobile ? 0 : '1vw' }}>
+                <div style={{display:'flex', flexDirection:'column', justifyContent:'space-between', flex:1}}>
+                    <div >
+                        {/* <p style={{fontSize: '0.9rem', fontWeight:'600', marginBottom:0}}>{propData.type} for rent</p> */}
 
-                    <div style={{flexDirection: 'row', display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap'}}>
-                        <p style={{fontSize: '1rem', fontWeight:'500', color:'#333333'}}>{new Date(propData.availableFrom).getTime() < new Date().getTime() ? "Now" : new Date(propData.availableFrom).toLocaleString().split(",")[0]} - {new Date(propData.availableTo).toLocaleString().split(",")[0]}</p>
-                        <p>{propData.amenities.includes("Utilities_Included") ? "Utilities included" : null}</p>
-                        {/* <p style={{fontSize: '1rem', fontWeight:'600'}}>{propData.type}</p> */}
+                        <p style={{fontSize: '0.9rem', fontWeight:'700', marginBottom:0,fontFamily: OPENSANS,marginBottom: 5}}>{propData.loc.streetAddr}, {subleaseArea}</p>
+                       
+                        <p style={{fontSize: '0.9rem', fontWeight:'600', color:'#333333', marginBottom:5, fontFamily: OPENSANS}}>{new Date(propData.availableFrom).getTime() < new Date().getTime() ? "Now" : new Date(propData.availableFrom).toLocaleString().split(",")[0]} - {new Date(propData.availableTo).toLocaleString().split(",")[0]}</p>
+                            <div style={{marginTop: mobile ? '2vh' : 0}}>
+                            {propData.amenities.includes("Mattress") &&
+                            <div style={{flexDirection:'row', display:'flex', alignItems:'center', paddingTop:'0.5vh', paddingBottom:'0.5vh'}}>
+                                <BedIcon style={{color:MEDIUMGREY, fontSize: mobile ? '5vw' : '1vw'}}/>
+                                <p style={{fontSize: '0.8rem', fontWeight:'600', color:'#333333', marginBottom:0, marginLeft:mobile ? '2vw' :'0.5vw', fontFamily: OPENSANS}}>Furnished</p>
+                            </div>
+                            }
+                            {propData.amenities.includes("Utilities_Included") &&
+                            <div style={{flexDirection:'row', display:'flex', alignItems:'center', paddingTop:'0.5vh', paddingBottom:'0.5vh'}}>
+                                <ElectricBoltIcon style={{color:MEDIUMGREY, fontSize: mobile ? '5vw' : '1vw'}}/>
+                                <p style={{fontSize: '0.8rem', fontWeight:'600', color:'#333333', marginBottom:0, marginLeft:mobile ? '2vw' :'0.5vw', fontFamily: OPENSANS}}>Utilities included</p>
+                            </div>
+                            }
+                            {propData.amenities.includes("Wifi") &&
+                            <div style={{flexDirection:'row', display:'flex', alignItems:'center', paddingTop:'0.5vh', paddingBottom:'0.5vh'}}>
+                                <WifiIcon style={{color:MEDIUMGREY, fontSize: mobile ? '5vw' : '1vw'}}/>
+                                <p style={{fontSize: '0.8rem', fontWeight:'600', color:'#333333', marginBottom:0, marginLeft: mobile ? '2vw' :'0.5vw', fontFamily: OPENSANS}}>Wifi included</p>
+                            </div>
+                            }
+                            </div>
+                    </div>
+                   
+                    
+                    <div style={{flexDirection: 'row', display:'flex', justifyContent:'space-between', alignItems:'center', marginTop: mobile ? '2vh' : 0 }}>
+                        <p style={{fontWeight:'500', color:'#333333', fontFamily: OPENSANS, fontSize:"0.9rem", marginBottom:0}}><span style={{fontWeight:'700'}}>{propData.type}</span> posted by {tenantData.firstName}</p>
+                        <p style={{fontFamily:OPENSANS, fontWeight:'600', fontSize:'0.9rem', marginBottom:0}}>${propData.price}/month</p>
                     </div>
                     {/* <p style={{fontSize: '1rem', fontWeight:'600'}}>{propData.loc.streetAddr}</p> */}
                 </div>
                 {/* <div style={{opacity: showPhoneNum ? 1 : 0 }}>
                     <p>Send {tenantData.firstName.split(" ")[0]} a message: <a href={`tel:+1${tenantData.phoneNumber}`}>+1{tenantData.phoneNumber}</a></p>
                 </div> */}
-                <div style={{ flexDirection:'row', display:'flex', justifyContent:'space-between', width:'100%' }}>
+                {/* <div style={{ flexDirection:'row', display:'flex', justifyContent:'space-between', width:'100%' }}>
                         <h5 style={{fontWeight: '600'}}>${propData.price} <span style={{fontWeight:'500', fontSize:15, color: '#333333'}}> /month</span></h5>
                     
                         <Button onClick={handlePhoneNumberPress} style={{backgroundColor:'#2D6674', }} variant="contained">
@@ -368,64 +544,11 @@ export default function TennatCard(props) {
                             }
                         </Button>
                     
-                </div>
+                </div> */}
             </div>
                 
-                {/* <div style={{flexDirection:'row', display:'flex', justifyContent:'space-between', alignItems:'center', paddingBottom: 20}}>
-                    <img  key={tenantData._id + "profilepic"} src={tenantData.profilePic} style={{height: 60, width: 60, borderRadius: 30}}/>
-                    <div style={{flexDirection:'row', display:'flex',}}>
-                        <h6 style={{fontWeight: '600'}}>{tenantData.firstName}</h6>
-                        <h6 style={{fontWeight: '500', marginLeft: 20}}>{tenantData.gender}</h6>
-                        <h6 style={{fontWeight: '500', marginLeft: 20}}>{getAge(tenantData.dob)}</h6>
-                    </div>
-                </div>
-                
-                    
-                
-                <div>
-                    <h6 style={{fontWeight:'600'}}>Sublease location:</h6>
-                    <p>{propData.loc.streetAddr}<br/>{propData.loc.secondaryTxt}</p>
-                
-                </div> 
-                
-                
-                <div>
-                    <h6 style={{fontWeight:'600'}}>Availability:</h6>
-                    <p>{new Date(propData.availableFrom).toLocaleString().split(",")[0] + " - " + new Date(propData.availableTo).toLocaleString().split(",")[0]}</p>
-                </div>
-                
-                <div>
-                    <h6 style={{fontWeight:'600'}}>Description:</h6>
-                    <p style={{height: 150, overflow:'scroll'}}>{propData.description}</p>
-                </div>  
-            
-                <div style={{flexDirection:'row', display: 'flex', borderRadius:10, overflow:'scroll' }}>
-                    {
-                        propData.imgList.map((item, index)=> {
-                            return(
-                                <img key={item + index + item._id} src={item} style={{marginLeft: index == 0 ? 0 : 20,  width:300, borderRadius: 10, objectFit:'cover'}}/>
-                            )
-                        })
-                    }  
-                    
-                    <img key={propData.imgList[0] + "propimage"} src={propData.imgList[0]} style={{marginLeft: 0,  width:'100%', borderRadius: 10, objectFit:'cover'}}/>
-                        
-                </div>  
-                
-                
 
-            
-                <div style={{flexDirection:'row', justifyContent:'space-between', alignItems:'center', display:'flex', marginTop: 20, marginBottom: 10}}>
-                    <Button onClick={handlePhoneNumberPress} style={{backgroundColor:'#2D6674'}} variant="contained">
-                    {tenantData.cribConnectUser ?
-                    "Show contact info"
-                    :
-                    "Request availability"
-                        }
-                    </Button>
-                    <h5 style={{fontWeight: '600'}}>${propData.price} <span style={{fontWeight:'500', fontSize:15, color: '#333333'}}> /month</span></h5>
-                </div> */}
-
+                {/* When subtenant click on Crib Connect users */}
                 <Modal 
                 open={open}
                 onClose={handleClose}
@@ -436,28 +559,114 @@ export default function TennatCard(props) {
                     justifyContent: 'center',
                     flex: 1,
                     display: 'flex',
+                    zIndex: 1000
                 }}
                 >
-                    <div style={{width: '90vw', height: 'auto', backgroundColor:'white', alignSelf:'center', maxWidth: 400, borderRadius:20, padding: 20, position: 'absolute',
+                    <div style={{width: '95vw', height: 'auto', backgroundColor:'white', alignSelf:'center', maxWidth: 400, borderRadius:20, padding: 20, position: 'absolute', zIndex: 2001,
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',}}>
-                        <h4 style={{fontWeight:'700'}}>Enter your phone number</h4>
-                        <p>We will keep you updated when new subleases around the area is posted.</p>
+                        {requestPage == 0 ?
+                        <>
+                        <h4 style={{fontWeight:'700'}}>We will let the tenant know!</h4>
+                        <p>Enter the following info to send a sublease request</p>
                         <div style={{marginTop: 20}}>
-                            <TextField onChange={(val)=>setSubtenantName(val.target.value)} fullWidth label="Name" variant="outlined"/>
-                            <TextField onChange={(val)=>setSubtenantPhoneNumber(val.target.value)} type="number" fullWidth label="Phone number" variant="outlined" style={{marginTop: 15}}/>
+                            <TextField value={subtenantName} onChange={(val)=>setSubtenantName(val.target.value)} fullWidth label="Name" variant="outlined"/>
+                            <TextField value={subtenantPhoneNumber} onChange={(val)=>setSubtenantPhoneNumber(val.target.value)} type="number" fullWidth label="Phone number" variant="outlined" style={{marginTop: 15}}/>
                             <small>* Enter a US phone number if possible<br/>* Only enter digits, no dashes(-) or spaces( )</small>
-                            {/* <div style={{marginTop:40}}>
-                                <p style={{fontWeight:'500'}}>{tenantData.firstName.split(" ")[0]} might be out of the country.</p>
-                                <small>Let {tenantData.firstName.split(" ")[0]} know how to reach you! Such as email, instagram and whatsapp...</small>
-                                <TextField multiline onChange={(val)=>setSubtenantDescription(val.target.value)} inputProps={{maxLength:50}} label={`Enter description`} fullWidth variant="outlined" style={{marginTop:10}}/>
-                            </div> */}
-
+                            <div style={{marginTop: 15}}>
+                                <FormControl fullWidth>
+                                <InputLabel id="demo-simple-select-label">Gender</InputLabel>
+                                <Select
+                                    labelId="demo-simple-select-label"
+                                    id="demo-simple-select"
+                                    value={subtenantGender}
+                                    label="Gender"
+                                    onChange={(val)=> setSubtenantGender(val.target.value)}
+                                >
+                                    <MenuItem value={"Male"}>Male</MenuItem>
+                                    <MenuItem value={"Female"}>Female</MenuItem>
+                                    <MenuItem value={"Others"}>Others</MenuItem>
+                                </Select>
+                                </FormControl>
+                            </div>
+                            {/* Need to select age */}
+                            <div style={{marginTop: 15}}>
+                                <FormControl fullWidth>
+                                <InputLabel id="demo-age-select-label">Age</InputLabel>
+                                <Select
+                                    labelId="demo-age-select-label"
+                                    id="demo-simple-select"
+                                    value={subtenantAge}
+                                    label="Age"
+                                    
+                                >
+                                    {generateAges()}
+                                </Select>
+                                </FormControl>
+                            </div>
+                            <div style={{marginTop: 15}}>
+                                <p>Bio (Tell the tenant a bit about yourself)</p>
+                                <TextField onChange={(val)=>setSubtenantDescription(val.target.value)} value={subtenantDescription} fullWidth label="Bio" variant="outlined"/>
+                            </div>
                         </div>
-                        
-                        <Button onClick={handlePhoneNumberSubmit} style={{backgroundColor: '#2D6674', marginTop:20 }} variant="contained">Submit</Button>
-                        
+                        </>
+                        :
+                        <>
+                            <h4 style={{fontWeight:'700'}}>One last step!</h4>
+                            <div style={{marginTop: 15, position:'relative'}}>
+                                <p>Where do you want to stay at?</p>
+                                <input value={subtenantLocation} onChange={loadPlaces} class="form-control"  id="searchTextField" type="text" style={{position:'relative', zIndex: 1}} />
+                            </div>
+                            <div style={{marginTop: 15, position:'relative'}}>
+                                <p>Budget</p>
+                                <TextField onChange={(val)=>setSubtenantBudget(val.target.value)} value={subtenantBudget} fullWidth label="Budget per month ($)" type="number" variant="outlined"/>
+                            </div>
+                            <div style={{marginTop: 15}}>
+                                <p>Sublease dates</p>
+                                <div style={{flexDirection:'row', display:'flex', marginTop:15, justifyContent:'space-between'}}>
+                                <div style={{width: '45%'}}>
+                                    <DatePicker 
+                                    label="Request start"
+                                    value={ dayjs(subtenantStartDate)}
+                                    onChange={(event)=> setSubtenantStartDate(event)}
+                                    />
+                                </div>
+                                <div style={{width: '45%'}}>
+                                    <DatePicker 
+                                    label="Request end" 
+                                    onChange={(event)=> setSubtenantEndDate(event)}
+                                    value={dayjs(subtenantEndDate)}/>
+                                </div>
+                            </div>
+                            <div style={{marginTop: 15}}>
+                                <p>Which area works for you? (Select all that applies)</p>
+                                <div style={{display:"flex", flexDirection:'row', justifyContent:'space-between'}}>
+                                    <p>Manhattan</p>
+                                    <Checkbox checked={subtenantLocationM} onClick={()=> setSubtenantLocatioM(!subtenantLocationM)} style={{color: PRIMARYCOLOR }}/>
+                                </div>
+                                <div style={{display:"flex", flexDirection:'row', justifyContent:'space-between'}}>
+                                    <p>Queens</p>
+                                    <Checkbox checked={subtenantLocationQ} onClick={()=> setSubtenantLocatioQ(!subtenantLocationQ)} style={{color: PRIMARYCOLOR }}/>
+                                </div>
+                                <div style={{display:"flex", flexDirection:'row', justifyContent:'space-between'}}>
+                                    <p>Jersey City</p>
+                                    <Checkbox checked={subtenantLocationJ} onClick={()=> setSubtenantLocatioJ(!subtenantLocationJ)} style={{color: PRIMARYCOLOR }}/>
+                                </div>
+                                <div style={{display:"flex", flexDirection:'row', justifyContent:'space-between'}}>
+                                    <p>Brooklyn</p>
+                                    <Checkbox checked={subtenantLocationB} onClick={()=> setSubtenantLocatioB(!subtenantLocationB)} style={{color: PRIMARYCOLOR }}/>
+                                </div>
+                            </div>
+                            
+                        </div>
+                            
+                        </>
+                        }
+                        <div style={{display:'flex', flexDirection:'row', justifyContent: !requestPage ? 'flex-end' : 'space-between'}}>
+                            <Button onClick={handleRequestFormGoBack} style={{backgroundColor: '#ABABAB', marginTop:20, display: requestPage == 1 ? 'block' : 'none', color:'white' }} variant="contained">Back</Button>
+                            <Button onClick={handleRequestForm} style={{backgroundColor: '#2D6674', marginTop:20, alignSelf:'flex-end' }} variant="contained">{requestPage == 1 ? "Submit" : "Next"}</Button>
+                        </div>
                     </div>
                 </Modal>
                 <Modal 
@@ -620,7 +829,7 @@ export default function TennatCard(props) {
                 
             </>
 
-        </div>
+        </Link>
     </LocalizationProvider>
     )
 }

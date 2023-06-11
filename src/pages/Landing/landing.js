@@ -3,7 +3,7 @@ import React from 'react';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import TennatCard from "../../TenantCard/tenantCard";
-import {Box, Checkbox, Menu, MenuItem, IconButton } from "@mui/material";
+import {Box, Checkbox, Menu, MenuItem, IconButton, TextField } from "@mui/material";
 import { UserContext } from "../../UserContext"
 import { Button } from "@mui/material";
 import Slider from '@mui/material/Slider';
@@ -19,13 +19,23 @@ import CancelIcon from '@mui/icons-material/Cancel';
 
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import TuneIcon from '@mui/icons-material/Tune';
+import { MEDIUMGREY, MEDIUMROUNDED, OPENSANS } from "../../sharedUtils";
+
+
+//For date picker
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import dayjs, { Dayjs } from "dayjs";
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { useNavigate } from "react-router-dom";
 
 const PRIMARYCOLOR = '#2D6674';
 
 const defaultProps = {
     center: {
-      lat: 40.730610,
-      lng: -73.935242
+      lat: 40.749089,
+      lng: -73.990306
     },
     zoom: 12
   };
@@ -34,8 +44,9 @@ const defaultProps = {
 
 
 export default function LandingPage(props){
-   
-    const {manhattanDL, setManhattanDL, queensDL, setQueensDL, brooklynDL, setBrooklynDL, jerseyDL, setJerseyDL, price, setPrice} = useContext(UserContext)
+    const navigate = useNavigate()
+    const {manhattanDL, setManhattanDL, queensDL, setQueensDL, brooklynDL, setBrooklynDL, jerseyDL, setJerseyDL, price, setPrice, roomType, setRoomType, studioType, setStudioType, apartmentType, setApartmentType
+    ,requestStart, setRequestStart, requestEnd, setRequestEnd} = useContext(UserContext)
     const [tenants, setTenants] = useState([])
     const [filterModal, setfilterModal] = useState(false)
     const [sortMenu, setSortMenu] = useState(false)
@@ -64,7 +75,7 @@ export default function LandingPage(props){
     const onGoogleApiLoaded = ({ map, maps }) => {
         GoogleMapRef.current = map
         setMapReady(true)
-      }
+    }
 
     
     function getDeviceWidth(){
@@ -125,6 +136,7 @@ export default function LandingPage(props){
                         return false
                     }
                 }
+                
                 if(!manhattanDL){
                     let sa = prop.propertyInfo.loc.secondaryTxt;
                     let spaceless_sa = sa.toLowerCase().replace(" ", "");
@@ -132,9 +144,28 @@ export default function LandingPage(props){
                         return false
                     }
                 }
+                if(!roomType){
+                    let type = prop.propertyInfo.type;
+                    if(type == "Room"){
+                        return false
+                    }
+                }
+                if(!studioType){
+                    let type = prop.propertyInfo.type;
+                    if(type == "Studio"){
+                        return false
+                    }
+                }
+                if(!apartmentType){
+                    let type = prop.propertyInfo.type;
+                    if(type == "Apartment" || type == "Entire apartment"){
+                        return false
+                    }
+                }
                 if(prop.propertyInfo.price > price){
                   return false
                 }
+
                 return true
             }))
             setLoading(false)
@@ -203,6 +234,11 @@ export default function LandingPage(props){
         setNYProps(tempProps.sort((a,b) => a.propertyInfo.price - b.propertyInfo.price))
         setLoading(false)
         tenantListRef.current.scrollIntoView(true)
+        window.scrollTo({
+            top: 0,
+            left: 0,
+            behavior: "smooth",
+        });
     }
 
     async function SortByStartDate() {
@@ -212,6 +248,15 @@ export default function LandingPage(props){
         setNYProps(tempProps.sort((a,b) => new Date(a.propertyInfo.availableFrom).getTime() - new Date(b.propertyInfo.availableFrom).getTime()))
         setLoading(false)
         tenantListRef.current.scrollIntoView(true)
+        window.scrollTo({
+            top: 0,
+            left: 0,
+            behavior: "smooth",
+        });
+    }
+
+    function handleNav(route){
+        navigate(route)
     }
     function HandleScrollToWithId(p){
         
@@ -286,26 +331,47 @@ export default function LandingPage(props){
     }
 
     return(
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
         <div style={{ height: '90vh', width: '100vw'}}>
             
             {/* <h2 style={{fontWeight:'700'}}>Hello there 👋🏻</h2>
             <p style={{maxWidth: 400}}>We are Crib, a student startup for subleasing! We are students too so we understand how difficult subleasing can be. Check out the selected tenants below, be sure to check regularly since we update the list everyday!</p> */}
-            <div style={{maxWidth: mobile ? '95vw' : '95vw', flexDirection:'row', justifyContent:'space-between', alignItems:'center', display:'flex', flex: 1,  height:'10vh', marginLeft:'auto', marginRight:'auto'}}>
-                <p style={{alignSelf:'center', textAlign:'center',  fontWeight:'600', marginTop:'auto', marginBottom:'auto'}}>{loading ? "Finding subleases..." : `${NYProps.length} subleases found`}</p>
-                
-                <div style={{flexDirection:'row'}}>
-                    <Button onClick={filterTenants} style={{backgroundColor:'#2D6674'}} variant="contained">
-                        Filters
-                    </Button>
+            <div style={{width: '100vw', paddingLeft: mobile ? '2.5vw' : '5vw', paddingRight: mobile ? '2.5vw' : '5vw', flexDirection:'row', justifyContent:'space-between', alignItems:'center', display:'flex', flex: 1,  height:'10vh'}}>
+                <div style={{marginTop:'auto', marginBottom:'auto', width: '40vw'}}>
+                    {/* <small style={{alignSelf:'center', textAlign:'center',  fontWeight:'600', marginTop:'auto', marginBottom:'auto', fontFamily: OPENSANS}}>{loading ? "Finding subleases..." : `${NYProps.length}+ subleases found`}</small> */}
+                    <p style={{fontSize: mobile ? '0.9rem' : '1rem', marginBottom:0, fontWeight:'700',fontFamily: OPENSANS, color: PRIMARYCOLOR}}>{loading ? "Finding subleases..." : `${NYProps.length}+ subleases found`}</p>
+                </div>
+                {/* <div style={{flexDirection:'row', display:'flex'}}>
+                    <div style={{width: '12vw'}}>
+                        <DatePicker 
+                        value={ dayjs(requestStart)}
+                        onChange={(event)=> setRequestStart(event)}
+                        slotProps={{ textField: {error: false, size: 'small', label: 'Move in',} }}
+                        />
+                    </div>
+                    <div style={{width: '12vw', marginLeft:'1vw'}}>
+                        <DatePicker 
+                       
+                        value={ dayjs(requestEnd)}
+                        onChange={(event)=> setRequestEnd(event)}
+                        slotProps={{ textField: {error: false, size: 'small', label:'Move out' } }}
+                        />
+                    </div>
+                </div> */}
+                <div style={{flexDirection:'row',  width:'40vw', justifyContent:'flex-end', display:'flex'}}>
+                    
+                    <IconButton onClick={filterTenants} style={{outline:'none'}}>
+                        <TuneIcon size={20} style={{color:'black'}} />
+                    </IconButton>
                     <Button
                         id="sort-menu"
                         aria-controls={open ? 'demo-positioned-menu' : undefined}
                         aria-haspopup="true"
                         aria-expanded={open ? 'true' : undefined}
                         onClick={handleClick}
-                        style={{backgroundColor: '#E0E0E0', borderStyle:'solid', color: 'black', borderWidth:1, marginLeft: '1vw' }}
+                        style={{ borderStyle:'solid', color: 'black', borderWidth:1, marginLeft: '1vw', outline:'none' }}
                     >
-                        Sort
+                        <p style={{fontFamily:'Open Sans', fontWeight:'700', marginTop:'auto', marginBottom:'auto', textTransform:'none'}}>Sort</p>
                     </Button>
                 </div>
                 <Menu
@@ -328,7 +394,7 @@ export default function LandingPage(props){
                     
                 </Menu>
             </div>
-            <div style={{flexDirection: mobile ? 'column' : 'row', display:'flex', width:'100vw',  }}>
+            <div style={{flexDirection: mobile ? 'column' : 'row', display:'flex', width:'100vw', paddingLeft: mobile ? 0 : '5vw', paddingRight: mobile ? 0 : '5vw'  }}>
                 <div style={{height:'80vh', overflow:'scroll', display:'flex', width: mobile ? '100vw' : '50vw', overflowX:'hidden',  }}>
                     {loading ? 
                     <div style={{display:'flex', flex: 1}}>
@@ -344,7 +410,7 @@ export default function LandingPage(props){
                     :
 
                    
-                        <ul ref={tenantListRef} style={{paddingLeft: mobile ? 0 : '1vw', }}>
+                        <ul ref={tenantListRef} style={{paddingLeft: 0 }}>
                          {NYProps.map((item, index) => {
                                 const ref = React.createRef(null);
                                 MapPinsHashmap.set(item.propertyInfo._id, ref)
@@ -355,6 +421,7 @@ export default function LandingPage(props){
                                 else{
                                     return (
                                         <li
+                                        style={{listStyleType:'none', paddingLeft: 0}}
                                         key={item.userInfo._id + item.propertyInfo._id}
                                         ref={ref}
                                         >  
@@ -371,22 +438,23 @@ export default function LandingPage(props){
                     }
                 </div>
                 <div >
-                <div style={{height: '80vh', width:  '50vw', borderRadius:20, display: mobile ? 'none' : 'block' }}>
+                <div style={{height: '78vh', width:  '40vw', borderRadius:10, display: mobile ? 'none' : 'block', overflow:'hidden' }}>
                      <GoogleMap
+                        
                         onGoogleApiLoaded={onGoogleApiLoaded}
                         apiKey="AIzaSyBbZGuUw4bqWirb1UWSzu9R6_r13rPj-eI"
                         defaultCenter={{
                             lat: defaultProps.center.lat,
                             lng: defaultProps.center.lng
                         }}
-                        defaultZoom={11}
+                        defaultZoom={12}
                         >
 
                         {
                             NYProps.map((p, index) => {
                                 return(
-                                    <div onClick={()=>{HandleScrollToWithId(p)}} key={"mappin" + p.propertyInfo._id} lat={p.propertyInfo.loc.coordinates[1]} lng={p.propertyInfo.loc.coordinates[0]} style={{backgroundColor: GMCenter.lat == p.propertyInfo.loc.coordinates[1] && GMCenter.lng == p.propertyInfo.loc.coordinates[0] ? 'red' : PRIMARYCOLOR, justifyContent:'center', textAlign:'center', alignItems:'center', width: 50, height: 30, display:'flex', flex: 1, borderRadius:20 ,zIndex: GMCenter.lat == p.propertyInfo.loc.coordinates[1] && GMCenter.lng == p.propertyInfo.loc.coordinates[0] ? 999 : 1 }}>
-                                        <p style={{color:'white',margin:'auto'}}>${p.propertyInfo.price}</p>
+                                    <div onClick={()=>{HandleScrollToWithId(p)}} key={"mappin" + p.propertyInfo._id} lat={p.propertyInfo.loc.coordinates[1]} lng={p.propertyInfo.loc.coordinates[0]} style={{backgroundColor: GMCenter.lat == p.propertyInfo.loc.coordinates[1] && GMCenter.lng == p.propertyInfo.loc.coordinates[0] ? PRIMARYCOLOR : 'white', justifyContent:'center', textAlign:'center', alignItems:'center', width: 50, height: 30, display:'flex', flex: 1, borderRadius:20, borderColor: PRIMARYCOLOR, borderWidth:'2px', borderStyle:'solid' ,zIndex: GMCenter.lat == p.propertyInfo.loc.coordinates[1] && GMCenter.lng == p.propertyInfo.loc.coordinates[0] ? 999 : 1 }}>
+                                        <p style={{color: GMCenter.lat == p.propertyInfo.loc.coordinates[1] && GMCenter.lng == p.propertyInfo.loc.coordinates[0] ? 'white' : PRIMARYCOLOR ,margin:'auto', fontWeight:'700', fontFamily:OPENSANS}}>${p.propertyInfo.price}</p>
                                     </div>
                                 )
                             })
@@ -426,6 +494,25 @@ export default function LandingPage(props){
                     <p>Jercity City / Jersey</p>
                     <Checkbox onClick={()=>setJerseyDL(!jerseyDL)} checked={jerseyDL} style={{color: PRIMARYCOLOR }}/>
                 </div>
+
+
+                <h5 style={{fontWeight:'500', marginTop: 20}}>Sublease type</h5>
+                <div style={{flexDirection:'row', display:'flex', justifyContent:'space-between', alignItems:'center', maxWidth:400, marginTop:20}}>
+                    <p>Studio</p>
+                    <Checkbox checked={studioType} onClick={()=>setStudioType(!studioType)} style={{color: PRIMARYCOLOR }}/>
+
+                </div>
+                <div style={{flexDirection:'row', display:'flex', justifyContent:'space-between', alignItems:'center', maxWidth:400}}>
+                    <p>Room</p>
+                    <Checkbox checked={roomType}  onClick={()=> setRoomType(!roomType)} style={{color: PRIMARYCOLOR }}/>
+
+                </div>
+                <div style={{flexDirection:'row', display:'flex', justifyContent:'space-between', alignItems:'center', maxWidth:400}}>
+                    <p>Apartment</p>
+                    <Checkbox checked={apartmentType} onClick={()=> setApartmentType(!apartmentType)} style={{color: PRIMARYCOLOR }}/>
+
+                </div>
+                
                 <div style={{flexDirection:'row', display:'flex', justifyContent:'space-between', marginTop: 20}}>
                     <h5 style={{fontWeight:'500',}}>Max Price</h5>
                     <h6 style={{fontWeight:'500', }}>${price}</h6>
@@ -468,19 +555,23 @@ export default function LandingPage(props){
                     display: 'flex',
                 }}
                 >
-                    <div style={{width: '95vw', height:'85vh', backgroundColor:'white', alignSelf:'center', borderRadius:20,position: 'absolute',
+                    <div style={{width: '100vw', height:'100vh', backgroundColor:'white', alignSelf:'center', position: 'absolute', paddingTop:'5vh',
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)'}}>
-                        <div style={{height:'7vh', width:'100%', justifyContent:'space-between', padding:'auto', flexDirection:'row', display:'flex', paddingLeft: '2vw', paddingRight:'2vw'}}>
-                            <p style={{alignSelf:'center', textAlign:'center',  fontWeight:'600', marginTop:'auto', marginBottom:'auto'}}>{loading ? "Finding subleases..." : `${NYProps.length} subleases found`}</p>
-                            <div style={{flexDirection:'row', marginTop:'auto', marginBottom:'auto'}}>
-                                <Button size="small" onClick={filterTenants} style={{backgroundColor:'#2D6674'}} variant="contained">
-                                    Filters
-                                </Button>
+
+                        <div style={{height:'10vh', width:'100%',  padding:'auto', flexDirection:'column', display:'flex', width: '95vw', marginLeft:'auto', marginRight:'auto'}}>
+                            <p onClick={()=>setMobileMapModalVis(false)} style={{textDecorationLine:'underline', fontFamily: OPENSANS, fontWeight:'600', color: MEDIUMGREY, fontSize:'0.9rem'}}>Back to list view</p>
+                            <div style={{flexDirection:'row', display:'flex', justifyContent:'space-between'}}>
+                                <p style={{alignSelf:'center', textAlign:'center',  fontWeight:'600', marginTop:'auto', marginBottom:'auto'}}>{loading ? "Finding subleases..." : `${NYProps.length}+ subleases found`}</p>
+                                <div style={{flexDirection:'row', marginTop:'auto', marginBottom:'auto'}}>
+                                    <Button size="small" onClick={filterTenants} style={{backgroundColor:'#2D6674', textTransform:'none'}} variant="contained">
+                                        Filters
+                                    </Button>
+                                </div>
                             </div>
                        </div>
-                        <div style={{height:'78vh', width:'100%', borderRadius: 15, overflow:'hidden'}}>
+                        <div style={{height:'50vh', width:'100%',  overflow:'hidden'}}>
                             <GoogleMap
                             onGoogleApiLoaded={onGoogleApiLoaded}
                             apiKey="AIzaSyBbZGuUw4bqWirb1UWSzu9R6_r13rPj-eI"
@@ -495,47 +586,48 @@ export default function LandingPage(props){
                             {
                                 NYProps.map((p, index) => {
                                     return(
-                                        <div onClick={() => handleMobileMapPinClick(p)} key={"mappin" + p.propertyInfo._id} lat={p.propertyInfo.loc.coordinates[1]} lng={p.propertyInfo.loc.coordinates[0]} style={{backgroundColor: GMCenter.lat == p.propertyInfo.loc.coordinates[1] && GMCenter.lng == p.propertyInfo.loc.coordinates[0] ? 'red' : PRIMARYCOLOR, justifyContent:'center', textAlign:'center', alignItems:'center', width: 50, height: 30, display:'flex', flex: 1, borderRadius:20 ,zIndex: GMCenter.lat == p.propertyInfo.loc.coordinates[1] && GMCenter.lng == p.propertyInfo.loc.coordinates[0] ? 999 : 1 }}>
-                                            <p style={{color:'white',margin:'auto'}}>${p.propertyInfo.price}</p>
+                                        <div onClick={() => handleMobileMapPinClick(p)} key={"mappin" + p.propertyInfo._id} lat={p.propertyInfo.loc.coordinates[1]} lng={p.propertyInfo.loc.coordinates[0]} style={{backgroundColor: mapSelectedProp != null && mapSelectedProp.propertyInfo.loc.coordinates[1] == mapSelectedProp.propertyInfo.loc.coordinates[1] && mapSelectedProp.propertyInfo.loc.coordinates[0] == p.propertyInfo.loc.coordinates[0] ? PRIMARYCOLOR : 'white', justifyContent:'center', textAlign:'center', alignItems:'center', width: 50, height: 30, display:'flex', flex: 1, borderRadius:20, borderColor: PRIMARYCOLOR, borderWidth:'2px', borderStyle:'solid' ,zIndex: GMCenter.lat == p.propertyInfo.loc.coordinates[1] && GMCenter.lng == p.propertyInfo.loc.coordinates[0] ? 999 : 1 }}>
+                                             <p style={{color: mapSelectedProp != null && mapSelectedProp.propertyInfo.loc.coordinates[1] == p.propertyInfo.loc.coordinates[1] && mapSelectedProp.propertyInfo.loc.coordinates[0] == p.propertyInfo.loc.coordinates[0] ? 'white' : PRIMARYCOLOR ,margin:'auto', fontWeight:'700', fontFamily:OPENSANS}}>${p.propertyInfo.price}</p>
                                         </div>
                                     )
                                 })
                                 
                             }
-                          
-                          
-                            </GoogleMap>
-                            { mapSelectedProp != null &&
-                                <div style={{width:'100%', position:'absolute', background:'white', bottom: 0, paddingLeft:'2vw', paddingRight:'2vw', paddingTop:'1vh', borderBottomLeftRadius: 15, borderBottomRightRadius: 15 }}>
-                                    <IconButton style={{position:'absolute', right:'2vw', top: '-5vh'}} onClick={()=> setMapSelectedProp(null)}>
-                                        <CancelIcon size={40} style={{color:'black'}} />
-                                    </IconButton>
-                                    <div onClick={handlePreviewClick}>
-                                        <div style={{flexDirection:'row', display:'flex', justifyContent:'space-between'}}>
-                                            <p style={{fontWeight:'500', marginBottom:0,}}>{mapSelectedProp.propertyInfo.loc.streetAddr}</p>
-                                            <p style={{fontWeight:'500', marginBottom:0,}}>${mapSelectedProp.propertyInfo.price} /month</p>
-                                        </div>
-                                        <p style={{color:'#333333'}}>{new Date(mapSelectedProp.propertyInfo.availableFrom).getTime() < new Date().getTime() ? "Now" : new Date(mapSelectedProp.propertyInfo.availableFrom).toLocaleString().split(",")[0]} - {new Date(mapSelectedProp.propertyInfo.availableTo).toLocaleString().split(",")[0]}</p>
-                                    </div>
-                                    <>
-                                    <ul style={{flexDirection:'row', display: 'flex', overflow:'scroll', height:'auto', width: '100%',  marginLeft:'auto', marginRight:'auto', paddingLeft:0,}}>
-                                    
-                                        {
-                                        mapSelectedProp.propertyInfo.imgList.map((item, index)=> {
-                                            return(
-                                                <li onClick={()=>setMapGalleryModalVis(true)} style={{marginLeft: index == 0 ? 0 : '2vw'}}>
-                                                    <img key={item + index} src={item} style={{width: '20vw', maxHeight: '20vw', borderRadius:10 }}/>
-                                                </li>
-                                            )
-                                        })
-                                        }   
-                                        
-                                    </ul>
-                                    </>
-                                </div>
-                            }
-                            
+                            </GoogleMap>        
                         </div>   
+                        { mapSelectedProp != null &&
+                            <div style={{width:'100vw',background:'white', paddingLeft:'2vw', paddingRight:'2vw', paddingTop:'2vh', borderBottomLeftRadius: 15, borderBottomRightRadius: 15, height:'auto' }}>
+                                {/* <IconButton style={{position:'absolute', right:'2vw', top: '-5vh'}} onClick={()=> setMapSelectedProp(null)}>
+                                    <CancelIcon size={40} style={{color:'black'}} />
+                                </IconButton> */}
+                                <div onClick={handlePreviewClick}>
+                                    <div style={{flexDirection:'row', display:'flex', justifyContent:'space-between'}}>
+                                        <p style={{fontWeight:'500', marginBottom:0, fontSize:'1rem', fontFamily: OPENSANS}}>{mapSelectedProp.propertyInfo.loc.streetAddr}</p>
+                                        <p style={{fontWeight:'500', marginBottom:0, fontSize:'1rem', fontFamily: OPENSANS}}>${mapSelectedProp.propertyInfo.price} /month</p>
+                                    </div>
+                                    <p style={{color:MEDIUMGREY, fontWeight:'600', fontSize:'0.9rem', fontFamily: OPENSANS}}>{new Date(mapSelectedProp.propertyInfo.availableFrom).getTime() < new Date().getTime() ? "Now" : new Date(mapSelectedProp.propertyInfo.availableFrom).toLocaleString().split(",")[0]} - {new Date(mapSelectedProp.propertyInfo.availableTo).toLocaleString().split(",")[0]}</p>
+                                </div>
+                                <div style={{ width: '95vw',  }}>
+                                {/* <ul style={{flexDirection:'row', display: 'flex', overflowX:'scroll', height:'15vh', width: '95vw',  marginLeft:'auto', marginRight:'auto', paddingLeft:0,}}> */}
+                                <ul style={{flexDirection:'row', display: 'flex',   width: '95vw',  paddingLeft:0, borderRadius: MEDIUMROUNDED, marginLeft:'auto', marginRight:'auto',  overflow:'hidden'}}>
+
+                                    {
+                                    mapSelectedProp.propertyInfo.imgList.map((item, index)=> {
+                                        return(
+                                            <li key={"mapInLandingImg" + item + index} onClick={()=>setMapGalleryModalVis(true)} style={{marginLeft: index == 0 ? 0 : '2vw', width: '30vw', height: '30vw',}}>
+                                                <img key={item + index} src={item} style={{width: '30vw', height: '30vw', borderRadius:10 }}/>
+                                            </li>
+                                        )
+                                    })
+                                    }   
+                                    
+                                </ul>
+                                </div>
+                                <Button onClick={()=>handleNav(`/listingDetails/${mapSelectedProp.propertyInfo._id}`)} fullWidth style={{backgroundColor: PRIMARYCOLOR, outline:'none', height:'5vh', textTransform:'none'}}>
+                                    <p style={{fontSize:'0.9rem', fontWeight:'600', fontFamily: OPENSANS, color:'white', marginBottom:0}}>View property details</p>
+                                </Button>
+                            </div>
+                        }
                     </div>
                 </Modal>
 
@@ -552,7 +644,7 @@ export default function LandingPage(props){
                     display: 'flex',
                 }}
                 >
-                    <div style={{width: mobile ? '95vw' : '70vw',  backgroundColor:'white', alignSelf:'center', borderRadius:20, padding: 10, position: 'absolute',
+                    <div style={{width: mobile ? '95vw' : '70vw',  backgroundColor:'white', alignSelf:'center', borderRadius: MEDIUMROUNDED, padding: 10, position: 'absolute',
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',}}>
@@ -560,7 +652,7 @@ export default function LandingPage(props){
                             <h6 style={{fontWeight:'500', marginLeft:'auto', marginRight:'auto'}}>Image Gallery</h6>
                         </div>
                         <div style={{position:'relative'}}>
-                            <ul ref={imgListRef} style={{flexDirection:'row', display: 'flex', overflow:'scroll', height:'auto', width: mobile ? '100%' : '50vw', borderRadius:10,  marginLeft:'auto', marginRight:'auto', paddingLeft:0,}}>
+                            <ul ref={imgListRef} style={{flexDirection:'row', display: 'flex', overflow:'scroll', height:'auto', width: mobile ? '100%' : '50vw', borderRadius: MEDIUMROUNDED,  marginLeft:'auto', marginRight:'auto', paddingLeft:0,}}>
                             
                                 {
                                 mapSelectedProp != null && mapSelectedProp.propertyInfo.imgList.map((item, index)=> {
@@ -585,16 +677,18 @@ export default function LandingPage(props){
                     </div>
                 </Modal>
                { mobile &&
-                <div onClick={()=>setMobileMapModalVis(true)} style={{position:'absolute',backgroundColor:PRIMARYCOLOR, flexDirection:'row', display:'flex', justifyContent:'space-around', alignItems:'center', marginLeft:'auto', marginRight:'auto', bottom: '5vh', paddingLeft: 10, paddingRight:10, paddingTop:7, paddingBottom:7, borderRadius:15, width:'auto',
+                <div onClick={()=>setMobileMapModalVis(true)} style={{position:'absolute',backgroundColor: 'black', flexDirection:'row', display:'flex', justifyContent:'space-around', alignItems:'center', marginLeft:'auto', marginRight:'auto', bottom: '5vh', paddingLeft: 10, paddingRight:10, paddingTop:7, paddingBottom:7, borderRadius:15, width:'auto',
                     left: '50%',
                     transform: 'translate(-5vh, -50%)'}}>
                     <div>
-                        <p style={{color:"white", marginTop:'auto', marginBottom:"auto"}}>Map</p>
+                        <p style={{color:"white", marginTop:'auto', marginBottom:"auto", fontFamily: OPENSANS, fontWeight:'600', fontSize:'0.9rem'}}>Map</p>
                     </div>
-                    <MapIcon size={12} color='white' style={{color:'white'}} />
+                    <MapIcon color='white' style={{color:'white', marginLeft:'1vw', fontSize:"2.5vh"}} />
                 </div>
                 }
     
         </div>
+        </LocalizationProvider>
+    
     )
 }

@@ -10,6 +10,7 @@
     "@mui/material": "^5.13.2",
     "@mui/x-date-pickers": "^6.6.0",
     "@react-google-maps/api": "^2.18.1",
+    "@react-spring/web": "^9.7.2",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -26,9 +27,13 @@
     "react-infinite-scroll-component": "^6.1.0",
     "react-lazy-load-image-component": "^1.5.6",
     "react-modal": "^3.16.1",
+    "react-phone-input-2": "^2.15.1",
+    "react-phone-number-input": "^3.2.23",
+    "react-places-autocomplete": "^7.3.0",
     "react-router-dom": "^6.11.2",
     "react-scripts": "5.0.1",
     "react-svg": "^16.1.15",
+    "sendbird": "^3.1.32",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -54,5 +59,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "styled-components": "^5.3.10"
   }
 }
