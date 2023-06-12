@@ -332,7 +332,7 @@ export default function LandingPage(props){
 
     return(
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <div style={{ height: '78vh', width: '100vw', overflowY: 'hidden', }}>
+        <div style={{ height: mobile ? '78vh' : '90vh', width: '100vw', overflowY: 'hidden', }}>
             
             {/* <h2 style={{fontWeight:'700'}}>Hello there 👋🏻</h2>
             <p style={{maxWidth: 400}}>We are Crib, a student startup for subleasing! We are students too so we understand how difficult subleasing can be. Check out the selected tenants below, be sure to check regularly since we update the list everyday!</p> */}
