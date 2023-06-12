@@ -332,7 +332,7 @@ export default function LandingPage(props){
 
     return(
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <div style={{ height: '90vh', width: '100vw', overflowY: 'hidden'}}>
+        <div style={{ height: '78vh', width: '100vw', overflowY: 'hidden', }}>
             
             {/* <h2 style={{fontWeight:'700'}}>Hello there 👋🏻</h2>
             <p style={{maxWidth: 400}}>We are Crib, a student startup for subleasing! We are students too so we understand how difficult subleasing can be. Check out the selected tenants below, be sure to check regularly since we update the list everyday!</p> */}
@@ -441,7 +441,7 @@ export default function LandingPage(props){
                 <div style={{height: '78vh', width:  '40vw', borderRadius:10, display: mobile ? 'none' : 'block', overflow:'hidden' }}>
                      <GoogleMap
                         
-                        onGoogleApiLoaded={onGoogleApiLoaded}
+                       
                         apiKey="AIzaSyBbZGuUw4bqWirb1UWSzu9R6_r13rPj-eI"
                         defaultCenter={{
                             lat: defaultProps.center.lat,
@@ -573,7 +573,7 @@ export default function LandingPage(props){
                        </div>
                         <div style={{height:'40vh', width:'100%',  overflow:'hidden'}}>
                             <GoogleMap
-                            onGoogleApiLoaded={onGoogleApiLoaded}
+                          
                             apiKey="AIzaSyBbZGuUw4bqWirb1UWSzu9R6_r13rPj-eI"
                             defaultCenter={{
                                 lat: defaultProps.center.lat,

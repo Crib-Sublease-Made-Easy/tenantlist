@@ -436,7 +436,7 @@ export default function ListingDetails(){
                                 <p style={{fontWeight:'700', fontFamily: OPENSANS, fontSize:'1.2rem', marginBottom: 10}}>Location</p>
                                 <div style={{paddingTop:'2vh'}}>
                                     <div style={{height: '25vh', width: mobile ? '90vw' : '45vw', borderRadius: MEDIUMROUNDED, backgroundColor:'#E0E0E0', overflow:'hidden'}}>
-                                    {/* {propData != null &&
+                                    {propData != null &&
                                         <GoogleMap
                                             ref={GoogleMapRef}
                                             onGoogleApiLoaded={onGoogleApiLoaded}
@@ -454,7 +454,7 @@ export default function ListingDetails(){
                                         
                                         
                                         </GoogleMap>
-                                    } */}
+                                    }
                                         
                                         
 
@@ -481,6 +481,10 @@ export default function ListingDetails(){
                                 </div>
                                 
                             </div>
+                            {
+                                mobile &&
+                                <div style={{width:'100%', height:'10vh'}}/>
+                            }
 
 
                         </div>
