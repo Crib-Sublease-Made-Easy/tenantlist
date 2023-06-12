@@ -310,7 +310,7 @@ export default function ListingDetails(){
             :
             <div>
                 {mobilePage == 0 ?
-                <div style={{position:'relative',  display:'block', width: mobile ? '100vw' : 'auto', height: mobile ? '80vh' : '90vh', paddingTop: mobile ? 0 : '3vh', overflow:'scroll', }}>
+                <div style={{position:'relative',  display:'block', width: mobile ? '100vw' : 'auto', height: mobile ? '78vh' : '90vh', paddingTop: mobile ? 0 : '3vh', overflow:'scroll', }}>
                     
                     <div style={{paddingTop:15, paddingBottom:15, width:'90vw', marginLeft:'auto', marginRight:'auto'}}>
                         <p onClick={()=> navigate("/discoverSubleases")} style={{textDecorationLine:'underline', fontFamily: OPENSANS, fontWeight:'600', color: MEDIUMGREY, fontSize:'0.9rem'}}>Browse other listings</p>
