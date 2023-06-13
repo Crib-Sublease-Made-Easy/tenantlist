@@ -366,6 +366,20 @@ export default function PropertyPostingScreen(){
                 return
             }
         }
+        if(postingPage == 4){
+            let pass = /^\d+$/.test(propertyPrice)
+            if(!pass){
+                alert("Please enter a valid monthly rent.")
+                return
+            }
+        }
+        if(postingPage == 4){
+            let pass = /^\d+$/.test(propertySecurityDeposit)
+            if(!pass){
+                alert("Please enter a valid security deposit.")
+                return
+            }
+        }
         if(postingPage == 5){
             if(propertyStartDate == null){
                 alert("Please enter sublease start date.")
