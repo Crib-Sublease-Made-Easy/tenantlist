@@ -1,26 +1,21 @@
 import { Button } from "@mui/material";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Link, useParams } from "react-router-dom";
 import { LIGHTGREY, MEDIUMROUNDED, PRIMARYCOLOR } from "../../../sharedUtils";
+import { UserContext } from "../../../UserContext";
 import { SubtenantRequestSubheading, SubtenantRequestText, SubtenantRequestTitle } from "./subtenantRequestSuccessStyle";
 
 export default function SubtenantRequestSuccess(){
-
+    const {mobile} = useContext(UserContext)
     const { id } = useParams()
 
-    const [mobile, setMobile] = useState(true)
     const [propData, setPropData] = useState(null)
     const [tenantData, setTenantData] = useState(null)
 
     useEffect(()=>{
         fetchProp()
-        getDeviceWidth()
+     
     },[])
-
-    function getDeviceWidth(){
-        let width = window.innerWidth
-        setMobile(width < 400)
-    }
 
     async function fetchProp(){
         await fetch('https://crib-llc.herokuapp.com/properties/' + id, {

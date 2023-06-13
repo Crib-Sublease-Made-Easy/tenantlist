@@ -86,12 +86,19 @@ export default function NavBar(){
                         <div onClick={()=>handleNav("/propertyPosting")} style={{paddingTop:5, paddingBottom: 5, flexDirection:'row', cursor:'pointer'}}>
                             <p style={{fontFamily:'Open Sans', fontWeight:'600'}}>Post a sublease</p>
                         </div>
+                        {
+                            loggedIn &&
+                            <div onClick={()=> handleNav("/myRequests")} style={{paddingTop:5, paddingBottom: 5, flexDirection:'row', cursor:'pointer'}}>
+                                <p style={{fontFamily:'Open Sans', fontWeight:'600'}}>My requests</p>
+                            </div>
+                        }
                         <div onClick={()=>handleNav("/termsOfServices")} style={{paddingTop:5, paddingBottom: 5, flexDirection:'row', cursor:'pointer'}}>
                             <p style={{fontFamily:'Open Sans', fontWeight:'600'}}>Terms of services</p>
                         </div>
                         <div onClick={()=>handleNav("/privacy")} style={{paddingTop:5, paddingBottom: 5, flexDirection:'row', cursor:'pointer'}}>
                             <p style={{fontFamily:'Open Sans', fontWeight:'600'}}>Privacy</p>
                         </div>
+
                      
                         
                         { !loggedIn ?
@@ -110,9 +117,6 @@ export default function NavBar(){
                             </>
                             :
                             <>
-                                <div onClick={()=> handleNav("/myRequests")} style={{paddingTop:5, paddingBottom: 5, flexDirection:'row', cursor:'pointer'}}>
-                                    <p style={{fontFamily:'Open Sans', fontWeight:'600'}}>My requests</p>
-                                </div>
                                 <div style={{paddingTop:5, paddingBottom: 5, flexDirection:'row'}}>
                                     <Link style={{display:'flex', flex: 1, textDecorationLine:"none"}}>
                                     <p onClick={signout} style={{fontFamily:'Open Sans', fontWeight:'600', marginTop:'auto', marginBottom:'auto', color:'black', textDecorationLine:'none'}}>Sign out</p>

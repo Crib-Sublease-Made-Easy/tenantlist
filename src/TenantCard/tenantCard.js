@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Modal, TextField, Select, MenuItem, InputLabel, FormControl, IconButton, TypeSelect, Checkbox} from "@mui/material";
 import Button from '@mui/material/Button';
 
@@ -20,18 +20,13 @@ import WifiIcon from '@mui/icons-material/Wifi';
 import { EXTRALIGHT, LIGHTGREY, MEDIUMGREY, MEDIUMROUNDED, OPENSANS, PRIMARYCOLOR } from "../sharedUtils";
 import { Link } from "react-router-dom";
 import { Wifi } from "@mui/icons-material";
+import { UserContext } from "../UserContext";
 
 
 export default function TennatCard(props) {
-    const [mobile, setMobile] = useState(null)
-
-    function getDeviceWidth(){
-        let width = window.innerWidth
-        setMobile(width < 400)
-    }
+    const {mobile} = useContext(UserContext)
 
     useEffect(()=> {
-        getDeviceWidth()
         getSubleaseArea()
     }, [])
 
@@ -492,7 +487,7 @@ export default function TennatCard(props) {
                     Show in map
                 </Button> */}
             </div>
-            <div onTouchin style={{ display:'flex', flexDirection:'column', position:'relative', justifyContent:'space-between',  flex: 1, width: mobile ? '90vw' : '48vw', padding: mobile ? 0 : '1vw', paddingTop: mobile ? '3vh' : 0 }}>
+            <div onTouchin style={{ display:'flex', flexDirection:'column', position:'relative', justifyContent:'space-between',  flex: 1, width: mobile ? '90vw' : '48vw', padding: mobile ? 0 : '1.5vw', paddingTop: mobile ? '3vh' : '1.5vw' }}>
                 <div style={{display:'flex', flexDirection:'column', justifyContent:'space-between', flex:1}}>
                     <div >
                         {/* <p style={{fontSize: '0.9rem', fontWeight:'600', marginBottom:0}}>{propData.type} for rent</p> */}

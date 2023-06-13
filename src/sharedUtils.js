@@ -37,6 +37,10 @@ export const EXTRALIGHT = '#f2f2f2'
 //Font family
 export const OPENSANS = 'Open Sans'
 
+//GENDERS
+
+export const GENDERS = ["Male", "Female", "Both"]
+
 
 //Border radius
 export const MEDIUMROUNDED = 10
@@ -128,3 +132,37 @@ export const GetIcon = (color, size, name) => {
         return <GiteIcon style={{fontSize:size, color: color}} />
     }
 }
+
+
+export const AMENITIESLIST =
+
+    [
+    { name: 'Utilities_Included', library: 'MaterialCommunityIcons', color: '#fa4b4b', icon: 'power-plug' },
+    { name: 'Wifi', library: 'Ionicon', color: '#00d14d', icon: 'wifi' },
+    { name: 'Mattress', library: 'MaterialCommunityIcons', color: '#57b2f7', icon: 'bed' },
+    { name: 'Pet_Friendly', library: 'FontAwesome', color: '#57b2f7', icon: "paw" },
+    { name: "Garages", library: 'MaterialCommunityIcons', color: '#fa4b4b', icon: "garage"},
+    { name: 'Swimming_Pool', library: 'MaterialCommunityIcons',color: '#f79c40', icon: "pool" },
+    { name: 'Gym', library: 'MaterialCommunityIcons', color: '#f79c40', icon: 'weight-lifter' },
+    { name: 'Washer_Dryer', library: 'MaterialCommunityIcons', color: '#00d14d', icon: 'tumble-dryer' },
+    { name: 'Gated_Access', library: 'MaterialCommunityIcons', color: '#fa4b4b', icon: 'gate' },
+    { name: 'Public_Transportation', library: 'FontAwesome', color: '#57b2f7', icon: 'bus' },
+    { name: 'Heating', library: 'Ionicon', color: '#f79c40', icon: 'thermometer' },
+    { name: 'Cooling', library: 'Ionicon', color: '#f79c40', icon: 'wind' },
+    { name: 'Microwave', library: 'MaterialCommunityIcons', color: '#57b2f7', icon: 'microwave' },
+    { name: 'Grill', library: 'FontAwesome', color: '#fa4b4b', icon: 'bars' },
+    { name: 'TV', library: 'Ionicon', color: '#fa4b4b', icon: 'tv-sharp' },
+    { name: 'Fridge', library: 'MaterialCommunityIcons', color: '#f79c40', icon: 'fridge' },
+    { name: 'Couch', library: 'MaterialCommunityIcons', color: '#00d14d', icon: 'sofa-single' },
+    { name: 'Oven', library: 'MaterialCommunityIcons', color: '#fa4b4b', icon: 'toaster-oven' },
+    { name: 'Coffee_Maker', library: 'MaterialCommunityIcons', color: '#fa4b4b', icon: 'coffee' },
+    { name: 'Toaster', library: 'MaterialCommunityIcons', color: '#57b2f7', icon: 'toaster' },
+    { name: 'Dishes', library: 'MaterialCommunityIcons', color: '#f79c40', icon: 'bowl-mix' },
+    { name: 'Pots_Pans', library: 'MaterialCommunityIcons', color: '#fa4b4b', icon: 'pot' },
+    { name: 'Walkin_Closet', library: 'MaterialCommunityIcons', color: '#57b2f7', icon: 'door-open' },
+    { name: 'Iron', library: 'MaterialCommunityIcons', color: '#fa4b4b', icon: 'iron' },
+    { name: 'Freezer', library: 'MaterialCommunityIcons', color: '#00d14d', icon: 'fridge' },
+    { name: 'Street_Parking', library: 'MaterialCommunityIcons', color: '#f79c40', icon: 'parking' },
+    { name: 'Parking_on_Premises', library: 'MaterialCommunityIcons', color: '#00d14d', icon: 'parking' },
+    { name: 'Balcony', library: 'MaterialCommunityIcons', color: '#57b2f7', icon: 'balcony' },
+]

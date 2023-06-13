@@ -45,7 +45,7 @@ const defaultProps = {
 
 export default function LandingPage(props){
     const navigate = useNavigate()
-    const {manhattanDL, setManhattanDL, queensDL, setQueensDL, brooklynDL, setBrooklynDL, jerseyDL, setJerseyDL, price, setPrice, roomType, setRoomType, studioType, setStudioType, apartmentType, setApartmentType
+    const {mobile, setMobile, manhattanDL, setManhattanDL, queensDL, setQueensDL, brooklynDL, setBrooklynDL, jerseyDL, setJerseyDL, price, setPrice, roomType, setRoomType, studioType, setStudioType, apartmentType, setApartmentType
     ,requestStart, setRequestStart, requestEnd, setRequestEnd} = useContext(UserContext)
     const [tenants, setTenants] = useState([])
     const [filterModal, setfilterModal] = useState(false)
@@ -58,7 +58,6 @@ export default function LandingPage(props){
     const [loading, setLoading] = useState(true)
 
     const [anchorEl, setAnchorEl] = useState(null);
-    const [mobile, setMobile] = useState(null)
     const [GMCenter, setGMCenter] = useState({lat:40.730610, lng:-73.935242})
     const [GMZoom, setGMZoom] = useState(12)
 
@@ -77,12 +76,6 @@ export default function LandingPage(props){
         setMapReady(true)
     }
 
-    
-    function getDeviceWidth(){
-        let width = window.innerWidth
-        setMobile(width < 400)
-    }
-
     const open = anchorEl;
     const handleClick = (event) => {
       setAnchorEl(event.currentTarget);
@@ -92,7 +85,6 @@ export default function LandingPage(props){
     };
 
     useEffect(() => {
-        getDeviceWidth()
         fetchCribConnectTenants()
     }, [])
 

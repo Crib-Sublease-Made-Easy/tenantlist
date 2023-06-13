@@ -10,22 +10,19 @@ import worldSVG from '../../worldSVG.svg'
 
 
 import { Fade } from "react-awesome-reveal";
+import { UserContext } from "../../UserContext"
 
 //SVG icons
 
 
 export default function TenantRequestPage(){
-
-    const [mobile, setMobile] = useState(null)
+    
+    const {mobile} = useContext(UserContext)
 
     useEffect(()=>{
-        getDeviceWidth()
+        
     },[])
 
-    function getDeviceWidth(){
-        let width = window.innerWidth
-        setMobile(width < 400)
-    }
 
     function handleTryNowClick(){
         window.location = 'https://apps.apple.com/us/app/crib-subleasing-made-easy/id1645127110'
