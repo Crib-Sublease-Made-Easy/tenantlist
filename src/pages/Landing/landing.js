@@ -432,8 +432,8 @@ export default function LandingPage(props){
                 <div >
                 <div style={{height: '78vh', width:  '40vw', borderRadius:10, display: mobile ? 'none' : 'block', overflow:'hidden' }}>
                      <GoogleMap
-                        
                        
+                        onGoogleApiLoaded={onGoogleApiLoaded}
                         apiKey="AIzaSyBbZGuUw4bqWirb1UWSzu9R6_r13rPj-eI"
                         defaultCenter={{
                             lat: defaultProps.center.lat,
@@ -565,7 +565,8 @@ export default function LandingPage(props){
                        </div>
                         <div style={{height:'40vh', width:'100%',  overflow:'hidden'}}>
                             <GoogleMap
-                          
+                           
+                            onGoogleApiLoaded={onGoogleApiLoaded}
                             apiKey="AIzaSyBbZGuUw4bqWirb1UWSzu9R6_r13rPj-eI"
                             defaultCenter={{
                                 lat: defaultProps.center.lat,
