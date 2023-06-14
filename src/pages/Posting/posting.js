@@ -32,6 +32,10 @@ import PostingImage2 from './postingImg2.jpg'
 import PostingImage3 from './postingImg3.jpg'
 
 
+//Gooogle map
+import GoogleMap from 'google-maps-react-markers';
+
+
 
 //Datepicker
 import dayjs, { Dayjs } from "dayjs";
@@ -41,6 +45,13 @@ import { DatePicker } from "@mui/x-date-pickers"
 import { CheckBox } from '@mui/icons-material'
 
 
+const defaultProps = {
+    center: {
+      lat: 40.749089,
+      lng: -73.990306
+    },
+    zoom: 12
+  };
 
 function loadScript(src, position, id) {
     if (!position) {
@@ -66,6 +77,7 @@ export default function PropertyPostingScreen(){
     const [fading, setFading] = useState(false)
     const [review, setReview] = useState(false)
     const [userData, setUserData] = useState(null)
+    const [NYProps, setNYProps] = useState([])
 
     //Sublease property 
    
@@ -180,8 +192,16 @@ export default function PropertyPostingScreen(){
 
     useEffect(()=>{
         getToken()
+        fetchProps()
     }, [])
 
+    async function fetchProps(){
+        await fetch("https://crib-llc.herokuapp.com/properties/getAllNewYorkPosting?&page=0&latitude=40.730610&longitude=-73.935242")
+        .then((res) => {return res.json()})
+        .then( async data => {
+            setNYProps(data)
+        })
+    }
     async function getToken(){
         let at = localStorage.getItem("accessToken")
         let uid = localStorage.getItem("uid")
@@ -634,65 +654,70 @@ export default function PropertyPostingScreen(){
     return(
         
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <div style={{ height: mobile ? '70vh' : '80vh', width:'100vw', flexDirection: mobile ? 'column' : 'row', display:'flex', paddingLeft: '5vw', paddingRight:'5vw', justifyContent:'space-between', overflowY:'scroll'}}>
+            <div style={{ height: mobile ? '70vh' : '80vh', width:'100vw', flexDirection: 'column', display:'flex', paddingLeft: '5vw', paddingRight:'5vw',  overflowY:'scroll'}}>
             <Fade in={fading}>
             { postingPage == 0 ?
                 <>
-                    <div style={{height:'auto', flexDirection:'column', marginTop:  0,  paddingTop: mobile ? '3vh' : 0,display:'flex', justifyContent:'center'}}>
-                        {mobile ?
-                        <p style={{fontWeight:'800', fontFamily: OPENSANS, fontSize: mobile ? '2.1rem' : '2.6rem'}}>Sublease your room<br/>easier, safer, faster with Crib.</p>
-                        :
-                        <p style={{fontWeight:'800', fontFamily: OPENSANS, fontSize: mobile ? '1.8rem' : '2.6rem'}}>Sublease your room<br/>safer, faster, easier,<br/>with Crib.</p>
-                        }
-                        {/* <p style={{fontFamily: OPENSANS, fontWeight:'500'}}>Post a sublease in 30 seconds and save thousands in rent.</p> */}
-                        {/* <img onClick={AppStoreNav} src={AppStoreDownload} style={{width: mobile ? '30vw' : '10vw', marginTop:mobile ? '2vh' : '10vh', cursor:'pointer'}}/> */}
-                        {/* <div style={{flexDirection: mobile ? 'column' : 'row', display:'flex', marginTop: mobile ? '5vh' : '5vh' }}>
-                            <Button onClick={()=> handleNav('/discoverSubleases')} style={{backgroundColor: PRIMARYCOLOR, color: 'white', padding: 10, textTransform:'none', outline:'none'}}> 
-                                <p style={{marginBottom:0, fontFamily: OPENSANS, fontWeight:'700'}}>Find a sublease</p>
-                            </Button>
-                            <Button onClick={()=>handleNav('/subleasemyroomintro')} variant="outlined" style={{color: PRIMARYCOLOR, padding: 10, borderColor: PRIMARYCOLOR, marginLeft: mobile ? 0 : '2vh', textTransform:'none', marginTop: mobile ? '2vh' : 0, outline:'none'}}>
-                                <p style={{marginBottom:0, fontFamily: OPENSANS, fontWeight:'700'}}>Post a sublease</p>
-                            </Button>
-                        </div> */}
-                    </div>
-                    <div style={{flexDirection: 'column', display:'flex',  justifyContent:'center'}}>
-                        {/* <div style={{flexDirection: 'row', display:'flex', justifyContent:'flex-end', }}>
-                            <Button variant="outlined" style={{borderColor: PRIMARYCOLOR, textTransform:'none'}}>
-                                <p style={{marginBottom:0, fontFamily: OPENSANS, color: PRIMARYCOLOR,  }}>View postings</p>
-                            </Button>
-                        </div> */}
-                        <div style={{}}>
-                            <div style={{ alignItems:'center', display:'flex', flexDirection: mobile ? 'column-reverse' : 'row', marginTop: mobile ? '2vh' : 0 }}>
-                                {/* <img src={TwoPhonesImage} style={{width: mobile ? '60vw' : 'auto', height: mobile ? 'auto' : '70vh', alignSelf:'center', marginRight: mobile ? 0 : '10vw'}} /> */}
-                                
-                                    <img src={PostingImage1} style={{width: mobile ? '70vw' : '15vw', height:'auto', marginTop: mobile ? '3vh' : 0 }} />
-                                    <div style={{marginLeft:'2vw',width: mobile ? '90vw' : '30vw',}}>
-                                        <p style={{marginBottom: 10, fontSize: mobile ? '1.2rem' : '1.4rem', fontWeight:'600', fontFamily: OPENSANS}}>Post a sublease in 30 seconds</p>
-                                        <p style={{marginBottom: 0, fontSize: mobile ? '0.9rem' : '1rem', fontWeight:'500',fontFamily: OPENSANS, color: MEDIUMGREY}}>Tell us a little bit about your sublease so we can create a posting for you. Takes 30 seconds ~</p>
-                                    </div>
-                                
-                            </div>
-                            <div style={{alignItems:'center', display:'flex', flexDirection: mobile ? 'column-reverse' : 'row', marginTop:'8vh',  }}>
-                                {/* <img src={TwoPhonesImage} style={{width: mobile ? '60vw' : 'auto', height: mobile ? 'auto' : '70vh', alignSelf:'center', marginRight: mobile ? 0 : '10vw'}} /> */}
-                                
-                                <img src={PostingImage2} style={{width: mobile ? '70vw' : '15vw', height:'auto', marginTop: mobile ? '3vh' : 0 }} />
-                                <div style={{marginLeft:'2vw',width: mobile ? '90vw' : '30vw',}}>
-                                    <p style={{marginBottom: 10, fontSize: mobile ? '1.2rem' : '1.4rem', fontWeight:'600', fontFamily: OPENSANS}}>Receive sublease requests</p>
-                                    <p style={{marginBottom: 0, fontSize:'1rem',fontWeight:'500',fontFamily: OPENSANS, color: MEDIUMGREY }}>You will get a request when subtenants are interested in your sublease.</p>
-                                </div>
+                    <div style={{flexDirection: mobile ? 'column' : 'row', display:'flex', justifyContent: mobile ? 'center' : 'space-between', alignItems:'center', height:'80vh',}}> 
+                        <div style={{height:'auto', flexDirection:'column', marginTop:  0,  paddingTop: mobile ? '3vh' : 0,display:'flex', justifyContent:'center',}}>
+                            {mobile ?
+                            <p style={{fontWeight:'800', fontFamily: OPENSANS, fontSize: mobile ? '2.1rem' : '2.6rem'}}>Sublease your room<br/>easier, safer, faster with Crib.</p>
+                            :
+                            <p style={{fontWeight:'800', fontFamily: OPENSANS, fontSize: mobile ? '1.8rem' : '2.6rem'}}>Sublease your room<br/>faster, safer, and easier.</p>
+                            }
+                            <p style={{marginBottom: 0, fontSize: mobile ? '1.2rem' : '1.2rem', fontWeight:'500', fontFamily: OPENSANS}}>Join 1000+ tenants who posted on Crib</p>
+
+                        </div>
+                        <div style={{flexDirection: 'column', justifyContent: 'center', alignItems:'center', display:'flex', backgroundColor:'yellow', marginTop: mobile ? '5vh' : 0}}>
+                            <div style={{width: mobile ? '90vw' : '40vw', height: mobile ? '90vw' : '40vw', backgroundColor:EXTRALIGHT, borderRadius: MEDIUMROUNDED, overflow:'hidden'}}>
+                            <GoogleMap
                             
-                                
+                            apiKey="AIzaSyBbZGuUw4bqWirb1UWSzu9R6_r13rPj-eI"
+                            defaultCenter={{
+                                lat: defaultProps.center.lat,
+                                lng: defaultProps.center.lng
+                            }}
+                            defaultZoom={12}
+                            >
+                                {
+                                NYProps.map((p, index) => {
+                                    return(
+                                        <div key={"mappin" + p.propertyInfo._id} lat={p.propertyInfo.loc.coordinates[1]} lng={p.propertyInfo.loc.coordinates[0]} style={{backgroundColor: 'white', justifyContent:'center', textAlign:'center', alignItems:'center', width: 50, height: 30, display:'flex', flex: 1, borderRadius:20, borderColor: PRIMARYCOLOR, borderWidth:'2px', borderStyle:'solid' , }}>
+                                            <p style={{color:  PRIMARYCOLOR ,margin:'auto', fontWeight:'700', fontFamily:OPENSANS}}>${p.propertyInfo.price}</p>
+                                        </div>
+                                    )
+                                })
+                            }
+                            </GoogleMap>
                             </div>
-                            <div style={{alignItems:'center', display:'flex', flexDirection: mobile ? 'column-reverse' : 'row', marginTop:'8vh',  }}>
-                                {/* <img src={TwoPhonesImage} style={{width: mobile ? '60vw' : 'auto', height: mobile ? 'auto' : '70vh', alignSelf:'center', marginRight: mobile ? 0 : '10vw'}} /> */}
-                                
-                                    <img src={PostingImage3} style={{width: mobile ? '70vw' : '15vw', height:'auto', marginTop: mobile ? '3vh' : 0 }} />
+                        
+                            {/* <div style={{}}>
+                                <div style={{ alignItems:'center', display:'flex', flexDirection: mobile ? 'column-reverse' : 'row', marginTop: mobile ? '2vh' : 0 }}>                                
+                                        <img src={PostingImage1} style={{width: mobile ? '70vw' : '15vw', height:'auto', marginTop: mobile ? '3vh' : 0 }} />
+                                        <div style={{marginLeft:'2vw',width: mobile ? '90vw' : '30vw',}}>
+                                            <p style={{marginBottom: 10, fontSize: mobile ? '1.2rem' : '1.4rem', fontWeight:'600', fontFamily: OPENSANS}}>Post a sublease in 30 seconds</p>
+                                            <p style={{marginBottom: 0, fontSize: mobile ? '0.9rem' : '1rem', fontWeight:'500',fontFamily: OPENSANS, color: MEDIUMGREY}}>Tell us a little bit about your sublease so we can create a posting for you. Takes 30 seconds ~</p>
+                                        </div>
+                                    
+                                </div>
+                                <div style={{alignItems:'center', display:'flex', flexDirection: mobile ? 'column-reverse' : 'row', marginTop:'8vh',  }}>                                
+                                    <img src={PostingImage2} style={{width: mobile ? '70vw' : '15vw', height:'auto', marginTop: mobile ? '3vh' : 0 }} />
                                     <div style={{marginLeft:'2vw',width: mobile ? '90vw' : '30vw',}}>
-                                        <p style={{marginBottom: 10, fontSize: mobile ? '1.2rem' : '1.4rem', fontWeight:'600', fontFamily: OPENSANS}}>Finalize sublease details</p>
-                                        <p style={{marginBottom: 0, fontSize:'1rem',fontWeight:'500',fontFamily: OPENSANS, color: MEDIUMGREY }}>Tell subtenants more about how rent is paid and what's the move in process like.</p>
+                                        <p style={{marginBottom: 10, fontSize: mobile ? '1.2rem' : '1.4rem', fontWeight:'600', fontFamily: OPENSANS}}>Receive sublease requests</p>
+                                        <p style={{marginBottom: 0, fontSize:'1rem',fontWeight:'500',fontFamily: OPENSANS, color: MEDIUMGREY }}>You will get a request when subtenants are interested in your sublease.</p>
                                     </div>
                                 
-                            </div>
+                                    
+                                </div>
+                                <div style={{alignItems:'center', display:'flex', flexDirection: mobile ? 'column-reverse' : 'row', marginTop:'8vh',  }}>                                
+                                        <img src={PostingImage3} style={{width: mobile ? '70vw' : '15vw', height:'auto', marginTop: mobile ? '3vh' : 0 }} />
+                                        <div style={{marginLeft:'2vw',width: mobile ? '90vw' : '30vw',}}>
+                                            <p style={{marginBottom: 10, fontSize: mobile ? '1.2rem' : '1.4rem', fontWeight:'600', fontFamily: OPENSANS}}>Finalize sublease details</p>
+                                            <p style={{marginBottom: 0, fontSize:'1rem',fontWeight:'500',fontFamily: OPENSANS, color: MEDIUMGREY }}>Tell subtenants more about how rent is paid and what's the move in process like.</p>
+                                        </div>
+                                    
+                                </div>
+                            </div> */}
                         </div>
                     </div>
                 </>
@@ -1200,8 +1225,8 @@ export default function PropertyPostingScreen(){
             </Fade>
         </div>
         
-        <div style={{flexDirection:"row" , display: 'flex', justifyContent: postingPage == 0 || review ? 'flex-end' : 'space-between', paddingLeft:"5vw", paddingRight:'5vw', borderTopWidth:'1px', borderTopColor:LIGHTGREY, borderTopStyle: 'solid', alignItems:'center', flex: 1, alignContent:'center', backgroundColor:'white', height:'10vh', outline: 'none', position:'absolute',bottom:0, zIndex: 999, width:'100%'}}>
-                {!review && postingPage != 0 &&
+        <div style={{flexDirection:"row" , display: 'flex', justifyContent: postingPage == 0 || postingPage == 1 || review ? 'flex-end' : 'space-between', paddingLeft:"5vw", paddingRight:'5vw', borderTopWidth:'1px', borderTopColor:LIGHTGREY, borderTopStyle: 'solid', alignItems:'center', flex: 1, alignContent:'center', backgroundColor:'white', height:'10vh', outline: 'none', position:'absolute',bottom:0, zIndex: 999, width:'100%'}}>
+                {!review && postingPage != 0 && postingPage != 1 &&
                 <Button variant='text' onClick={handleBackClick} style={{height:'5vh', textTransform:'none', outline:'none'}}>
                     <p style={{fontFamily: OPENSANS, fontWeight:'600', fontSize:'0.9rem', color: MEDIUMGREY, textDecorationLine:'underline', marginBottom:0}}>Back</p>
                 </Button>
