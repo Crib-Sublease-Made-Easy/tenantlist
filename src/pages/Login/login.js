@@ -5,7 +5,7 @@ import { LoginSubheading, LoginText } from "./loginStyle"
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
 import { Button, TextField } from "@mui/material"
-import { MEDIUMGREY, PRIMARYCOLOR } from "../../sharedUtils"
+import { PRIMARYCOLOR } from "../../sharedUtils"
 import { Link, useNavigate } from "react-router-dom"
 import WhiteLoadingAnimation from '../../whiteLoading.json'
 import Lottie from "lottie-react";
@@ -47,11 +47,9 @@ export default function LoginScreen(){
                     body: JSON.stringify({phoneNumber: pn})
                 })
                 .then(async (res)=>{
-                    console.log("CHECK", res.status)
                     if(res.status == 200){
                     let data = await res.json();
 
-                    console.log(data)
                     setAuthyId(data.authy_id)
                     send_sms(data.authy_id)
 
@@ -93,9 +91,6 @@ export default function LoginScreen(){
         let countryCodelength = countryCode.toString().length
         let pn = phoneNumber.substring(countryCodelength, phoneNumber.toString().length)
         console.log("Inside login")
-        console.log(authyId)
-        console.log(pn)
-        console.log(OTPCode)
 
         if(OTPCode.length != 6){
             alert("Please enter a valid code")
@@ -115,11 +110,8 @@ export default function LoginScreen(){
           })
         });
         const content = await rawResponse.json();
-        console.log(rawResponse.status)
         if(rawResponse.status == 200 || rawResponse.status == 201){
             setLoggedIn(true)
-            console.log("DATA IS ", content)
-
             //store in local storage 
             //First Name : firstName
             //Last Name: lastName

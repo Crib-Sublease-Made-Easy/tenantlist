@@ -7,7 +7,6 @@ import { SingupSubheading, SingupText } from "./signupStyle";
 
 export default function SignupVerifyScreen(props){
     let location = useLocation()
-    console.log(location)
     const {mobile} =useContext(UserContext)
     function handleSignupClick(){
 

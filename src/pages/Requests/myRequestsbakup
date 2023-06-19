@@ -67,10 +67,8 @@ export default function MyRequestsScreen(){
             if(res.status == 200){
                 let data = await res.json()
                 setRequestsReceived(data)
-                console.log(data)
             }
             else{
-                console.log(res.status)
             }
         })
         .catch( e => console.log("Error"))
@@ -78,7 +76,6 @@ export default function MyRequestsScreen(){
 
     async function getRequestsSent(){
         let at = localStorage.getItem("accessToken")
-        console.log(at)
         if(at == null){
             return
         }
@@ -101,7 +98,6 @@ export default function MyRequestsScreen(){
                 setRequestsSent(data)
             }
             else{
-                console.log(res.status)
             }
         })
     }

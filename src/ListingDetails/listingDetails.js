@@ -1,6 +1,5 @@
-import { borderRadius } from "@mui/system"
 import { createRef, useContext, useEffect, useState, useRef, useCallback } from "react"
-import { Link, useNavigate, useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { EXTRALIGHT, LIGHTGREY, MEDIUMGREY, MEDIUMROUNDED, OPENSANS, PRIMARYCOLOR, GetIcon } from "../sharedUtils"
 import WhiteLoadingAnimation from '../whiteLoading.json'
 import Lottie from "lottie-react";
@@ -21,10 +20,7 @@ import KingBedIcon from '@mui/icons-material/KingBed';
 import PermPhoneMsgIcon from '@mui/icons-material/PermPhoneMsg';
 import MarkEmailReadIcon from '@mui/icons-material/MarkEmailRead';
 import GppGoodIcon from '@mui/icons-material/GppGood';
-import IosShareIcon from '@mui/icons-material/IosShare';
-import FavoriteIcon from '@mui/icons-material/Favorite';
 import Diversity3Icon from '@mui/icons-material/Diversity3';
-import PoolIcon from '@mui/icons-material/Pool';
 
 import GoogleMap from 'google-maps-react-markers';
 import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from "@mui/material";
@@ -33,8 +29,9 @@ import dayjs, { Dayjs } from "dayjs";
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from "@mui/x-date-pickers"
-import { UserContext } from "../UserContext"
 
+
+import { UserContext } from "../UserContext"
 
 export default function ListingDetails(){
     const {mobile} = useContext(UserContext)
@@ -44,7 +41,6 @@ export default function ListingDetails(){
     const [loading, setLoading] = useState(false)
     const [propData, setPropData] = useState(null)
     const [tenantData, setTenantData] = useState(null)
-    const [subleaseLocation, setSubleaseLocation] = useState("Manhattan")
 
     const [mapReady, setMapReady] = useState(false)
 
@@ -112,30 +108,35 @@ export default function ListingDetails(){
         }
         setLoading(true)
         let USERID = localStorage.getItem("uid")
+       
 
         //Add this user to the other user's property requestedBy field
         // - Need sublease from and to
         // - Need the user's ID
         // - Need the person's message 
         // - Need the number of Occupants
-        await fetch('https://crib-llc.herokuapp.com/properties/automate/addSubtenantRequests', {
+
+
+        await fetch('https://crib-llc.herokuapp.com/requests', {
             method: 'POST',
             headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
+            'Authorization': "Bearer " + at
             },
             body:JSON.stringify({
                 "subtenantId": USERID,
+                "tenantId": propData.postedBy,
                 "propId": propData._id,
-                "requestStart": new Date(requestStart),
-                "requestEnd": new Date(requestEnd),
-                "requestMessage": requestMessage,
-                "numOfOccupants": numberOfOccupants
+                "startDate": new Date(requestStart),
+                "endDate": new Date(requestEnd),
+                "about": requestMessage,
+                "numberOfOccupants": numberOfOccupants
             })
         })
         .then(async (res)=>{
             if(res.status == 200){
-                smsSubtenantMessageToTenant()
+                // smsSubtenantMessageToTenant()
                 addRequestSend()
             }
             else{
@@ -240,6 +241,20 @@ export default function ListingDetails(){
             return "$" + (months * propData.price).toFixed(2)
         }
     }
+    function getFees(){
+      
+        if(requestStart == null || requestEnd == null){
+            return "TBD";
+        }
+        else{
+            let sd = new Date(requestStart).getTime()
+            let ed = new Date(requestEnd).getTime()
+
+            let months = (ed -sd) / (1000*60*60*24*31)
+
+            return "$" + (months * propData.price*0.05).toFixed(2)
+        }
+    }
 
     function getTotalRent(){
         if(propData == undefined ||  propData == null || requestStart == null || requestEnd == null){
@@ -248,9 +263,9 @@ export default function ListingDetails(){
         else{
             let total = 0;
             
-            if(propData.securityDeposit != undefined && propData.securityDeposit != null){
-                total += Number(propData.securityDeposit)
-            }
+            // if(propData.securityDeposit != undefined && propData.securityDeposit != null){
+            //     total += Number(propData.securityDeposit)
+            // }
 
             let sd = new Date(requestStart).getTime()
             let ed = new Date(requestEnd).getTime()
@@ -259,7 +274,12 @@ export default function ListingDetails(){
 
             total += Number((months * propData.price).toFixed(2))
 
-            return "$" + Number(total).toFixed(2)
+         
+            let fees = Number(propData.price * months * 0.05)
+            
+            total += Number(fees.toFixed(2))
+
+            return "$" + total.toFixed(2)
         }
     }
 
@@ -455,8 +475,6 @@ export default function ListingDetails(){
                                         
                                         </GoogleMap>
                                     }
-                                        
-                                        
 
                                     </div>
                                 </div>
@@ -540,6 +558,11 @@ export default function ListingDetails(){
                                     <TextField value={requestMessage} onChange={(val) => setRequestMessage(val.target.value)} helperText={`The more detailed the better`} multiline fullWidth label={`Tell ${tenantData.firstName} a bit about yourself`} rows={2} />
                                 </div>
 
+                                <div>
+                                    
+
+                                </div>
+
                                 <Button onClick={requestToBook} fullWidth style={{backgroundColor: PRIMARYCOLOR, textTransform:'none', marginTop:'3vh', height:'6vh', outline: 'none'}}>
                                     {loading ?
                                     <Lottie animationData={WhiteLoadingAnimation} style={{display:'flex', flex:1, color:'white', height:'6vh', preserveAspectRatio: 'xMidYMid slice'}}/>
@@ -555,13 +578,14 @@ export default function ListingDetails(){
                                         <p style={{fontFamily:OPENSANS, fontWeight:'500', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>Security deposit</p>
                                         <p style={{fontFamily:OPENSANS, fontWeight:'500', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>${propData.securityDeposit == undefined || propData.securityDeposit == null ? "0" : propData.securityDeposit}</p>
                                     </div>
-                                    {/* <div style={{flexDirection:'row', marginTop:'2vh', justifyContent:'space-between', display:'flex'}}>
-                                        <p style={{fontFamily:OPENSANS, fontWeight:'500', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>1st month</p>
-                                        <p style={{fontFamily:OPENSANS, fontWeight:'500', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>${propData.securityDeposit}</p>
-                                    </div> */}
+                                   
                                     <div style={{flexDirection:'row', marginTop:'2vh', justifyContent:'space-between', display:'flex'}}>
                                         <p style={{fontFamily:OPENSANS, fontWeight:'500', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>Toal rent</p>
                                         <p style={{fontFamily:OPENSANS, fontWeight:'500', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>{getRent()}</p>
+                                    </div>
+                                    <div style={{flexDirection:'row', marginTop:'2vh', justifyContent:'space-between', display:'flex'}}>
+                                        <p style={{fontFamily:OPENSANS, fontWeight:'500', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>Service fees (5% of total rent)</p>
+                                        <p style={{fontFamily:OPENSANS, fontWeight:'500', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>{getFees()}</p>
                                     </div>
                                 </div>
                                 <div style={{width:'100%', borderTopWidth:'0.5px', borderTopColor: LIGHTGREY, borderTopStyle:'solid', marginTop:'2vh'}}>
@@ -569,6 +593,7 @@ export default function ListingDetails(){
                                         <p style={{fontFamily:OPENSANS, fontWeight:'700', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>Total</p>
                                         <p style={{fontFamily:OPENSANS, fontWeight:'700', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>{getTotalRent()}</p>
                                     </div>
+                                    <p style={{marginTop:'2vh', fontSize:'0.8rem', fontFamily: OPENSANS}}>No fees required to book, you would only need to pay security deposit and fees once after tenant accepts your request</p>
                                 </div>
 
                             </div>
@@ -642,8 +667,31 @@ export default function ListingDetails(){
                         <div style={{marginTop:'2vh'}}>
                             <TextField value={requestMessage} onChange={(val) => setRequestMessage(val.target.value)} helperText={`The more detailed the better`} multiline fullWidth label={`Tell ${tenantData.firstName} a bit about yourself`} rows={2} />
                         </div>
-                   
-
+                        <div style={{marginTop:'2vh'}}>
+                            <div style={{flexDirection: 'row', }}>
+                                <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize:'1.3rem', marginBottom: 10}}>Rent summary</p>
+                            </div>
+                            <div style={{flexDirection:'row', marginTop:'2vh', justifyContent:'space-between', display:'flex'}}>
+                                <p style={{fontFamily:OPENSANS, fontWeight:'500', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>Security deposit</p>
+                                <p style={{fontFamily:OPENSANS, fontWeight:'500', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>${propData.securityDeposit == undefined || propData.securityDeposit == null ? "0" : propData.securityDeposit}</p>
+                            </div>
+                            
+                            <div style={{flexDirection:'row', marginTop:'2vh', justifyContent:'space-between', display:'flex'}}>
+                                <p style={{fontFamily:OPENSANS, fontWeight:'500', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>Toal rent</p>
+                                <p style={{fontFamily:OPENSANS, fontWeight:'500', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>{getRent()}</p>
+                            </div>
+                            <div style={{flexDirection:'row', marginTop:'2vh', justifyContent:'space-between', display:'flex'}}>
+                                <p style={{fontFamily:OPENSANS, fontWeight:'500', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>Service fees (5% of total rent)</p>
+                                <p style={{fontFamily:OPENSANS, fontWeight:'500', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>{getFees()}</p>
+                            </div>
+                        </div>
+                        <div style={{width:'100%', borderTopWidth:'0.5px', borderTopColor: LIGHTGREY, borderTopStyle:'solid', marginTop:'2vh'}}>
+                            <div style={{flexDirection:'row', marginTop:'2vh', justifyContent:'space-between', display:'flex'}}>
+                                <p style={{fontFamily:OPENSANS, fontWeight:'700', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>Total</p>
+                                <p style={{fontFamily:OPENSANS, fontWeight:'700', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>{getTotalRent()}</p>
+                            </div>
+                            <p style={{marginTop:'2vh', fontSize:'0.8rem', fontFamily: OPENSANS}}>No fees required to book, you would only need to pay security deposit and fees once after tenant accepts your request.</p>
+                        </div>
                     </>
                    
                 </div>

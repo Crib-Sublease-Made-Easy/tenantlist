@@ -11,7 +11,6 @@ export default function TermsOfServicesScreen(){
     async function fetchTOS(){
         let res = await fetch('https://crib-llc.herokuapp.com/web/termsofservicesdetails')
         let resjson = await res.json()
-        console.log(resjson)
         setTos(resjson)
     }
 

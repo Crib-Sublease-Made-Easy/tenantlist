@@ -27,15 +27,13 @@ import Groups2Icon from '@mui/icons-material/Groups2';
 import CloseIcon from '@mui/icons-material/Close';
 
 //Image 
-import PostingImage1 from './postingImg1.jpg'
+import PostingImage1 from './postingImg1.jpg'   
 import PostingImage2 from './postingImg2.jpg'
 import PostingImage3 from './postingImg3.jpg'
 
 
 //Gooogle map
 import GoogleMap from 'google-maps-react-markers';
-
-
 
 //Datepicker
 import dayjs, { Dayjs } from "dayjs";
@@ -52,6 +50,8 @@ const defaultProps = {
     },
     zoom: 12
   };
+
+
 
 function loadScript(src, position, id) {
     if (!position) {
@@ -134,13 +134,7 @@ export default function PropertyPostingScreen(){
     const loaded = useRef(false);
 
     if (typeof window !== 'undefined' && !loaded.current) {
-        if (!document.querySelector('#google-maps')) {
-          loadScript(
-            `https://maps.googleapis.com/maps/api/js?key=AIzaSyBbZGuUw4bqWirb1UWSzu9R6_r13rPj-eI&libraries=places`,
-            document.querySelector('head'),
-            'google-maps',
-          );
-        }
+        
         loaded.current = true;
     }
     const fetchAuto = useMemo(
@@ -269,7 +263,6 @@ export default function PropertyPostingScreen(){
         }
 
         const fileUploaded = event.target.files[0];
-        console.log(fileUploaded)
 
         const compressedFile = await imageCompression(fileUploaded, options);
         
@@ -343,11 +336,7 @@ export default function PropertyPostingScreen(){
         // console.log(propertyShareRoom)
         // console.log(propertyShareRoomGender)
         // console.log(propertyPreferenceGender)
-       
-        console.log(propertyBedroomFile)
-        console.log(propertyBathroomFile)
-        console.log(propertyKitchenFile)
-        console.log(propertyLivingroomFile)
+
         if(postingPage == 1 ){
             if(propertyType == null){
                 alert("Please select a property type.")
@@ -355,14 +344,12 @@ export default function PropertyPostingScreen(){
             }  
         }
         if(postingPage == 2 ){
-            console.log(value)
             if(propertyLocation == null){
                 alert("Please select  property location.")
                 return
             }  
         }
         if(postingPage == 3 ){
-            console.log(value)
             if(propertyBedroomFile == null){
                 alert("Please select a bedroom image.")
                 return
@@ -646,7 +633,7 @@ export default function PropertyPostingScreen(){
 
     function handlePostingSuccess(){
         setPostingSuccessModal(false)
-        navigate("/")
+        navigate("/mySublease")
     }
 
 
@@ -661,35 +648,36 @@ export default function PropertyPostingScreen(){
                     <div style={{flexDirection: mobile ? 'column' : 'row', display:'flex', justifyContent: mobile ? 'center' : 'space-between', alignItems:'center', height:'80vh',}}> 
                         <div style={{height:'auto', flexDirection:'column', marginTop:  0,  paddingTop: mobile ? '3vh' : 0,display:'flex', justifyContent:'center',}}>
                             {mobile ?
-                            <p style={{fontWeight:'800', fontFamily: OPENSANS, fontSize: mobile ? '2.1rem' : '2.6rem'}}>Sublease your room<br/>easier, safer, faster with Crib.</p>
+                            <p style={{fontWeight:'800', fontFamily: OPENSANS, fontSize: mobile ? '2.1rem' : '2.6rem'}}>Sublease your place<br/>easier, safer, faster with Crib.</p>
                             :
-                            <p style={{fontWeight:'800', fontFamily: OPENSANS, fontSize: mobile ? '1.8rem' : '2.6rem'}}>Sublease your room<br/>faster, safer, and easier.</p>
+                            <p style={{fontWeight:'800', fontFamily: OPENSANS, fontSize: mobile ? '1.8rem' : '2.6rem'}}>Sublease your place<br/>faster, safer, and easier.</p>
                             }
                             <p style={{marginBottom: 0, fontSize: mobile ? '1.2rem' : '1.2rem', fontWeight:'500', fontFamily: OPENSANS}}>Join 1000+ tenants who posted on Crib</p>
 
                         </div>
                         <div style={{flexDirection: 'column', justifyContent: 'center', alignItems:'center', display:'flex', backgroundColor:'yellow', marginTop: mobile ? '5vh' : 0}}>
-                            <div style={{width: mobile ? '90vw' : '40vw', height: mobile ? '90vw' : '40vw', backgroundColor:EXTRALIGHT, borderRadius: MEDIUMROUNDED, overflow:'hidden'}}>
-                            <GoogleMap
-                            
-                            apiKey="AIzaSyBbZGuUw4bqWirb1UWSzu9R6_r13rPj-eI"
-                            defaultCenter={{
-                                lat: defaultProps.center.lat,
-                                lng: defaultProps.center.lng
-                            }}
-                            defaultZoom={12}
-                            >
-                                {
-                                NYProps.map((p, index) => {
-                                    return(
-                                        <div key={"mappin" + p.propertyInfo._id} lat={p.propertyInfo.loc.coordinates[1]} lng={p.propertyInfo.loc.coordinates[0]} style={{backgroundColor: 'white', justifyContent:'center', textAlign:'center', alignItems:'center', width: 50, height: 30, display:'flex', flex: 1, borderRadius:20, borderColor: PRIMARYCOLOR, borderWidth:'2px', borderStyle:'solid' , }}>
-                                            <p style={{color:  PRIMARYCOLOR ,margin:'auto', fontWeight:'700', fontFamily:OPENSANS}}>${p.propertyInfo.price}</p>
-                                        </div>
-                                    )
-                                })
-                            }
-                            </GoogleMap>
-                            </div>
+                            {/* <div style={{width: mobile ? '90vw' : '40vw', height: mobile ? '90vw' : '40vw', backgroundColor:EXTRALIGHT, borderRadius: MEDIUMROUNDED, overflow:'hidden'}}>
+                                
+                                <GoogleMap
+                                
+                                apiKey={MAPAPI}
+                                defaultCenter={{
+                                    lat: defaultProps.center.lat,
+                                    lng: defaultProps.center.lng
+                                }}
+                                defaultZoom={12}
+                                >
+                                    {
+                                    NYProps.map((p, index) => {
+                                        return(
+                                            <div key={"mappin" + p.propertyInfo._id} lat={p.propertyInfo.loc.coordinates[1]} lng={p.propertyInfo.loc.coordinates[0]} style={{backgroundColor: 'white', justifyContent:'center', textAlign:'center', alignItems:'center', width: 50, height: 30, display:'flex', flex: 1, borderRadius:20, borderColor: PRIMARYCOLOR, borderWidth:'2px', borderStyle:'solid' , }}>
+                                                <p style={{color:  PRIMARYCOLOR ,margin:'auto', fontWeight:'700', fontFamily:OPENSANS}}>${p.propertyInfo.price}</p>
+                                            </div>
+                                        )
+                                    })
+                                }
+                                </GoogleMap>
+                            </div> */}
                         
                             {/* <div style={{}}>
                                 <div style={{ alignItems:'center', display:'flex', flexDirection: mobile ? 'column-reverse' : 'row', marginTop: mobile ? '2vh' : 0 }}>                                
@@ -716,8 +704,8 @@ export default function PropertyPostingScreen(){
                                             <p style={{marginBottom: 0, fontSize:'1rem',fontWeight:'500',fontFamily: OPENSANS, color: MEDIUMGREY }}>Tell subtenants more about how rent is paid and what's the move in process like.</p>
                                         </div>
                                     
-                                </div>
-                            </div> */}
+                                </div> */}
+                            {/* </div> */}
                         </div>
                     </div>
                 </>
@@ -778,12 +766,12 @@ export default function PropertyPostingScreen(){
                             setInputValue(newInputValue);
                         }}
                         renderInput={(params) => (
+                           
                             <TextField {...params} label="Add a location" fullWidth />
                         )}
                         renderOption={(props, option) => {
                             const matches =
                             option.structured_formatting.main_text_matched_substrings || [];
-
                             const parts = parse(
                             option.structured_formatting.main_text,
                             matches.map((match) => [match.offset, match.offset + match.length]),
@@ -879,7 +867,7 @@ export default function PropertyPostingScreen(){
                         value={propertySecurityDeposit}
                         onChange={(val) => setPropertySecurityDepost(val.target.value)}
                         InputProps={{
-                            placeholder: 'Security deposit (if applicable)',
+                            placeholder: 'Security deposit',
                             startAdornment: <InputAdornment style={{paddingRight:'1vw'}}>$</InputAdornment>
                         }}
                         fullWidth 
@@ -890,14 +878,13 @@ export default function PropertyPostingScreen(){
                 postingPage == 5 ?
                 <div style={{flexDirection:'column', display:'block', justifyContent:'center',paddingTop:'5vh', marginLeft:'auto', marginRight:'auto',  textAlign: mobile ? 'left' : 'center'}}>
                     <p style={{fontSize: '1.5rem', fontFamily: OPENSANS, fontWeight:'600'}}>What is availability of your sublease?</p>
-                    <p style={{fontSize: '1rem', fontFamily: OPENSANS, fontWeight:'400'}}>Enter the maximun range for a better result</p>
+                    <p style={{fontSize: '1rem', fontFamily: OPENSANS, fontWeight:'400'}}>Enter the maximum range for a better result</p>
                     <div style={{marginTop:'5vh'}}>
                         <DatePicker
                         label="Start date"
                         value={propertyStartDate}
                         onChange={(event)=>   
                             {                     
-                            console.log(event)        
                             setPropertyStartDate(event)
                             }
                         }
@@ -1043,7 +1030,7 @@ export default function PropertyPostingScreen(){
                 postingPage == 10 ?
                 <div style={{flexDirection:'column', display:'block', justifyContent:'center',paddingTop:'5vh', marginLeft:'auto', marginRight:'auto',  textAlign: mobile ? 'left' : 'center', width: mobile ? '90vw' : '45vw'}}>
                     <p style={{fontSize: '1.5rem', fontFamily: OPENSANS, fontWeight:'600'}}>What genders are you comfortable subleasing to? </p>
-                    <p style={{fontSize: '1rem', fontFamily: OPENSANS, fontWeight:'400'}}>Choose "Both" increases your success by 50%</p>
+                    <p style={{fontSize: '1rem', fontFamily: OPENSANS, fontWeight:'400'}}>Choosing "Both" increases your success by 50%</p>
                     <div style={{flexDirection:'row', justifyContent:'space-between', display:'flex', marginTop:'6vh', width:'100%'}}>
                         {
                             GENDERS.map((item) => {
@@ -1281,7 +1268,7 @@ export default function PropertyPostingScreen(){
                 
                 }}>
                 <IconButton onClick={handlePostingSuccess} style={{position:'absolute', top: '-7vh', left: 0, backgroundColor:'white'}}>
-                    <CloseIcon style={{color: MEDIUMGREY, fontSize:'4vw', color:'black'}} />
+                    <CloseIcon style={{color: MEDIUMGREY, fontSize: mobile ?'4vw' : '1.5vw', color:'black'}} />
                 </IconButton>
                 <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize:'1.1rem', marginBottom: '2vh',}}>Sublease successfully posted!</p>
                 <div style={{width: mobile ? '82vw' : '25vw', height:  mobile ? '82vw' : '25vw', backgroundColor: EXTRALIGHT, borderRadius: MEDIUMROUNDED}}>

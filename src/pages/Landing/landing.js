@@ -15,7 +15,8 @@ import PropertySearching from '../../propertySearching.json'
 import NoPropertiesFound from '../../noSearchResult.json'
 
 import MapIcon from '@mui/icons-material/Map';
-import CancelIcon from '@mui/icons-material/Cancel';
+
+import SearchingAnim from './searching.json'
 
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
@@ -390,7 +391,7 @@ export default function LandingPage(props){
                 <div style={{height:'80vh', overflowY:'scroll', display:'flex', width: mobile ? '100vw' : '50vw', overflowX:'hidden',  }}>
                     {loading ? 
                     <div style={{display:'flex', flex: 1}}>
-                        <Lottie style={{margin:'auto'}} animationData={PropertySearching} loop/>
+                        <Lottie style={{margin:'auto'}} animationData={SearchingAnim} loop/>
                     </div>
                     :
 

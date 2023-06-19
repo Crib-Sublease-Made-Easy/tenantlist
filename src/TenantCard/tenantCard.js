@@ -7,11 +7,8 @@ import dayjs, { Dayjs } from "dayjs";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
-import { LazyLoadImage } from 'react-lazy-load-image-component';
-import 'react-lazy-load-image-component/src/effects/blur.css';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
-import DoneIcon from '@mui/icons-material/Done';
 import BedIcon from '@mui/icons-material/Bed';
 import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
 import WifiIcon from '@mui/icons-material/Wifi';
@@ -19,7 +16,6 @@ import WifiIcon from '@mui/icons-material/Wifi';
 
 import { EXTRALIGHT, LIGHTGREY, MEDIUMGREY, MEDIUMROUNDED, OPENSANS, PRIMARYCOLOR } from "../sharedUtils";
 import { Link } from "react-router-dom";
-import { Wifi } from "@mui/icons-material";
 import { UserContext } from "../UserContext";
 
 

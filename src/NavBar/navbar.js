@@ -1,12 +1,13 @@
 import * as React from 'react';
 import { Link, useNavigate} from "react-router-dom";
 import MenuIcon from '@mui/icons-material/Menu';
-import { EXTRALIGHT, MEDIUMGREY, OPENSANS, PRIMARYCOLOR } from "../sharedUtils";
-import { Button, IconButton, Modal} from "@mui/material";
+import { EXTRALIGHT, MEDIUMGREY, MEDIUMROUNDED, OPENSANS, PRIMARYCOLOR } from "../sharedUtils";
+import { Avatar, Button, Divider, IconButton, ListItemIcon, Menu, MenuItem, Modal, Tooltip} from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 import { useState } from "react"
 import { useContext, useEffect } from 'react';
 import { UserContext } from '../UserContext';
+import { PersonAdd } from '@mui/icons-material';
 
 
 export default function NavBar(){
@@ -18,12 +19,13 @@ export default function NavBar(){
     const openMenu = Boolean(anchorEl);
 
     const handleClick = (event) => {
+        setMenuModal(true)
         setAnchorEl(event.currentTarget);
     };
     const handleClose = () => {
+        setMenuModal(false)
         setAnchorEl(null);
     };
-
     useEffect(()=> {
         getToken()
     }, [])
@@ -54,80 +56,100 @@ export default function NavBar(){
         
         <div style={{display:'flex', height: "10vh", width: mobile ? "100vw" : '100vw', flexDirection: 'row', alignItems:'center',  borderBottomStyle:'solid', borderBottomWidth:1, borderColor: EXTRALIGHT, flexDirection:'row', justifyContent:'space-between',paddingLeft:  '5vw', paddingRight:'5vw'}}>
             <Link to="/" style={{textDecorationLine:'none', outline:'none'}} >
-                <h3 style={{fontWeight:'400', fontFamily: 'Lobster', color: '#2D6674', marginTop: 'auto', marginBottom:'auto'}}>Crib</h3>
+                <h3 style={{fontWeight:'400', fontFamily: 'Righteous', color: '#2D6674', marginTop: 'auto', marginBottom:'auto'}}>Crib</h3>
             </Link>
-            {/* <Link to="subleasemyroomintro" style={{fontWeight:'700',  color: '#333333'}}>Post a sublease</Link> */}
-            <IconButton onClick={()=>setMenuModal(true)} style={{borderColor:'white', outline:'none'}}>
-                <MenuIcon size={20} style={{color: MEDIUMGREY}}/>
-            </IconButton>
-            
-            <Modal
-                
-                open={menuModal}
-                onClose={()=>setMenuModal(false)}
-                aria-labelledby="modal-menu"
-                aria-describedby="modal-menu"
-                style={{display: 'flex', flex: 1, justifyContent:'center', alignItems:'center'}}
-            >
-                <div style={{backgroundColor: 'red', position:'relative', height: '100%', width:'100%' , backgroundColor:'white'}}>
-                    <div style={{display:'flex', height: "10vh", width: mobile ? "100vw" : '90vw', flexDirection: 'row', alignItems:'center', paddingLeft: mobile ? '5vw' : 0, paddingRight: mobile ? '5vw' : 0, marginLeft: mobile ? 0 : '5vw', marginRight: mobile ? 0 : '5vw', flexDirection:'row', justifyContent: loggedIn ? 'space-between' : 'flex-end'}}>
-                        {loggedIn &&
-                            <p style={{fontWeight:'600', fontSize:'1.3rem', fontFamily: OPENSANS, marginBottom:0, color: PRIMARYCOLOR}}>Welcome back {firstName}!</p>
-                        }
-                        <IconButton onClick={()=>setMenuModal(false)} style={{borderColor:'white', outline:'none'}}>
-                            <CloseIcon size={20} style={{color: MEDIUMGREY}}/>
-                        </IconButton>
-                    </div>
-                    <div style={{display:'block', marginLeft:'5vw',}}>
-                        
-                        <div onClick={()=>handleNav("/discoverSubleases")} style={{paddingTop:5, paddingBottom: 5,display:'block',flexDirection:'column',  cursor:'pointer', }}>
-                            <p style={{fontFamily:'Open Sans', fontWeight:'600'}}>Find subleases</p>
-                        </div>
-                        <div onClick={()=>handleNav("/propertyPosting")} style={{paddingTop:5, paddingBottom: 5, flexDirection:'row', cursor:'pointer'}}>
-                            <p style={{fontFamily:'Open Sans', fontWeight:'600'}}>Post a sublease</p>
-                        </div>
-                        {
-                            loggedIn &&
-                            <div onClick={()=> handleNav("/myRequests")} style={{paddingTop:5, paddingBottom: 5, flexDirection:'row', cursor:'pointer'}}>
-                                <p style={{fontFamily:'Open Sans', fontWeight:'600'}}>My requests</p>
-                            </div>
-                        }
-                        <div onClick={()=>handleNav("/termsOfServices")} style={{paddingTop:5, paddingBottom: 5, flexDirection:'row', cursor:'pointer'}}>
-                            <p style={{fontFamily:'Open Sans', fontWeight:'600'}}>Terms of services</p>
-                        </div>
-                        <div onClick={()=>handleNav("/privacy")} style={{paddingTop:5, paddingBottom: 5, flexDirection:'row', cursor:'pointer'}}>
-                            <p style={{fontFamily:'Open Sans', fontWeight:'600'}}>Privacy</p>
-                        </div>
-
-                     
-                        
-                        { !loggedIn ?
-                            <>
-                           
-                            <div style={{paddingTop:5, paddingBottom: 5, flexDirection:'row',}}>
-                                <Link onClick={()=>setMenuModal(false)} to="/login" style={{display:'flex', flex: 1, textDecorationLine:'none'}}>
-                                    <p  style={{fontFamily:'Open Sans', fontWeight:'600',  color:'black', textDecorationLine:'none'}}>Log In</p>
-                                </Link>
-                            </div>
-                            <div style={{paddingTop:5, paddingBottom: 5, flexDirection:'row',}}>
-                                <Link onClick={()=>setMenuModal(false)} to='/signup' style={{display:'flex', flex: 1, textDecorationLine:'none'}}>
-                                    <p  style={{fontFamily:'Open Sans', fontWeight:'600', color:'black', textDecorationLine:'none'}}>Sign up</p>
-                                </Link>
-                            </div>
-                            </>
-                            :
-                            <>
-                                <div style={{paddingTop:5, paddingBottom: 5, flexDirection:'row'}}>
-                                    <Link style={{display:'flex', flex: 1, textDecorationLine:"none"}}>
-                                    <p onClick={signout} style={{fontFamily:'Open Sans', fontWeight:'600', marginTop:'auto', marginBottom:'auto', color:'black', textDecorationLine:'none'}}>Sign out</p>
-                                    </Link>
-                                </div>
-                            </>
-                        }
-                        
-                    </div>
+            <div style={{flexDirection:'row', display:'flex', alignItems:'center'}}>
+                <div style={{flexDirection:'row', display:'flex', alignItems:'center'}}>
+                    {!mobile &&
+                    <>
+                    <p onClick={()=> handleNav('/discoverSubleases')} style={{fontFamily: OPENSANS, marginBottom:0, fontWeight:'600', color: MEDIUMGREY, marginRight:'2vw', cursor:'pointer', fontSize:'0.9rem'}}>Find</p>
+                    <p onClick={()=> handleNav('/propertyPosting')} style={{fontFamily: OPENSANS, marginBottom:0, fontWeight:'600', color: MEDIUMGREY, marginRight:'2vw',  cursor:'pointer', fontSize:'0.9rem'}}>Post</p>
+                    </>
+                    }
+                    <p onClick={()=> handleNav('/howItWorks')} style={{fontFamily: OPENSANS, marginBottom:0, fontWeight:'600', color: MEDIUMGREY, marginRight:'5vw',  cursor:'pointer', fontSize:'0.9rem'}}>How it works</p>
                 </div>
-            </Modal>
+                <Tooltip>
+                <IconButton
+                    onClick={handleClick}
+                    
+                    size="small"
+                    style={{outline:'none'}}
+                    aria-controls={menuModal ? 'account-menu' : undefined}
+                    aria-haspopup="true"
+                    aria-expanded={menuModal ? 'true' : undefined}
+                >
+                    <MenuIcon size={20} style={{color: MEDIUMGREY}}/>
+                </IconButton>
+                </Tooltip>
+            </div>
+            <Menu
+            onClose={handleClose}
+            anchorEl={anchorEl}
+            id="account-menu"
+            open={menuModal}
+            PaperProps={{
+            elevation: 0,
+            sx: {
+                borderRadius: 2,
+                overflow: 'visible',
+                filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.2))',
+                mt: 1.5,
+                width: mobile ? '90vw' : '17.5vw',
+            },
+            }}
+            transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+            anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+        >
+        <div>
+            {loggedIn &&
+            <>
+            <MenuItem onClick={()=>handleNav("/profile")} style={{paddingTop:'1.5vh', paddingBottom:'1.5vh'}}>
+                <p style={{marginBottom:0, fontWeight:'600', fontFamily: OPENSANS, fontSize:'0.9rem'}}>Profile</p>
+            </MenuItem>
+            <MenuItem onClick={()=>handleNav("/mySublease")}  style={{paddingTop:'1.5vh', paddingBottom:'1.5vh'}}>
+                <p style={{marginBottom:0, fontWeight:'600', fontFamily: OPENSANS, fontSize:'0.9rem'}}>My sublease</p>
+            </MenuItem>
+            
+            <MenuItem onClick={()=> handleNav("/myRequests")} style={{paddingTop:'1.5vh', paddingBottom:'1.5vh'}}>
+                <p style={{marginBottom:0, fontWeight:'600', fontFamily: OPENSANS, fontSize:'0.9rem'}}>My requests</p>
+            </MenuItem>
+            <MenuItem onClick={()=> handleNav("/howitworks")} style={{paddingTop:'1.5vh', paddingBottom:'1.5vh'}}>
+                <p style={{marginBottom:0, fontWeight:'600', fontFamily: OPENSANS, fontSize:'0.9rem'}}>How it works</p>
+            </MenuItem>
+            {/* <MenuItem onClick={handleClose} style={{paddingTop:'1.5vh', paddingBottom:'1.5vh'}}>
+                <p style={{marginBottom:0, fontWeight:'600', fontFamily: OPENSANS, fontSize:'0.9rem'}}>Notification</p>
+            </MenuItem> */}
+            </>
+            }
+            
+            <Divider />
+            <MenuItem onClick={()=>handleNav("/termsOfServices")}  style={{paddingTop:'1.5vh', paddingBottom:'1.5vh'}}>
+                <p style={{marginBottom:0, fontWeight:'500', fontFamily: OPENSANS, fontSize:'0.9rem'}}>Terms of services</p>
+            </MenuItem>
+            <MenuItem onClick={()=>handleNav("/privacy")} style={{paddingTop:'1.5vh', paddingBottom:'1.5vh'}}>
+                <p style={{marginBottom:0, fontWeight:'500', fontFamily: OPENSANS, fontSize:'0.9rem'}}>Privacy</p>
+            </MenuItem>
+
+            <Divider />
+            {loggedIn ?
+            <MenuItem onClick={signout} style={{paddingTop:'1.5vh', paddingBottom:'1.5vh'}}>
+                <p style={{marginBottom:0, fontWeight:'500', fontFamily: OPENSANS, fontSize:'0.9rem'}}>Logout</p>
+            </MenuItem>
+            :
+            <>
+                <MenuItem onClick={()=>handleNav("/login")} style={{paddingTop:'1.5vh', paddingBottom:'1.5vh'}}>
+                    <p style={{marginBottom:0, fontWeight:'500', fontFamily: OPENSANS, fontSize:'0.9rem'}}>Login</p>
+                </MenuItem>
+                <MenuItem onClick={()=>handleNav("/signup")} style={{paddingTop:'1.5vh', paddingBottom:'1.5vh'}}>
+                    <p style={{marginBottom:0, fontWeight:'500', fontFamily: OPENSANS, fontSize:'0.9rem'}}>Sign up</p>
+                </MenuItem>
+            </>
+            }
+           
+        </div>
+        </Menu>
+            
+          
         </div>
        
     )

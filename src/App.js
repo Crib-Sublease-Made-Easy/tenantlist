@@ -22,6 +22,12 @@ import MyRequestsScreen from './pages/Requests/myRequests';
 import TermsOfServicesScreen from './pages/Docs/termsOfServices';
 import PrivacyScreen from './pages/Docs/privacy';
 import PropertyPostingScreen from './pages/Posting/posting';
+import RequestDetailsScreen from './pages/Requests/requestDetails';
+import ProfileScreen from './pages/Profile/profile';
+import MySubleaseEditScreen from './pages/MySublease/mySubleaseEdit';
+import MySubleaseScreen from './pages/MySublease/mySublease';
+import SubtenantRequestDetailsScreen from './pages/Requests/subtenantRequestDetails';
+import HowItWorksScreen from './pages/HowItWorks/howitworks';
 const appId = 'EF181665-2473-42C6-9376-A340AF716169';
 
 
@@ -66,6 +72,7 @@ const refreshAccessToken = async () => {
   try{
     const rt = localStorage.getItem("refreshToken")
     const id = localStorage.getItem("uid");
+
     setUSERID(id)
 
     //If refresh token is undefined, meaning user have not logged in
@@ -83,7 +90,7 @@ const refreshAccessToken = async () => {
       }).then(async e => {
         const response = await e.json();
         if(e.status == 200){
-         
+          console.log("Successfully refreshed the accessToken")
           try {
             if(response.accessToken != undefined ?? response.accessToken != null){
               localStorage.setItem("accessToken", response.accessToken)
@@ -95,15 +102,16 @@ const refreshAccessToken = async () => {
           }
         }
         else if(e.status == 401){
-          alert("An error has occured.");
           setLoggedIn(false)
+          localStorage.clear()
         }
         else{
           alert("An error has occured.")
         }
       })
       .catch ( e => {
-        alert("An error has occured.")
+        console.log("failing")
+        alert(e)
       })
     }
     else{
@@ -157,6 +165,14 @@ const connectSendbird = async (UID) => {
         <Route path="/termsOfServices" element={ <TermsOfServicesScreen/> } />
         <Route path="/privacy" element={ <PrivacyScreen/> } />
         <Route path="/propertyPosting" element={ <PropertyPostingScreen/> } />
+        <Route path="/requestDetails/:id" element={ <RequestDetailsScreen/> } />
+        <Route path="/subtenantRequestDetails/:id" element={ <SubtenantRequestDetailsScreen/> } />
+        <Route path="/profile" element={ <ProfileScreen/> } />
+        <Route path="/mySubleaseEdit" element={ <MySubleaseEditScreen/> } />
+        <Route path="/mySublease" element={ <MySubleaseScreen/> } />
+        <Route path="/howitworks" element={ <HowItWorksScreen/> } />
+
+
         {
           loggedIn &&
           <>

@@ -245,7 +245,6 @@ export default function SingupScreen(){
                     // console.log("SIGN UP STEP 3 RESPONSE: ", res.status)
                     const data = await res.json();
                     // console.log("SIGN UP STEP 3 DATA: ", data)
-                        console.log(data)
                         console.log("RESPONSE 201")
                         try {
                             sb.connect(data.createdUser._id, function(user, error) {
@@ -308,7 +307,6 @@ export default function SingupScreen(){
     function handlePhoneInput(phone, country){
         setPhoneNumberWCC(phone)
         setCountryCode(country.dialCode)
-        console.log(country.dialCode)
 
     }
 
@@ -318,7 +316,6 @@ export default function SingupScreen(){
     
     function handleImageChange(event){
         const fileUploaded = event.target.files[0];
-        console.log(fileUploaded)
         
         const url = URL.createObjectURL(fileUploaded)
         setProfImg(url)
