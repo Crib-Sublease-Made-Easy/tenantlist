@@ -121,8 +121,9 @@ export default function NavBar(){
             </MenuItem> */}
             </>
             }
-            
+            { loggedIn &&
             <Divider />
+            }
             <MenuItem onClick={()=>handleNav("/termsOfServices")}  style={{paddingTop:'1.5vh', paddingBottom:'1.5vh'}}>
                 <p style={{marginBottom:0, fontWeight:'500', fontFamily: OPENSANS, fontSize:'0.9rem'}}>Terms of services</p>
             </MenuItem>
