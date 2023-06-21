@@ -11,16 +11,15 @@ export default function DetailsMessageScreen(){
     const [message, setMessage] = useState("")
     const [convo, setConvo] = useState([])
     const [uid, setUid] = useState("")
+    const [scrolling, setScrolling] = useState(false)
     
-    
-    const TEST = [1,1,1,1,1,1,1,1,1,1,1,1,1]
     const convosRef = useRef(null)
 
     useEffect(()=> {
         fetchConvo()
         const interval = setInterval(() => {
             fetchConvo()
-        }, 1000);
+        }, 500);
         
           return () => clearInterval(interval);
     }, [message])
@@ -50,11 +49,14 @@ export default function DetailsMessageScreen(){
                
             }
         })
+      
         scrollToBottom()
+        
     }
 
 
     async function handleSendMessage(){
+        
         let at = localStorage.getItem("accessToken")
         let uid = localStorage.getItem("uid")
 
@@ -78,17 +80,18 @@ export default function DetailsMessageScreen(){
        
         setMessage("")
         fetchConvo()  
+        
     }
 
     function scrollToBottom() {
-        animateScroll.scrollToBottom({
-          containerId: "messageContainer"
+        convosRef.current.scrollTo({
+            top: 100000000000000
         });
     }
     
     return(
         <div style={{width:'100vw', height:'auto', paddingLeft:'5vw', paddingRight:'5vw'}}>
-            <div id="messageContainer" ref={convosRef} style={{height:'auto', overflow:'scroll', height: mobile ? '60vh' : '70vh'}}>
+            <div id="messageContainer" ref={convosRef} style={{ overflow:'scroll', height: mobile ? '60vh' : '70vh'}}>
                 {
                     convo.map((item, index) => {
                         

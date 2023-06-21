@@ -12,7 +12,7 @@ import { PersonAdd } from '@mui/icons-material';
 
 export default function NavBar(){
     const navigate = useNavigate()
-    const {loggedIn, setLoggedIn, mobile} = useContext(UserContext) 
+    const {loggedIn, setLoggedIn, mobile, notifications} = useContext(UserContext) 
     const [menuModal, setMenuModal] = useState(false)
     const [firstName, setFirstName] = useState("")
     const [anchorEl, setAnchorEl] = useState(null)
@@ -68,19 +68,25 @@ export default function NavBar(){
                     }
                     <p onClick={()=> handleNav('/howItWorks')} style={{fontFamily: OPENSANS, marginBottom:0, fontWeight:'600', color: MEDIUMGREY, marginRight:'5vw',  cursor:'pointer', fontSize:'0.9rem'}}>How it works</p>
                 </div>
-                <Tooltip>
-                <IconButton
-                    onClick={handleClick}
+                <div style={{position:'relative'}}>
+                    {notifications &&
+                    <div style={{width:'1vh', height:'1vh', borderRadius:'0.5vh', backgroundColor:'red', position:'absolute', top:0, right:0}}/>
+                    }
+                    <Tooltip>
                     
-                    size="small"
-                    style={{outline:'none'}}
-                    aria-controls={menuModal ? 'account-menu' : undefined}
-                    aria-haspopup="true"
-                    aria-expanded={menuModal ? 'true' : undefined}
-                >
-                    <MenuIcon size={20} style={{color: MEDIUMGREY}}/>
-                </IconButton>
-                </Tooltip>
+                    <IconButton
+                        onClick={handleClick}
+                        
+                        size="small"
+                        style={{outline:'none'}}
+                        aria-controls={menuModal ? 'account-menu' : undefined}
+                        aria-haspopup="true"
+                        aria-expanded={menuModal ? 'true' : undefined}
+                    >
+                        <MenuIcon size={20} style={{color: MEDIUMGREY}}/>
+                    </IconButton>
+                    </Tooltip>
+                </div>
             </div>
             <Menu
             onClose={handleClose}

@@ -414,6 +414,18 @@ With Crib, subleasing becomes a breeze. Experience the convenience and efficienc
                         </Typography>
                         </AccordionDetails>
                     </Accordion>
+                    <Accordion style={{ borderBottomWidth:'1px',borderBottomColor: LIGHTGREY, borderBottomStyle:'solid', paddingTop:'1vh', paddingBottom:'1vh',boxShadow:'none'}}>
+                        <AccordionSummary
+                        expandIcon={<ExpandMoreIcon />}
+                        aria-controls="panel3a-content"
+                        id="panel3a-header"
+                        >
+                        <p style={{marginBottom:0, fontFamily: OPENSANS, fontWeight:'600', fontSize:'1.1rem'}}>Can I tour the place?</p>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                        <Typography style={{textAlign:'left'}}>To ensure a fair and secure process for both parties, we kindly request that the security deposit and fees are paid first. Once the payment is completed, we would be more than happy to schedule a tour of the place at your convenience. We strive to prioritize the safety and satisfaction of all our users, and this approach helps maintain a smooth and trustworthy subleasing experience. Feel free to let us know when you are ready to proceed, and we'll be glad to assist you further.</Typography>
+                        </AccordionDetails>
+                    </Accordion>
                     <Accordion style={{ borderBottomWidth:'1px', borderBottomColor: LIGHTGREY, borderBottomStyle:'solid', paddingTop:'1vh', paddingBottom:'1vh', boxShadow:'none'}}>
                         <AccordionSummary
                         expandIcon={<ExpandMoreIcon />}
@@ -421,7 +433,6 @@ With Crib, subleasing becomes a breeze. Experience the convenience and efficienc
                         id="panel3a-header"
                         >
                             <p style={{marginBottom:0, fontFamily: OPENSANS, fontWeight:'600', fontSize:'1.1rem'}}>How would subtenant move-in?</p>
-
                         </AccordionSummary>
                         <AccordionDetails>
                         <Typography style={{textAlign:'left'}}>The move-in procedure at Crib is designed to be simple and seamless. Once all necessary agreements and payments are in place, the subtenant can proceed with the move-in process. Specific details regarding key exchange, property access, and any additional instructions will be communicated between the tenant and subtenant directly. Our goal is to ensure a smooth transition and a successful move-in experience for all parties involved.</Typography>
@@ -451,6 +462,7 @@ With Crib, subleasing becomes a breeze. Experience the convenience and efficienc
                         <Typography style={{textAlign:'left'}}>Rent payments for subleases facilitated through Crib are made directly between the tenant and subtenant off our platform. We provide a secure and user-friendly environment for subleasing, but the specifics of rent payment, including methods and schedules, are agreed upon between the involved parties outside of our platform.</Typography>
                         </AccordionDetails>
                     </Accordion>
+                    
                 </div>
             </div>
             <Modal

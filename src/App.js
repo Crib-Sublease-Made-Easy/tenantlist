@@ -55,6 +55,7 @@ function App() {
   const [USERID, setUSERID] = useState("")
 
   const [mobile, setMobile] = useState(true)
+  const [notifications, setNotifications] = useState(0)
 
   //Price base
   const [price, setPrice] = useState(10000)
