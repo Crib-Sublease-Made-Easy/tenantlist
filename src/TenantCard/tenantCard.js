@@ -98,21 +98,6 @@ export default function TennatCard(props) {
         }
     }
 
-    // async function fetchPropData() {
-    
-    //     await fetch(`https://crib-llc.herokuapp.com/properties/${props.data._id}`, {method: "POST"})
-    //     .then( async (res) => {
-    //         return res.json()
-    //     })
-    //     .then ( data => { 
-    //         setTenant(data.userInfo)
-    //     })
-    //     .catch( e => {
-    //         console.log(props.data._id)
-    //         console.log("Error")
-    //     })
-    // }
-
     function handleAvailModalVisOpen(){
         setRequestAvailabilityModalVis(true)
     }
@@ -137,35 +122,6 @@ export default function TennatCard(props) {
         }
     }
 
-    function getAge(ms){
-        return Math.floor(ms / (1000*60*60*24*365));
-    }
-
-    async function handlePhoneNumberPress(){
-        if(tenantData.cribConnectUser == false){
-            loadSubtenantInfo()
-            handleAvailModalVisOpen()
-            return
-        }
-        let pn = localStorage.getItem("subtenantPhoneNumber")
-        let name = localStorage.getItem("subtenantName")
-
-        if(pn == null){
-            setOpen(true)
-        }
-        else if(name == null){
-            setOpen(true)
-        }
-        else{
-
-            addToContactList(name, pn)
-            setCribConnectUserModal(true)
-        }
-
-        
-
-    //     //Handle Press
-    }
 
     async function addToContactList(name, phoneNumber) {
      
@@ -183,27 +139,6 @@ export default function TennatCard(props) {
         }).catch(e => {
             alert(e)
         })
-    }
-
-    function handlePhoneNumberSubmit(){       
-        if(subtenantName.trim() == ""){
-            alert("Name cannot be empty")
-            return;
-        }
-        if(subtenantPhoneNumber.trim() == ""){
-            alert("Phone Number cannot be empty")
-            return;
-        }
-
-        
-
-        localStorage.setItem("subtenantPhoneNumber", subtenantPhoneNumber)
-        localStorage.setItem("subtenantName", subtenantName)
-        
-        addToContactList(subtenantName, subtenantPhoneNumber)
-        //call api to document contacted by 
-        setOpen(false)
-        setCribConnectUserModal(true)
     }
     
     async function handleRequestAvailFormSubmit(){
@@ -460,13 +395,13 @@ export default function TennatCard(props) {
     return(
         <LocalizationProvider dateAdapter={AdapterDayjs}>
         
-        <Link target={'_blank'} to={`/listingDetails/${propData._id}`} style={{ color:'black', borderColor: LIGHTGREY, borderWidth: mobile ? 0 :  '1px', borderStyle:'solid',  borderRadius: 10, height: mobile ? 'auto' : '30vh', width: mobile ? '90vw' : '48vw', marginTop: props.index == 0 ? 0 : mobile ? '7vh' : '3vh', flexDirection:  mobile ? 'column' : 'row', display:'flex', textDecorationLine:'none', alignSelf:'center', paddingLeft: mobile ? 'auto' : 0 , paddingRight: mobile ? 'auto' : 0 }}>
+        <Link target={'_blank'} to={`/listingDetails/${propData._id}`} style={{ color:'black', borderColor: LIGHTGREY, borderWidth: mobile ? 0 :  '1px', borderStyle:'solid',  borderRadius: 10, height: mobile ? 'auto' : '30vh', width: mobile ? '90vw' : '48vw', marginTop: props.index == 0 ? 0 : mobile ? '7vh' : '3vh', flexDirection:  mobile ? 'column' : 'row', display:'flex', textDecorationLine:'none', alignSelf:'center', paddingLeft: mobile ? 'auto' : 0 , paddingRight: mobile ? 'auto' : 0, paddingTop:0 }}>
         
             <>
             <div  style={{position:'relative',  display:'block', width: mobile ? '90vw' : 'auto', overflow:'hidden'}}>
                  
                  
-                <img key={propData.imgList[0]} src={propData.imgList[0]} style={{width: mobile ? '90vw' : '40vh', height: mobile ? '90vw' : '30vh', borderTopLeftRadius:10, borderBottomLeftRadius: 10, borderTopRightRadius: mobile ? MEDIUMROUNDED : 0, borderBottomRightRadius: mobile ? MEDIUMROUNDED : 0, objectFit:'cover' }}/>
+                <img key={propData.imgList[0]} src={propData.imgList[0]} style={{width: mobile ? '90vw' : '40vh', height: mobile ? '90vw' : '100%', borderTopLeftRadius:10, borderBottomLeftRadius: 10, borderTopRightRadius: mobile ? MEDIUMROUNDED : 0, borderBottomRightRadius: mobile ? MEDIUMROUNDED : 0, objectFit:'cover' }}/>
                 
             
                

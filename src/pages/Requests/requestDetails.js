@@ -218,7 +218,7 @@ export default function RequestDetailsScreen(props){
         // </div>
         // :
         <div style={{width: '90vw', height:'90vh', marginLeft:'auto', marginRight:'auto', flexDirection: mobile ? 'column' : 'row', display:'flex'}}>
-            <div style={{width: mobile ? '90vw' : '30vw', borderRightWidth: mobile ? 0 :  '0.5px', borderRightColor: LIGHTGREY, borderRightStyle:'solid', height:'100%'}}>
+            <div style={{width: mobile ? '90vw' : '30vw', borderRightWidth: mobile ? 0 :  '0.5px', borderRightColor: LIGHTGREY, borderRightStyle:'solid', height:'100%', justifyContent:'space-between', display:'flex', flexDirection:'column', paddingBottom:'10vh'}}>
                 <div style={{height: mobile ? '8vh' : '10vh', width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between'}}>
                     <ArrowBackIcon onClick={()=>navigate("/myRequests")} style={{fontSize: mobile ? '5vw' : '1.5vw', cursor:'pointer'}}/>
                     <Button variant="contained" style={{backgroundColor: 'black', textTransform:'none', height:'5vh', outline:'none', marginRight: mobile ? 0 : '1vw'}}>
@@ -239,6 +239,7 @@ export default function RequestDetailsScreen(props){
                     <p style={{marginBottom:0, fontSize:'0.9rem', marginLeft:'1vw', fontWeight:'600', fontFamily: OPENSANS, }}>Please sign contract to proceed</p>
                     }
                 </div> */}
+                <div>
                 <p style={{marginBottom:0, fontSize: mobile ? '1.8rem' : '1.5rem', fontWeight:'500', paddingTop:"2vh", paddingBottom:'2vh'}}>Progress</p>
 
                 <Stepper 
@@ -279,6 +280,10 @@ export default function RequestDetailsScreen(props){
                     </Step>
                     ))}
                 </Stepper>
+                </div>
+                <Button onClick={()=>navigate(`/detailsMessage/${subleaseStatus._id}`)} style={{backgroundColor: 'black', outline: 'none', color:'white', height: mobile ? '6vh' : '5vh', textTransform:'none', width: mobile ? '100%' : "80%", marginTop:'5vh'}}>
+                    <p style={{marginBottom:0}}>Message</p>
+                </Button>
             </div>
             <div style={{width: mobile ? '100%' : '60vw', height: mobile ? 'auto' : "90vh", display:'flex', flexDirection:'column', justifyContent: mobile ? 'space-between' : 'flex-start', paddingLeft: mobile ? 0 : "2vw"}}>
             

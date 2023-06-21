@@ -101,6 +101,16 @@ export default function NavBar(){
             anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
         >
         <div>
+            { mobile &&
+            <>
+            <MenuItem onClick={()=> handleNav("/discoverSubleases")} style={{paddingTop:'1.5vh', paddingBottom:'1.5vh'}}>
+                <p style={{marginBottom:0, fontWeight:'600', fontFamily: OPENSANS, fontSize:'0.9rem'}}>Find a sublease</p>
+            </MenuItem>
+            <MenuItem onClick={()=> handleNav("/propertyPosting")} style={{paddingTop:'1.5vh', paddingBottom:'1.5vh'}}>
+                <p style={{marginBottom:0, fontWeight:'600', fontFamily: OPENSANS, fontSize:'0.9rem'}}>Post a sublease</p>
+            </MenuItem>
+            </>
+            }
             {loggedIn &&
             <>
             <MenuItem onClick={()=>handleNav("/profile")} style={{paddingTop:'1.5vh', paddingBottom:'1.5vh'}}>
@@ -112,9 +122,6 @@ export default function NavBar(){
             
             <MenuItem onClick={()=> handleNav("/myRequests")} style={{paddingTop:'1.5vh', paddingBottom:'1.5vh'}}>
                 <p style={{marginBottom:0, fontWeight:'600', fontFamily: OPENSANS, fontSize:'0.9rem'}}>My requests</p>
-            </MenuItem>
-            <MenuItem onClick={()=> handleNav("/howitworks")} style={{paddingTop:'1.5vh', paddingBottom:'1.5vh'}}>
-                <p style={{marginBottom:0, fontWeight:'600', fontFamily: OPENSANS, fontSize:'0.9rem'}}>How it works</p>
             </MenuItem>
             {/* <MenuItem onClick={handleClose} style={{paddingTop:'1.5vh', paddingBottom:'1.5vh'}}>
                 <p style={{marginBottom:0, fontWeight:'600', fontFamily: OPENSANS, fontSize:'0.9rem'}}>Notification</p>

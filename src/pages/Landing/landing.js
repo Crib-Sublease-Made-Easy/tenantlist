@@ -1,13 +1,17 @@
-import { createRef, useContext, useEffect, useState, useRef, useCallback } from "react"
+import { createRef, useContext, useEffect, useState, useRef, useCallback, useMemo } from "react"
 import React from 'react';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import TennatCard from "../../TenantCard/tenantCard";
-import {Box, Checkbox, Menu, MenuItem, IconButton, TextField } from "@mui/material";
+import {Box, Checkbox, Menu, MenuItem, IconButton, TextField, Autocomplete, Grid, Typography } from "@mui/material";
 import { UserContext } from "../../UserContext"
 import { Button } from "@mui/material";
 import Slider from '@mui/material/Slider';
 import Modal from '@mui/material/Modal';
+import { debounce } from '@mui/material/utils';
+import parse from 'autosuggest-highlight/parse';
+import { DatePicker } from "@mui/x-date-pickers"
+
 
 import GoogleMap from 'google-maps-react-markers';
 import Lottie from "lottie-react";
@@ -15,6 +19,7 @@ import PropertySearching from '../../propertySearching.json'
 import NoPropertiesFound from '../../noSearchResult.json'
 
 import MapIcon from '@mui/icons-material/Map';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
 
 import SearchingAnim from './searching.json'
 
@@ -24,11 +29,12 @@ import TuneIcon from '@mui/icons-material/Tune';
 import { MEDIUMGREY, MEDIUMROUNDED, OPENSANS } from "../../sharedUtils";
 
 
+
+
 //For date picker
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import dayjs, { Dayjs } from "dayjs";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useNavigate } from "react-router-dom";
 
 const PRIMARYCOLOR = '#2D6674';
@@ -71,6 +77,70 @@ export default function LandingPage(props){
     const [mapGalleryModalVis, setMapGalleryModalVis] = useState(false)
     const imgListRef = useRef(null)
 
+    //Location stuff
+    const [searchLocation, setSearchLocation] = useState("New York City")
+    const autocompleteService = { current: null };
+    const [value, setValue] = useState(null);
+    const [inputValue, setInputValue] = useState('');
+    const [options, setOptions] = useState([]);
+    const loaded = useRef(false);
+
+    const [startDate, setStartDate] = useState(null)
+    const [endDate, setEndDate] = useState(null)
+
+
+
+
+    if (typeof window !== 'undefined' && !loaded.current) {
+        
+        loaded.current = true;
+    }
+    const fetchAuto = useMemo(
+        () =>
+          debounce((request, callback) => {
+            autocompleteService.current.getPlacePredictions(request, callback);
+          }, 400),
+        [],
+    );
+
+    useEffect(()=> {
+        
+        let active = true;
+
+        if (!autocompleteService.current && window.google) {
+          autocompleteService.current =
+            new window.google.maps.places.AutocompleteService();
+        }
+        if (!autocompleteService.current) {
+          return undefined;
+        }
+    
+        if (inputValue === '') {
+          setOptions(value ? [value] : []);
+          return undefined;
+        }
+    
+        fetchAuto({ input: inputValue }, (results) => {
+          if (active) {
+            let newOptions = [];
+    
+            if (value) {
+              newOptions = [value];
+            }
+    
+            if (results) {
+              newOptions = [...newOptions, ...results];
+            }
+    
+            setOptions(newOptions);
+          }
+        });
+    
+        return () => {
+          active = false;
+        };
+    }, [value, inputValue, fetchAuto]);
+
 
     const onGoogleApiLoaded = ({ map, maps }) => {
         GoogleMapRef.current = map
@@ -86,10 +156,11 @@ export default function LandingPage(props){
     };
 
     useEffect(() => {
+        console.log("hellp")
         fetchCribConnectTenants()
     }, [])
 
-    async function fetchCribConnectTenants(){
+    async function fetchCribConnectTenants(location){
         // const resp = await fetch("https://crib-llc.herokuapp.com/users/cribconnect/getall");
         // const datas = await resp.json();
         
@@ -97,121 +168,87 @@ export default function LandingPage(props){
         // console.log(datas)
         setfilterModal(false)   
         setLoading(true)
-        await fetch("https://crib-llc.herokuapp.com/properties/getAllNewYorkPosting?&page=0&latitude=40.730610&longitude=-73.935242")
-        .then((res) => {return res.json()})
-        .then( async data => {
-           
-
-            //Sort Crib Connect users first 
-            data.sort( (a,b) => b.userInfo.cribConnectUser - a.userInfo.cribConnectUser)
-
-            setNYProps(data.filter((prop) => {
-                if(!queensDL){
-                    let sa = prop.propertyInfo.loc.secondaryTxt;
-                    let spaceless_sa = sa.toLowerCase().replace(" ", "");
-                    if(spaceless_sa.indexOf("queens") != -1){
-                        return false
-                    }
-                   
-                }
-                if(!brooklynDL){
-                    let sa = prop.propertyInfo.loc.secondaryTxt;
-                    let spaceless_sa = sa.toLowerCase().replace(" ", "");
-                    if(spaceless_sa.indexOf("brooklyn") != -1){
-                        return false
-                    }
-                  
-                }
-                if(!jerseyDL){
-                    let sa = prop.propertyInfo.loc.secondaryTxt;
-                    let spaceless_sa = sa.toLowerCase().replace(" ", "");
-                    if(spaceless_sa.indexOf("nj") != -1 || spaceless_sa.indexOf("jersey") != -1){
-                        return false
-                    }
-                }
-                
-                if(!manhattanDL){
-                    let sa = prop.propertyInfo.loc.secondaryTxt;
-                    let spaceless_sa = sa.toLowerCase().replace(" ", "");
-                    if(spaceless_sa.indexOf("nj") == -1 && spaceless_sa.indexOf("jersey") == -1 && spaceless_sa.indexOf("brooklyn") == -1 && spaceless_sa.indexOf("queens") == -1){
-                        return false
-                    }
-                }
-                if(!roomType){
-                    let type = prop.propertyInfo.type;
-                    if(type == "Room"){
-                        return false
-                    }
-                }
-                if(!studioType){
-                    let type = prop.propertyInfo.type;
-                    if(type == "Studio"){
-                        return false
-                    }
-                }
-                if(!apartmentType){
-                    let type = prop.propertyInfo.type;
-                    if(type == "Apartment" || type == "Entire apartment"){
-                        return false
-                    }
-                }
-                if(prop.propertyInfo.price > price){
-                  return false
-                }
-
-                return true
-            }))
-            setLoading(false)
-
-        } )
-        // const datas = await resp.json();
-      
-        // //Filter which tenant is suitable
-        // setNYProps(datas)
-      
-        // setTenants()
-        // await datas.forEach( async (user) => {
-        //     if(user.postedProperties.length != 0){
-        //         await fetch(`https://crib-llc.herokuapp.com/properties/${user.postedProperties[0]}`, {method: "POST"})
-        //         .then( async (res) => {
-        //             return await res.json()
-        //         })
-        //         .then ( data => {
-        //             if(data.propertyInfo.price < price && data.propertyInfo.deleted == false){
-
-        //                 let sa = data.propertyInfo.loc.secondaryTxt
-        //                 let lower_spaceless_sa = sa.toLowerCase().replaceAll(" ","")
-        //                 //Check if it is in NY
-        //                 if(lower_spaceless_sa.indexOf("ny") != -1 || lower_spaceless_sa.indexOf("newyork") != -1){
-    
-        //                     if(!brooklynDL){
-        //                         if(lower_spaceless_sa.indexOf("brooklyn") != - 1){
-        //                             return
-        //                         }
-        //                     }
-        //                     if(!jerseyDL){
-        //                         if(lower_spaceless_sa.indexOf("jersey") != - 1 || lower_spaceless_sa.indexOf("nj") != -1){
-        //                             return 
-        //                         }
-        //                     }
-        //                     if(!queensDL){
-        //                         if(lower_spaceless_sa.indexOf("queens") != - 1){
-        //                             return 
-        //                         }
-        //                     }
-                           
-        //                     setTenants(tenants => [...tenants, user])
-                            
-        //                 }
-        //             }
-        //         })
-
-        //     }
-        // })
-       
-        
-
-       
+        console.log(searchLocation)
+        let loc = location == undefined ? searchLocation : location
+        fetch('https://maps.googleapis.com/maps/api/geocode/json?address=' + loc + '&key=AIzaSyBbZGuUw4bqWirb1UWSzu9R6_r13rPj-eI', {
+            method: 'GET'
+                         }).then(res => res.json()).then(async jsonresp => {
+                            console.log("RESSSS", jsonresp.results[0].geometry.location)
+                            let coor = [jsonresp.results[0].geometry.location.lng, jsonresp.results[0].geometry.location.lat]
+                          
+                            return coor
+                     
+                        }).then( async coor => {
+                            console.log("COOR", coor)
+                            await fetch(`https://crib-llc.herokuapp.com/properties/getAllNewYorkPosting?&page=0&latitude=${coor[1]}&longitude=${coor[0]}`)
+                            .then((res) => {return res.json()})
+                            .then( async data => {
+                               
+                    
+                                //Sort Crib Connect users first 
+                                data.sort( (a,b) => b.userInfo.cribConnectUser - a.userInfo.cribConnectUser)
+                    
+                                setNYProps(data.filter((prop) => {
+                                    if(!queensDL){
+                                        let sa = prop.propertyInfo.loc.secondaryTxt;
+                                        let spaceless_sa = sa.toLowerCase().replace(" ", "");
+                                        if(spaceless_sa.indexOf("queens") != -1){
+                                            return false
+                                        }
+                                       
+                                    }
+                                    if(!brooklynDL){
+                                        let sa = prop.propertyInfo.loc.secondaryTxt;
+                                        let spaceless_sa = sa.toLowerCase().replace(" ", "");
+                                        if(spaceless_sa.indexOf("brooklyn") != -1){
+                                            return false
+                                        }
+                                      
+                                    }
+                                    if(!jerseyDL){
+                                        let sa = prop.propertyInfo.loc.secondaryTxt;
+                                        let spaceless_sa = sa.toLowerCase().replace(" ", "");
+                                        if(spaceless_sa.indexOf("nj") != -1 || spaceless_sa.indexOf("jersey") != -1){
+                                            return false
+                                        }
+                                    }
+                                    
+                                    if(!manhattanDL){
+                                        let sa = prop.propertyInfo.loc.secondaryTxt;
+                                        let spaceless_sa = sa.toLowerCase().replace(" ", "");
+                                        if(spaceless_sa.indexOf("nj") == -1 && spaceless_sa.indexOf("jersey") == -1 && spaceless_sa.indexOf("brooklyn") == -1 && spaceless_sa.indexOf("queens") == -1){
+                                            return false
+                                        }
+                                    }
+                                    if(!roomType){
+                                        let type = prop.propertyInfo.type;
+                                        if(type == "Room"){
+                                            return false
+                                        }
+                                    }
+                                    if(!studioType){
+                                        let type = prop.propertyInfo.type;
+                                        if(type == "Studio"){
+                                            return false
+                                        }
+                                    }
+                                    if(!apartmentType){
+                                        let type = prop.propertyInfo.type;
+                                        if(type == "Apartment" || type == "Entire apartment"){
+                                            return false
+                                        }
+                                    }
+                                    if(prop.propertyInfo.price > price){
+                                      return false
+                                    }
+                    
+                                    return true
+                                }))
+                                setLoading(false)
+                    
+                            } )
+                        })
+  
     }
 
 
@@ -327,31 +364,111 @@ export default function LandingPage(props){
         <LocalizationProvider dateAdapter={AdapterDayjs}>
         <div style={{ height: mobile ? '78vh' : '90vh', width: '100vw', overflowY: 'hidden', }}>
             
-            {/* <h2 style={{fontWeight:'700'}}>Hello there 👋🏻</h2>
-            <p style={{maxWidth: 400}}>We are Crib, a student startup for subleasing! We are students too so we understand how difficult subleasing can be. Check out the selected tenants below, be sure to check regularly since we update the list everyday!</p> */}
-            <div style={{width: '100vw', paddingLeft: '5vw', paddingRight: '5vw', flexDirection:'row', justifyContent:'space-between', alignItems:'center', display:'flex', flex: 1,  height:'10vh'}}>
-                <div style={{marginTop:'auto', marginBottom:'auto', width: '40vw'}}>
-                    {/* <small style={{alignSelf:'center', textAlign:'center',  fontWeight:'600', marginTop:'auto', marginBottom:'auto', fontFamily: OPENSANS}}>{loading ? "Finding subleases..." : `${NYProps.length}+ subleases found`}</small> */}
+            <div style={{width: '100vw', paddingLeft: '5vw', paddingRight: '5vw', flexDirection:'row', justifyContent:'space-between', alignItems:'center', display:'flex', flex: 1,  height:'12vh'}}>
+                {/* <div style={{marginTop:'auto', marginBottom:'auto', width: '40vw'}}>
                     <p style={{fontSize: mobile ? '0.9rem' : '1rem', marginBottom:0, fontWeight:'700',fontFamily: OPENSANS, color: PRIMARYCOLOR}}>{loading ? "Finding subleases..." : `${NYProps.length}+ subleases found`}</p>
-                </div>
-                {/* <div style={{flexDirection:'row', display:'flex'}}>
-                    <div style={{width: '12vw'}}>
-                        <DatePicker 
-                        value={ dayjs(requestStart)}
-                        onChange={(event)=> setRequestStart(event)}
-                        slotProps={{ textField: {error: false, size: 'small', label: 'Move in',} }}
-                        />
-                    </div>
-                    <div style={{width: '12vw', marginLeft:'1vw'}}>
-                        <DatePicker 
-                       
-                        value={ dayjs(requestEnd)}
-                        onChange={(event)=> setRequestEnd(event)}
-                        slotProps={{ textField: {error: false, size: 'small', label:'Move out' } }}
-                        />
-                    </div>
                 </div> */}
-                <div style={{flexDirection:'row',  width:'40vw', justifyContent:'flex-end', display:'flex'}}>
+                <div style={{flexDirection:'row', display:'flex', alignItems:'center'}}>
+                    <div style={{width: mobile ? '60vw' : '20vw', flex: 1, display:'flex'}}>
+                        <Autocomplete
+                        id="google-map-demo"
+                        fullWidth
+                        getOptionLabel={(option) =>
+                            typeof option === 'string' ? option : option.description
+                        }
+                        filterOptions={(x) => x}
+                        style={{outline:'none', marginBottom:0}}
+                        options={options}
+                        autoComplete
+                        includeInputInList
+                        filterSelectedOptions
+                        value={searchLocation}
+                        forcePopupIcon={false}
+                        noOptionsText="No locations"
+                        onChange={(event, newValue) => {
+                            setOptions(newValue ? [newValue, ...options] : options);
+                            console.log(newValue)
+                           
+                            if(newValue != null && newValue != undefined){
+                                setSearchLocation(newValue.description);
+                                fetchCribConnectTenants(newValue.description)
+                            }
+                            
+                            
+                            
+                        }}
+                        onInputChange={(event, newInputValue) => {
+                            console.log(newInputValue)
+                            setInputValue(newInputValue);
+                        }}
+                        renderInput={(params) => (
+                            <TextField {...params} label="Enter location" variant="outlined" />
+                        )}
+                        renderOption={(props, option) => {
+                            const matches =
+                            option.structured_formatting.main_text_matched_substrings || [];
+                            const parts = parse(
+                            option.structured_formatting.main_text,
+                            matches.map((match) => [match.offset, match.offset + match.length]),
+                            );
+
+                            return (
+                            <li {...props}>
+                                <Grid container alignItems="center">
+                                <Grid item sx={{ display: 'flex', width: 'auto' }}>
+                                    <LocationOnIcon sx={{ color: 'text.secondary' }} />
+                                </Grid>
+                                <Grid item sx={{ width: 'calc(100% - 44px)', wordWrap: 'break-word' }}>
+                                    {parts.map((part, index) => (
+                                    <Box
+                                        key={index}
+                                        component="span"
+                                        sx={{ fontWeight: part.highlight ? 'bold' : 'regular' }}
+                                    >
+                                        {part.text}
+                                    </Box>
+                                    ))}
+
+                                    <Typography variant="body2" color="text.secondary">
+                                    {option.structured_formatting.secondary_text}
+                                    </Typography>
+                                </Grid>
+                                </Grid>
+                            </li>
+                            );
+                        }}
+                        />
+                    </div>
+                    {/* <div style={{marginLeft:'1vw'}}>
+                        <DatePicker
+                        label="Start date"
+                        value={dayjs(startDate)}
+                        onChange={(event)=>                                
+                            setStartDate(event)
+                        }
+                        slotProps={{ textField: {error:false, style:{outline:"none"}} }}
+                        
+                        />
+                    </div>
+                    <div style={{marginLeft:'1vw'}}>
+                        <DatePicker
+                        label="End date"
+                        value={dayjs(startDate)}
+                        onChange={(event)=>                                
+                            setStartDate(event)
+                        }
+                        slotProps={{ textField: {error:false, style:{outline:"none"}} }}
+                        
+                        />
+                    </div> */}
+                    {/* <div style={{marginLeft:'1vw'}}>
+                        <Button onClick={fetchCribConnectTenants} variant="contained" style={{backgroundColor: PRIMARYCOLOR, textTransform:'none'}}>
+                            <p style={{marginBottom:0, fontSize:'1rem', fontWeight:'500'}} >Search</p>
+                        </Button>
+                    </div> */}
+                </div>
+                
+                <div style={{flexDirection:'row',  width:'30vw', justifyContent:'flex-end', display:'flex'}}>
                     
                     <IconButton onClick={filterTenants} style={{outline:'none'}}>
                         <TuneIcon size={20} style={{color:'black'}} />
@@ -414,7 +531,7 @@ export default function LandingPage(props){
                                 else{
                                     return (
                                         <li
-                                        style={{listStyleType:'none', paddingLeft: 0}}
+                                        style={{listStyleType:'none', paddingLeft: 0, paddingTop:0}}
                                         key={item.userInfo._id + item.propertyInfo._id}
                                         ref={ref}
                                         >  

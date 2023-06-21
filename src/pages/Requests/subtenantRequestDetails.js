@@ -252,6 +252,9 @@ export default function SubtenantRequestDetailsScreen(props){
                     </Step>
                     ))}
                 </Stepper>
+                <Button onClick={()=>navigate(`/detailsMessage/${subleaseStatus._id}`)} style={{backgroundColor: 'black', outline: 'none', color:'white', height: mobile ? '6vh' : '5vh', textTransform:'none', width: mobile ? '100%' : "80%", marginTop:'5vh'}}>
+                    <p style={{marginBottom:0}}>Message</p>
+                </Button>
             </div>
             <div style={{width: mobile ? '90vw' : '60vw', height:"90vh", display:'flex', flexDirection:'column', justifyContent:'space-between', paddingTop: mobile && '5vh', marginTop: mobile && '5vh',  borderTopWidth: mobile ? '1px' :0, borderTopColor: LIGHTGREY, borderTopStyle:"solid" }}>
                 {activeStep == 1 ?
