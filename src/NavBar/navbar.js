@@ -10,6 +10,7 @@ import { UserContext } from '../UserContext';
 import { PersonAdd } from '@mui/icons-material';
 
 
+
 export default function NavBar(){
     const navigate = useNavigate()
     const {loggedIn, setLoggedIn, mobile, notifications} = useContext(UserContext) 

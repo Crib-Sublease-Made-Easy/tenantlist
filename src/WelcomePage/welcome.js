@@ -39,6 +39,11 @@ export default function WelcomePage(){
         
     }
 
+    function handleFindSubleaseClick(){
+        localStorage.setItem("promptSubtenantForm", 1)
+        handleNav('/discoverSubleases')
+    }
+
     return(
         <>
         <div style={{ height: mobile ? 'auto' : 'auto', width:'100vw', flexDirection: mobile ? 'column-reverse' : 'row', display:'flex', paddingLeft: '5vw', paddingRight:'5vw', justifyContent:'space-between', paddingTop: mobile ? '5vh' : '10vh', paddingBottom: mobile ? 0 : '2vh', }}>
@@ -52,7 +57,7 @@ export default function WelcomePage(){
                 {/* <p style={{fontFamily: OPENSANS, fontWeight:'500'}}>Sublease easier than ever with Crib</p> */}
            
                 <div style={{flexDirection: mobile ? 'column' : 'row', display:'flex', marginTop: mobile ? '3vh' : '5vh' }}>
-                    <Button onClick={()=> handleNav('/discoverSubleases')} style={{backgroundColor: PRIMARYCOLOR, color: 'white', padding: 10, textTransform:'none', outline:'none'}}> 
+                    <Button onClick={handleFindSubleaseClick} style={{backgroundColor: PRIMARYCOLOR, color: 'white', padding: 10, textTransform:'none', outline:'none'}}> 
                         <p style={{marginBottom:0, fontFamily: OPENSANS, fontWeight:'700'}}>Find a sublease</p>
                     </Button>
                     <Button onClick={postProperty} variant="outlined" style={{color: PRIMARYCOLOR, padding: 10, borderColor: PRIMARYCOLOR, marginLeft: mobile ? 0 : '2vh', textTransform:'none', marginTop: mobile ? '2vh' : 0, outline:'none'}}>
@@ -73,7 +78,7 @@ export default function WelcomePage(){
             <div style={{position:'relative',}}>
                 <div style={{width: mobile ? '90vw' : '37vw'}}>
                     <p style={{fontWeight:'700', fontFamily: OPENSANS, fontSize: mobile ? '1.8rem' : '2.2rem', marginBottom:'1vh'}}><span style={{color:'black'}}>Why Crib?</span></p>
-                    <p style={{fontFamily: OPENSANS, fontWeight:'400', }}>Crib makes sublease easier than ever. By providing an all-in-one platform from browsing, to signing sublease contract, to paying security deposit, we got you covered to ensure a smooth move-in.</p>
+                    <p style={{fontFamily: OPENSANS, fontWeight:'400', }}>Crib makes subleasing easier than ever. By providing an all-in-one platform from browsing, to signing sublease/sublet contract, to paying security deposit, we got you covered to ensure a smooth process.</p>
                 </div>
                 <div style={{flexDirection: mobile ? 'column' : 'row', display:'flex', marginTop: mobile? '5vh' : '10vh', alignItems: mobile &&'center'}}>
                     {CRIBPROS.map((item)=> {

@@ -12,6 +12,9 @@ import { debounce } from '@mui/material/utils';
 import parse from 'autosuggest-highlight/parse';
 import { DatePicker } from "@mui/x-date-pickers"
 
+import NYDayImage from '../../NYCDay.jpeg'
+
+
 
 import GoogleMap from 'google-maps-react-markers';
 import Lottie from "lottie-react";
@@ -28,8 +31,7 @@ import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import TuneIcon from '@mui/icons-material/Tune';
 import { MEDIUMGREY, MEDIUMROUNDED, OPENSANS } from "../../sharedUtils";
 
-
-
+import Fade from '@mui/material/Fade';
 
 //For date picker
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -87,6 +89,9 @@ export default function LandingPage(props){
 
     const [startDate, setStartDate] = useState(null)
     const [endDate, setEndDate] = useState(null)
+
+    //Subtenant form modal prompt 
+    const [subtenantFormModalVis, setSubtenantFormModalVis] = useState(false)
 
 
 
@@ -156,9 +161,17 @@ export default function LandingPage(props){
     };
 
     useEffect(() => {
-        console.log("hellp")
+        promptSubtenantForm()
         fetchCribConnectTenants()
     }, [])
+
+    async function promptSubtenantForm(){
+        let showModal = localStorage.getItem("promptSubtenantForm")
+        if(showModal == 1 ){
+            setSubtenantFormModalVis(true)
+            localStorage.setItem("promptSubtenantForm", 0)
+        }
+    }
 
     async function fetchCribConnectTenants(location){
         // const resp = await fetch("https://crib-llc.herokuapp.com/users/cribconnect/getall");
@@ -358,6 +371,10 @@ export default function LandingPage(props){
             left: 0,
             behavior: "smooth",
         });
+    }
+
+    function handleSubtenantFormNav(){
+        window.open("https://subtenant-form.herokuapp.com", "_blank")
     }
 
     return(
@@ -741,6 +758,54 @@ export default function LandingPage(props){
                         }
                     </div>
                 </Modal>
+                {/* Subtenant form modal vis */}
+                <Modal
+                    aria-labelledby="subtenant-form"
+                    aria-describedby="subtenant-form"
+                    open={subtenantFormModalVis}
+                    onClose={()=> setSubtenantFormModalVis(false)}
+                    closeAfterTransition
+                
+                    slotProps={{
+                    backdrop: {
+                        timeout: 500,
+                    },
+                    }}
+                >
+                    <Fade in={subtenantFormModalVis}>
+                    <div 
+                        style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: mobile ? '90vw' : '40vw',
+                        height:'auto',
+                        backgroundColor:'white',
+                        padding: mobile ? '4vw' : '2vw',
+                        borderRadius: MEDIUMROUNDED,
+                        display:'flex',
+                      
+                        flexDirection:'column',
+                        }}>
+                        <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize:'1.3rem', marginBottom: 5,}}>Let us help you find a sublease!</p>
+                        <p style={{fontWeight:'400', fontFamily: OPENSANS, fontSize:'0.9rem', marginBottom: '2vh',}}>Let us know what kind of sublease you're looking for and we will notify you right away when subleases that fits your needs are posted</p>
+
+                        <img src={NYDayImage}  style={{width:'100%', height:'25vh', borderRadius: MEDIUMROUNDED}}/>
+                        <Button onClick={handleSubtenantFormNav} fullWidth variant="contained" style={{backgroundColor: 'black', outline:'none', textTransform:'none', height: '6vh', marginTop:'4vh'}}>
+                            <p style={{fontFamily: OPENSANS, marginBottom:0, fontWeight:'600', objectFit:'cover'}}>
+                                Yes, I'm in
+                            </p>
+                        </Button>
+                        <p onClick={()=> setSubtenantFormModalVis(false)} style={{fontFamily: OPENSANS, marginBottom:0, fontWeight:'500', color:'#737373', marginLeft:'auto', marginRight:'auto', marginTop:'2vh', cursor:'pointer', fontSize:"0.9rem"}}>
+                            No, I don't need help
+                        </p>
+
+
+
+                    </div>
+                    </Fade>
+                </Modal>
 
                 {/* Map Modal Image Click Gallery */}
                 <Modal 
@@ -787,6 +852,7 @@ export default function LandingPage(props){
                     
                     </div>
                 </Modal>
+                
                { mobile &&
                 <div onClick={()=>setMobileMapModalVis(true)} style={{position:'absolute',backgroundColor: 'black', flexDirection:'row', display:'flex', justifyContent:'space-around', alignItems:'center', marginLeft:'auto', marginRight:'auto', bottom: '5vh', paddingLeft: 10, paddingRight:10, paddingTop:7, paddingBottom:7, borderRadius:15, width:'auto',
                     left: '50%',
