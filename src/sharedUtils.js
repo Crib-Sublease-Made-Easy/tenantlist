@@ -33,6 +33,7 @@ export const PRIMARYCOLOR = '#2D6674'
 export const MEDIUMGREY = '#333333'
 export const LIGHTGREY = '#E0E0E0'
 export const EXTRALIGHT = '#f2f2f2'
+export const SUBTEXTCOLOR = '#737373'
 
 //Font family
 export const OPENSANS = 'Open Sans'

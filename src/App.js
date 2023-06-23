@@ -2,7 +2,12 @@
 import LandingPage from './pages/Landing/landing';
 import TenantRequestPage from './pages/Tenant/tenantRequests';
 import ListingDetails from './ListingDetails/listingDetails';
+import reportWebVitals from './reportWebVitals'
 
+
+
+//Google Analytics
+import ReactGA from "react-ga4";
 
 import NavBar from './NavBar/navbar';
 import './App.css';
@@ -35,6 +40,7 @@ const appId = 'EF181665-2473-42C6-9376-A340AF716169';
 
 const sb = new SendBird({ appId: appId});   // The `localCacheEnabled` is optional. The default is false.
 
+ReactGA.initialize("G-PYMC3R9G4G");
 
 function App() {
 
@@ -63,6 +69,7 @@ function App() {
   useEffect(()=>{
     refreshAccessToken()
     getDeviceWidth()
+    reportWebVitals()
 },[])
 
 function getDeviceWidth(){
@@ -189,5 +196,13 @@ const connectSendbird = async (UID) => {
     </UserContext.Provider>
   );
 }
+const SendAnalytics = ()=> {
+  ReactGA.send({
+    hitType: "pageview",
+    page: window.location.pathname,
+  });
+}
+reportWebVitals(SendAnalytics);
+
 
 export default App;

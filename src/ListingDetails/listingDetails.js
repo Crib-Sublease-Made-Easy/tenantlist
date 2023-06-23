@@ -1,6 +1,6 @@
 import { createRef, useContext, useEffect, useState, useRef, useCallback } from "react"
 import { useNavigate, useParams } from "react-router-dom"
-import { EXTRALIGHT, LIGHTGREY, MEDIUMGREY, MEDIUMROUNDED, OPENSANS, PRIMARYCOLOR, GetIcon } from "../sharedUtils"
+import { EXTRALIGHT, LIGHTGREY, MEDIUMGREY, MEDIUMROUNDED, OPENSANS, PRIMARYCOLOR, GetIcon, SUBTEXTCOLOR } from "../sharedUtils"
 import WhiteLoadingAnimation from '../whiteLoading.json'
 import Lottie from "lottie-react";
 import SubleaseRequestSent from './subleaseRequestSent.json'
@@ -23,7 +23,7 @@ import GppGoodIcon from '@mui/icons-material/GppGood';
 import Diversity3Icon from '@mui/icons-material/Diversity3';
 
 import GoogleMap from 'google-maps-react-markers';
-import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from "@mui/material";
+import { Button, Checkbox, FormControl, InputLabel, MenuItem, Select, TextField } from "@mui/material";
 
 import dayjs, { Dayjs } from "dayjs";
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -32,6 +32,7 @@ import { DatePicker } from "@mui/x-date-pickers"
 
 
 import { UserContext } from "../UserContext"
+import { CheckBox } from "@mui/icons-material";
 
 export default function ListingDetails(){
     const {mobile} = useContext(UserContext)
@@ -48,10 +49,19 @@ export default function ListingDetails(){
     const [requestEnd, setRequestEnd] = useState(null)
     const [numberOfOccupants, setNumberOfOccupants] = useState(1)
     const [requestMessage, setRequestMessage] = useState("")
+    const [userData, setUserData] = useState(null)
 
     const [mobilePage, setMobilePage] = useState(0)
 
     const [requestSuccessModal, setRequestSuccessModal] = useState(false)
+    const [requestConfirmationModalVis, setRequestConfirmationModalVis] = useState(false)
+
+    const [confirmationEmail, setConfirmationEmail] = useState("")
+    const [requestConfirmationPage, setRequestConfirmationPage] = useState(0)
+    const [verificationCode, setVerificationCode] = useState("")
+
+    const [requestDetailsConfirmationModalVis, setRequestDetailsConfirmationModalVis] = useState(false)
+    const [requestConfirmationCheckbox, setRequestConfirmationCheckbox] = useState(false)
 
     let GoogleMapRef = useRef(null)
 
@@ -60,7 +70,31 @@ export default function ListingDetails(){
     const { id } = useParams()
     useEffect(()=>{
         fetchProp()
+        fetchUserData()
     },[])
+
+    async function fetchUserData(){
+        let at = localStorage.getItem("accessToken")
+        let uid = localStorage.getItem("uid")
+        if(at != null && uid != null){
+
+            await fetch('https://crib-llc.herokuapp.com/users/' + uid, {
+            method: 'GET',
+            headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + at,
+            }
+            }) 
+            .then(res => res.json()).then(async userData =>{
+                setConfirmationEmail(userData.email)
+                setUserData(userData)
+            })
+            .catch(e=>{
+              console.log("Error")
+            })
+        } 
+    }
 
     const onGoogleApiLoaded = ({ map, maps }) => {
         GoogleMapRef.current = map
@@ -106,16 +140,18 @@ export default function ListingDetails(){
            
             return;
         }
+        if(userData.emailVerified == undefined || userData.emailVerified == false){
+            setRequestConfirmationModalVis(true)
+            return
+        }
+        setRequestDetailsConfirmationModalVis(true)
+    }
+
+    async function sendSubleaseRequest(){
+        setRequestDetailsConfirmationModalVis(false)
         setLoading(true)
         let USERID = localStorage.getItem("uid")
-       
-
-        //Add this user to the other user's property requestedBy field
-        // - Need sublease from and to
-        // - Need the user's ID
-        // - Need the person's message 
-        // - Need the number of Occupants
-
+        let at = localStorage.getItem("accessToken")
 
         await fetch('https://crib-llc.herokuapp.com/requests', {
             method: 'POST',
@@ -205,6 +241,104 @@ export default function ListingDetails(){
         })
         
 
+    }
+
+    // if(res.status == 200){
+    //     await fetch('https://crib-llc.herokuapp.com/users/' + USERID, {
+    //         method: 'PUT',
+    //         headers: {
+    //             Accept: 'application/json',
+    //             'Content-Type': 'application/json',
+    //             'Authorization': 'Bearer ' + at,
+    //         },
+    //         body: JSON.stringify({email: confirmationEmail})
+    //     })
+    //     .then((response) => {
+    //         if(response.status == 200){
+                
+    //         }
+    //     })
+    //     .catch( e => {
+    //         alert("Invalid email. Please enter a valid email before verification.")
+    //         setConfirmationEmail(0)
+    //     })
+    // }
+    // else{
+    //     alert("Invalid email. Please enter a valid email before verification.")
+    //     setConfirmationEmail(0)
+    // }
+
+    function sendEmailVerification(){
+    
+        fetch('https://crib-llc.herokuapp.com/users/sendEmailVerification', {
+            method:'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                "email": confirmationEmail
+            })
+        })
+        .then(async res => {
+            setRequestConfirmationPage(1)
+        })
+        .catch( e => {
+            alert("Invalid email. Please enter a valid email before verification.")
+            setRequestConfirmationPage(0)
+        })
+      
+    }
+
+    async function verifyEmail(){
+        console.log("hello")
+        let USERID = localStorage.getItem("uid")
+        let at = localStorage.getItem("accessToken")
+        if(verificationCode.length != 6){
+            alert("Please enter a valid verification code")
+            return
+        }
+        fetch('https://crib-llc.herokuapp.com/users/verifyEmailVerifcationCode', {
+            method:'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                "email": confirmationEmail,
+                "code": verificationCode,
+                "userId": userData._id
+            })
+        })
+        .then(async res => {
+            if(res.status == 200){
+                
+                await fetch('https://crib-llc.herokuapp.com/users/' + USERID, {
+                    method: 'PUT',
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + at,
+                    },
+                    body: JSON.stringify({"email": confirmationEmail})
+                })
+                .then((response) => {
+                    setRequestConfirmationModalVis(false)
+                    setRequestDetailsConfirmationModalVis(true)
+                })
+                .catch( e => {
+                    alert("Invalid email. Please try again!")
+                    setRequestConfirmationPage(0)
+                })
+                setRequestConfirmationModalVis(false)
+            }
+            else{
+                alert("Invalid code, please try again.")
+                setLoading(false)
+                setVerificationCode("")
+            }
+        })
+        .catch( e => console.log("Error"))
     }
 
 
@@ -610,66 +744,80 @@ export default function ListingDetails(){
                 
                 </div>
                 :
-                <div style={{width:'100%', height:'80vh', paddingLeft:'2.5vw', paddingRight:'2.5vw', paddingTop:'3vh', overflow:'scroll', paddingBottom:'20vh'}}>
-                    <p onClick={()=> setMobilePage(0)} style={{textDecorationLine:'underline', fontFamily: OPENSANS, fontWeight:'600', color: MEDIUMGREY, fontSize:'0.9rem'}}>Back to listing</p>
+                <div style={{width:'100%', height:'78vh', paddingLeft: mobile ? '5vw' : '2.5vw', paddingRight:  mobile ? '5vw' : '2.5vw', paddingTop: '3vh', overflow:'scroll', paddingBottom: '15vh'}}>
+                    <p onClick={()=> setMobilePage(0)} style={{textDecorationLine:'underline', fontFamily: OPENSANS, fontWeight:'600', color: SUBTEXTCOLOR, fontSize:'0.9rem', marginBottom:0}}>Back to listing</p>
                     <>
-                        <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize:'1.2rem',}}>Send {tenantData.firstName} a request to sublease</p>
-                        <div style={{position:'relative'}}>
-                            <img src={propData.imgList[0]} style={{width:'100%', height:'25vh', borderRadius: MEDIUMROUNDED, objectFit: 'cover'}}/>
-                            <div style={{position:'absolute', bottom: 10, right: 10, backgroundColor:PRIMARYCOLOR, padding: '2vw', borderRadius: MEDIUMROUNDED, borderColor:'white', borderWidth:1, borderStyle:'solid'}}>
-                                <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize:'0.9rem', marginBottom:0, color:'white'  }}>${propData.price} /month</p>
-
+                        <div style={{paddingTop:'4vh', paddingBottom:'4vh', borderBottomWidth:'1px', borderBottomColor: LIGHTGREY, borderBottomStyle:'solid'}}>
+                            <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize:'1.4rem',}}>Sublease details</p>
+                            <div style={{position:'relative', display:'flex', flexDirection:'row'}}>
+                                {/* <img src={propData.imgList[0]} style={{width:'100%', height:'25vh', borderRadius: MEDIUMROUNDED, objectFit: 'cover'}}/> */}
+                                <div style={{width:"50%"}}>
+                                    <img src={propData.imgList[0]} style={{width:'40vw', height:'15vh', borderRadius: MEDIUMROUNDED, objectFit: 'cover'}}/>
+                                </div>
+                                <div style={{width:"50%", display:'flex', flexDirection:'column', justifyContent:'space-between'}}>
+                                    <div> 
+                                        <p style={{fontSize:'0.9rem', fontFamily: OPENSANS, fontWeight:'500', marginBottom:0}}>{propData.type}</p>
+                                        <p style={{fontSize:'0.9rem', fontFamily: OPENSANS, fontWeight:'500', marginBottom:0}}>{propData.loc.streetAddr}</p>
+                                    </div>
+                                    <div>
+                                        <p style={{fontSize:'0.9rem', fontFamily: OPENSANS, fontWeight:'500', marginBottom:0, color: SUBTEXTCOLOR}}>{new Date(propData.availableFrom).getTime() < new Date().getTime() ? "Now" : new Date(propData.availableFrom).toLocaleString().split(",")[0]} - {new Date(propData.availableTo).toLocaleString().split(",")[0]}</p>
+                                    </div>
+                                    <div>
+                                        <p style={{fontSize:'0.9rem', fontFamily: OPENSANS, fontWeight:'600', marginBottom:0}}>${propData.price} /month</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div style={{flexDirection:'column', justifyContent:'space-between', display:'flex', marginTop:'3vh'}}>
-                            <p style={{fontWeight:'500', fontFamily: OPENSANS, fontSize:'1rem', marginBottom: '1vh',}}>Available from:  {new Date(propData.availableFrom).getTime() < new Date().getTime() ? "Now" : new Date(propData.availableFrom).toLocaleString().split(",")[0]} - {new Date(propData.availableTo).toLocaleString().split(",")[0]}</p>
-                        </div>
-                        <div style={{flexDirection:'row', display:'flex', marginTop:'2vh', justifyContent:'space-between'}}>
-                            <div style={{width:'47.5%'}}>
-                                <DatePicker
-                                label="Start date"
-                                value={dayjs(requestStart)}
-                                onChange={(event)=>                                
-                                    setRequestStart(event)
-                                }
-                                slotProps={{ textField: {error:false, } }}
-                                />
+                        <div style={{paddingTop:'4vh', paddingBottom:'4vh', borderBottomWidth:'1px', borderBottomColor: LIGHTGREY, borderBottomStyle:'solid'}}>
+                            <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize:'1.4rem',}}>Request details</p>
+                            <div style={{flexDirection:'row', display:'flex', marginTop:'2vh', justifyContent:'space-between'}}>
+                                <div style={{width:'47.5%'}}>
+                                    <DatePicker
+                                    label="Start date"
+                                    value={dayjs(requestStart)}
+                                    onChange={(event)=>                                
+                                        setRequestStart(event)
+                                    }
+                                    slotProps={{ textField: {error:false, } }}
+                                    />
+                                </div>
+                                <div style={{width:'47.5%'}}>
+                                    <DatePicker
+                                    label="End date"
+                                    value={dayjs(requestEnd)}
+                                    onChange={(event)=> setRequestEnd(event)}
+                                    slotProps={{ textField: {error:false, } }}
+                                    />
+                                </div>
                             </div>
-                            <div style={{width:'47.5%'}}>
-                                <DatePicker
-                                label="End date"
-                                value={dayjs(requestEnd)}
-                                onChange={(event)=> setRequestEnd(event)}
-                                slotProps={{ textField: {error:false, } }}
-                                />
+                            <div style={{marginTop:'2vh'}}>
+                                <FormControl fullWidth>
+                                    <InputLabel id="number-of-occupants">Number of occupants</InputLabel>
+                                    <Select
+                                        labelId="number-of-occupants"
+                                        value={numberOfOccupants}
+                                        label="Number of Occupants"
+                                    
+                                        onChange={(val)=> setNumberOfOccupants(val.target.value)}
+                                    >
+                                        <MenuItem value={1}>1</MenuItem>
+                                        <MenuItem value={2}>2</MenuItem>
+                                        <MenuItem value={3}>3</MenuItem>
+                                        <MenuItem value={4}>4</MenuItem>
+                                        <MenuItem value={5}>5</MenuItem>
+                                        <MenuItem value={6}>6</MenuItem>
+                                        <MenuItem value={7}>7</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </div>
+                            <div style={{marginTop:'2vh'}}>
+                                <TextField value={requestMessage} onChange={(val) => setRequestMessage(val.target.value)} helperText={`The more detailed the better`} multiline fullWidth label={`Tell ${tenantData.firstName} a bit about yourself`} rows={2} />
                             </div>
                         </div>
-                        <div style={{marginTop:'2vh'}}>
-                            <FormControl fullWidth>
-                                <InputLabel id="number-of-occupants">Number of occupants</InputLabel>
-                                <Select
-                                    labelId="number-of-occupants"
-                                    value={numberOfOccupants}
-                                    label="Number of Occupants"
-                                   
-                                    onChange={(val)=> setNumberOfOccupants(val.target.value)}
-                                >
-                                    <MenuItem value={1}>1</MenuItem>
-                                    <MenuItem value={2}>2</MenuItem>
-                                    <MenuItem value={3}>3</MenuItem>
-                                    <MenuItem value={4}>4</MenuItem>
-                                    <MenuItem value={5}>5</MenuItem>
-                                    <MenuItem value={6}>6</MenuItem>
-                                    <MenuItem value={7}>7</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </div>
-                        <div style={{marginTop:'2vh'}}>
-                            <TextField value={requestMessage} onChange={(val) => setRequestMessage(val.target.value)} helperText={`The more detailed the better`} multiline fullWidth label={`Tell ${tenantData.firstName} a bit about yourself`} rows={2} />
-                        </div>
-                        <div style={{marginTop:'2vh'}}>
+                        
+                        <div style={{paddingTop:'4vh', paddingBottom:'4vh', borderBottomWidth:'1px', borderBottomColor: LIGHTGREY, borderBottomStyle:'solid'}}>
                             <div style={{flexDirection: 'row', }}>
-                                <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize:'1.3rem', marginBottom: 10}}>Rent summary</p>
+                                <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize:'1.4rem',}}>Rent Summary</p>
                             </div>
                             <div style={{flexDirection:'row', marginTop:'2vh', justifyContent:'space-between', display:'flex'}}>
                                 <p style={{fontFamily:OPENSANS, fontWeight:'500', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>Security deposit</p>
@@ -685,7 +833,7 @@ export default function ListingDetails(){
                                 <p style={{fontFamily:OPENSANS, fontWeight:'500', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>{getFees()}</p>
                             </div>
                         </div>
-                        <div style={{width:'100%', borderTopWidth:'0.5px', borderTopColor: LIGHTGREY, borderTopStyle:'solid', marginTop:'2vh'}}>
+                        <div style={{width:'100%', marginTop:'2vh'}}>
                             <div style={{flexDirection:'row', marginTop:'2vh', justifyContent:'space-between', display:'flex'}}>
                                 <p style={{fontFamily:OPENSANS, fontWeight:'700', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>Total</p>
                                 <p style={{fontFamily:OPENSANS, fontWeight:'700', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>{getTotalRent()}</p>
@@ -698,7 +846,7 @@ export default function ListingDetails(){
                 }
                 {
                     mobile &&
-                    <div style={{height:'10vh', borderTopWidth:'1px', borderTopStyle:'solid', borderTopColor: EXTRALIGHT, paddingLeft:'5vw', paddingRight:'5vw', alignItems:'center', display:'flex', justifyContent:'space-between', position:'absolute', bottom:'-1vh',  width:'100%', zIndex:999, backgroundColor:'white'}}>
+                    <div style={{height:'10vh', borderTopWidth:'1px', borderTopStyle:'solid', borderTopColor: EXTRALIGHT, paddingLeft:'5vw', paddingRight:'5vw', alignItems:'center', display:'flex', justifyContent:'space-between', position:'absolute', bottom: '-0.5vh',  width:'100%', zIndex:999, backgroundColor:'white'}}>
                         <p style={{marginBottom:0, fontWeight:'600', fontSize:'1.1rem', fontFamily: OPENSANS}}>${propData.price} /month</p>
                         <Button disabled={loading} onClick={handleMobileRequestToBook} variant="contained" style={{backgroundColor: PRIMARYCOLOR, outline: 'none', color: 'white', textTransform:'none', height: '5vh', width:'40vw'}}>
                             {loading ?
@@ -744,10 +892,8 @@ export default function ListingDetails(){
             display:'flex',
             alignItems:'center',
             flexDirection:'column',
-            
-            
             }}>
-            <p style={{fontWeight:'700', fontFamily: OPENSANS, fontSize:'1.3rem', marginBottom: '2vh',}}>Sublease request sent!</p>
+            <p style={{fontWeight:'700', fontFamily: OPENSANS, fontSize:'1.3rem', marginBottom: '2vh',}}>Request successfully sent!</p>
             <Lottie animationData={SubleaseRequestSent} style={{height:'25vh'}} />
             <Button onClick={()=>handleNav('/discoverSubleases')} fullWidth variant="contained" style={{backgroundColor: PRIMARYCOLOR, outline:'none', textTransform:'none', height: '6vh'}}>
                 <p style={{fontFamily: OPENSANS, marginBottom:0, fontWeight:'600'}}>
@@ -765,6 +911,125 @@ export default function ListingDetails(){
           </div>
         </Fade>
       </Modal>
+      <Modal
+        aria-labelledby="transition-modal-title"
+        aria-describedby="transition-modal-description"
+        open={requestConfirmationModalVis}
+        onClose={()=> setRequestConfirmationModalVis(false)}
+        closeAfterTransition
+       
+        slotProps={{
+          backdrop: {
+            timeout: 500,
+          },
+        }}
+      >
+        <Fade in={requestConfirmationModalVis}>
+          <div 
+            style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: mobile ? '90vw' : '35vw',
+            height:'auto',
+            backgroundColor:'white',
+            padding: mobile ? '4vw' : '2vw',
+            borderRadius: MEDIUMROUNDED,
+            display:'flex',
+            
+            flexDirection:'column',
+            }}>
+            { requestConfirmationPage == 0 ?
+                <>
+                    <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize:'1.3rem', marginBottom: 5,}}>Let's confirm your email first</p>
+                    <p style={{fontWeight:'400', fontFamily: OPENSANS, fontSize:'0.9rem', marginBottom: '2vh',}}>We will send a verification code to your email</p>
+                    <div style={{display:'flex', flexDirection:'column', justifyContent:'space-between', alignItems:"center", }}>
+                        <TextField value={confirmationEmail} onChange={(val)=>setConfirmationEmail(val.target.value)} label="Email" fullWidth style={{marginTop:"4vh"}}/>
+                        <Button onClick={sendEmailVerification} variant="contained" fullWidth style={{backgroundColor:'black', textTransform:'none', fontSize:'0.9rem', height:'6vh', marginBottom:0, outline:'none', marginTop:"2vh"}}>
+                            <p style={{marginBottom:0}}>Continue</p>
+                        </Button>
+                    </div>
+                </>
+                :
+                <>
+                    <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize:'1.3rem', marginBottom: 5,}}>Enter verification code</p>
+                    <p style={{fontWeight:'400', fontFamily: OPENSANS, fontSize:'0.9rem', marginBottom: '2vh',}}>If you didn't receive an email, please check spam/junk for confirmation code</p>
+                    <div style={{display:'flex', flexDirection:'column', justifyContent:'space-between', alignItems:"center", }}>
+                        <TextField label="6 digit code" type="number" value={verificationCode} onChange={(val)=> setVerificationCode(val.target.value)} fullWidth style={{marginTop:"4vh"}}/>
+                        <Button onClick={verifyEmail} variant="contained" fullWidth style={{backgroundColor:'black', textTransform:'none', fontSize:'0.9rem', height:'6vh', marginBottom:0, outline:'none', marginTop:"2vh"}}>
+                            <p style={{marginBottom:0}}>Verify</p>
+                        </Button>
+                    </div>
+                    <p onClick={()=>setRequestConfirmationPage(0)} style={{fontWeight:'400', fontSize:'0.9rem', marginTop:'2vh', cursor:'pointer'}}>Edit email</p>
+                </>
+
+            }
+            </div>
+        </Fade>
+    </Modal>
+    <Modal
+        aria-labelledby="transition-modal-title"
+        aria-describedby="transition-modal-description"
+        open={requestDetailsConfirmationModalVis}
+        onClose={()=> setRequestDetailsConfirmationModalVis(false)}
+        closeAfterTransition
+       
+        slotProps={{
+          backdrop: {
+            timeout: 500,
+          },
+        }}
+      >
+        <Fade in={requestDetailsConfirmationModalVis}>
+          <div 
+            style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: mobile ? '90vw' : '35vw',
+            height:'auto',
+            backgroundColor:'white',
+            padding: mobile ? '4vw' : '2vw',
+            borderRadius: MEDIUMROUNDED,
+            display:'flex',
+            
+            flexDirection:'column',
+            }}>
+                
+                <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize:'1.2rem', marginBottom: 0}}>Confirm request details</p>
+                <p style={{fontWeight:'400', fontFamily: OPENSANS, fontSize:'0.9rem', marginBottom: 0}}>You're one step away from requesting this sublease</p>
+                {propData != null &&
+                <>
+                    <div style={{padding:'2vh', borderRadius: MEDIUMROUNDED, borderColor: LIGHTGREY, borderWidth:'1px', borderStyle:'solid', marginTop:'4vh'}}>
+                        <p style={{marginBottom:'1vh', fontFamily: OPENSANS, fontSize:'1rem', fontWeight:'600'}}>Sublease location</p>    
+                        <p style={{marginBottom:0, fontFamily: OPENSANS, fontSize:'0.9rem', fontWeight:'400'}}>{propData.loc.streetAddr}</p>    
+                    </div>    
+                    <div style={{padding:'2vh', borderRadius: MEDIUMROUNDED, borderColor: LIGHTGREY, borderWidth:'1px', borderStyle:'solid', marginTop:'2vh'}}>
+                        <p style={{marginBottom:'1vh', fontFamily: OPENSANS, fontSize:'1rem', fontWeight:'600'}}>Requested dates</p>    
+                        <p style={{marginBottom:0, fontFamily: OPENSANS, fontSize:'0.9rem', fontWeight:'400'}}>{new Date(requestStart).toLocaleDateString().split(",")[0]} - {new Date(requestEnd).toLocaleDateString().split(",")[0]}</p>    
+                    </div>  
+                </>  
+                }
+           
+                <div style={{ marginTop:'4vh', width:'100%'}}>
+                    <div style={{display:'flex', flexDirection:'row', alignItems:'center'}}>
+                        <Checkbox onChange={()=>setRequestConfirmationCheckbox(!requestConfirmationCheckbox)} checked={requestConfirmationCheckbox} style={{cursor:'pointer', color:'black'}} />
+                        <p style={{marginBottom:0,  color: '#737373', fontWeight:'400', fontSize:'0.8rem',}}>By clicking the checkbox, you are agreeing to our terms of services and privacy details</p>
+                    </div>
+                    <Button fullWidth onClick={sendSubleaseRequest} variant="contained" style={{backgroundColor:'black', outline:'none', textTransform:'none', height: mobile ? '6vh' : '5vh', marginTop:'2vh'}}>
+                        <p style={{marginBottom:0, fontFamily: OPENSANS, fontSize:'0.8rem', fontWeight:'600'}}>Confirm request</p>
+                    </Button>
+                    <Button fullWidth onClick={()=>setRequestDetailsConfirmationModalVis(false)}  style={{ boxShadow:'0px 0px 20px 1px rgba(33, 33, 33, 0.2)', color:'black', borderColor:'black' , outline:'none', textTransform:'none', height: mobile ? '6vh' : '5vh', marginTop:'2vh'}}>
+                        <p style={{marginBottom:0, fontFamily: OPENSANS, fontSize:'0.8rem', fontWeight:'600'}}>Edit</p>
+                    </Button>
+                </div>
+            </div>
+
+        </Fade>
+    </Modal>
+
 
         </LocalizationProvider>
     )

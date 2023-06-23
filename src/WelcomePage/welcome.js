@@ -14,7 +14,7 @@ import MoneySVG from './MoneySVG.svg'
 
 const CRIBPROS = [{name : "Budget friendly", content : "Most of our listings are on a discounted rent price. Request to book before they're gone.", img: BudgetSVG},
 {name : "Sublease instantly", content: "Crib provides a seamless and efficient process from start to finish. Secure your ideal sublease in no time.", img: LocalSVG},
-{name : "Hasstle free", content : "We provide tenants and subtenants with a formalizaed contract so you don't have to worry about it.", img: HassleFreeSVG},
+{name : "Hassle free", content : "We provide tenants and subtenants with a formalized contract so you don't have to worry about it.", img: HassleFreeSVG},
 {name : "Never get scammed", content: "We hold on to subtenant's security deposit until move-in day. It will be transferred to tenant on move-in day.", img: MoneySVG}]
 
 export default function WelcomePage(){
