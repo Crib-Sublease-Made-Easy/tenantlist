@@ -456,6 +456,14 @@ export default function LandingPage(props){
                         }}
                         />
                     </div>
+                    {!mobile && loading == true && searchLocation != null ? 
+                    <p style={{marginBottom:0, fontFamily: OPENSANS, fontSize:"0.9rem", fontWeight:"500", marginLeft:'2vw'}}>Looking for sublets in {searchLocation}...</p> 
+                    :
+                    !mobile ?
+                    <p style={{marginBottom:0, fontFamily: OPENSANS, fontSize:"0.9rem", fontWeight:"500", marginLeft:'2vw'}}><span style={{fontWeight:'700'}}>{NYProps.length}+</span> sublets found in {searchLocation}</p>
+                    :
+                    null
+                    }
                     {/* <div style={{marginLeft:'1vw'}}>
                         <DatePicker
                         label="Start date"
