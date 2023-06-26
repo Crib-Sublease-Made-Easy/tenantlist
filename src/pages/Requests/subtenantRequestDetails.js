@@ -74,11 +74,12 @@ export default function SubtenantRequestDetailsScreen(props){
 
     async function getStatus(){
         let at = localStorage.getItem("accessToken")
+        console.log("GetStatus + ATTTTT", at)
         if(at == null){
             refreshAccessToken()
             return
         }
-        await fetch(`https://crib-llc.herokuapp.com/requests/getOne/${String(id)}`, {
+        await fetch(`https://crib-llc.herokuapp.com/requests/getOne/${id}`, {
             method: 'GET',
             headers: {
             'Authorization': "Bearer " + at
@@ -112,24 +113,26 @@ export default function SubtenantRequestDetailsScreen(props){
                     .catch( e => {
                         console.log("error")
                     })
+
+                    await fetch(`https://crib-llc.herokuapp.com/requests/payment_amount/${id}`, {
+                        method: 'GET',
+                        headers: {
+                        'Authorization': "Bearer " + at
+                        }
+                    })
+                    .then ( async res => {
+                        if(res.status == 200){
+                            let data = await res.json()
+                            setPaymentAmount(data.amount)
+                            
+                        }
+                    })
+                    .catch( e => {
+                        console.log("error")
+                    })
                 }
 
-                await fetch(`https://crib-llc.herokuapp.com/requests/payment_amount/${id}`, {
-                    method: 'GET',
-                    headers: {
-                    'Authorization': "Bearer " + at
-                    }
-                })
-                .then ( async res => {
-                    if(res.status == 200){
-                        let data = await res.json()
-                        setPaymentAmount(data.amount)
-                        
-                    }
-                })
-                .catch( e => {
-                    console.log("error")
-                })
+                
 
             }
         })

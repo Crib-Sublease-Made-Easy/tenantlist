@@ -29,7 +29,7 @@ export default function DetailsMessageScreen(){
     
 
     function checkAuth(){
-        let at = localStorage.getItem("acessToken")
+        let at = localStorage.getItem("accessToken")
         let rt = localStorage.getItem("refreshToken")
         if(at == null && rt != null){
             window.location.reload()
@@ -44,30 +44,35 @@ export default function DetailsMessageScreen(){
         let rt = localStorage.getItem("refreshToken")
         let uid = localStorage.getItem("uid")
         let at = localStorage.getItem("accessToken")
-        setUid(uid)
+        if(at == null){
+            checkAuth()
+            return
+        }
         // POST /req_messages
         // fetch("")
-        await fetch(`https://crib-llc.herokuapp.com/req_messages/${id}`, {
-            method: 'GET',
-            headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-            'Authorization': "Bearer " + at
-            }
-        })
-        .then( async res => {
-            console.log(res)
-            if(res.status == 200){
-                let data = await res.json();
-                setConvo(data)
-                console.log(data[data.length-1]._id)
-            }
-            if(res.status == 401){
-                checkAuth()
-            }
-        })
-      
-        scrollToBottom()
+        if(at != null && id != null){
+            await fetch(`https://crib-llc.herokuapp.com/req_messages/${id}`, {
+                method: 'GET',
+                headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': "Bearer " + at
+                }
+            })
+            .then( async res => {
+                console.log(res)
+                if(res.status == 200){
+                    let data = await res.json();
+                    setConvo(data)
+                    console.log(data[data.length-1]._id)
+                }
+                if(res.status == 401){
+                    checkAuth()
+                }
+            })
+        
+            scrollToBottom()
+        }
         
     }
 
@@ -112,7 +117,7 @@ export default function DetailsMessageScreen(){
                 <AnnouncementIcon style={{color:MEDIUMGREY, fontSize: '1.2rem'}} />
                 <p style={{marginLeft:'1vw', color: SUBTEXTCOLOR, fontWeight:"500", marginBottom:0}}>For you own and the other user's safety, please communicate only on Crib platform. </p>
             </div>
-            <div id="messageContainer" ref={convosRef} style={{ overflow:'scroll', height: mobile ? '55vh' : '65vh'}}>
+            <div id="messageContainer" ref={convosRef} style={{ overflow:'scroll', height: mobile ? '53vh' : '65vh'}}>
                 {
                     convo.map((item, index) => {
                         
