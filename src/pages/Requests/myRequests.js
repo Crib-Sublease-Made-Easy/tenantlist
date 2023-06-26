@@ -63,11 +63,24 @@ export default function MyRequestsScreen(){
     //Delete 
 
     useEffect(()=> {
+        checkAccessToken()
         getToken()
     }, [])
 
+    function checkAccessToken(){
+        let at = localStorage.getItem("accessToken")
+        let rt = localStorage.getItem("refreshToken")
+
+        if ( at == null && rt != null){
+            window.location.reload()
+        }
+        else if(at == null && rt == null){
+            navigate("/login")
+        }
+    }
+
     async function getToken(){
-        let at = localStorage.getItem("refreshToken")
+        let at = localStorage.getItem("accessToken")
         let uid = localStorage.getItem("uid")
         if(at == null || at == undefined){
             navigate("/")
@@ -198,14 +211,14 @@ export default function MyRequestsScreen(){
                
                     <div style={{height: '10vh', width:'100%',  alignItems:'center', display:'flex', justifyContent:'space-between', paddingLeft:'5%', paddingRight:'5%'}}>
                         <div style={{flexDirection:'row', display:'flex',}}>
-                            <p style={{marginBottom:0, fontSize:'1.2rem', fontWeight:'500'}}>My requests ({requestsReceived.length})</p>
+                            <p style={{marginBottom:0, fontSize:'1.2rem', fontWeight:'500'}}>My requests</p>
                             {!mobile &&
                             <div style={{flexDirection:'row', display:'flex', marginLeft:'2vw'}}>
                                 <Button onClick={()=> setIndex(0)} size="small" variant={ index == 0 ? "contained" : 'outlined'} style={{backgroundColor: index == 0 ? 'black' : 'white', textTransform:"none",  borderColor:'black', outline:'none'}}>
-                                    <p  style={{fontSize: mobile ? '1.1rem' : '0.9rem', fontFamily: OPENSANS, fontWeight:"600", marginBottom:0,color: index == 0 ? 'white' : 'black'}}>Requests received</p>
+                                    <p  style={{fontSize: mobile ? '1.1rem' : '0.9rem', fontFamily: OPENSANS, fontWeight:"600", marginBottom:0,color: index == 0 ? 'white' : 'black'}}>Requests received ({requestsReceived.length})</p>
                                 </Button>
                                 <Button onClick={()=> setIndex(1)} variant={ index == 1 ? "contained" : 'outlined'} size="small" style={{backgroundColor: index == 1 ? 'black' : 'white',  textTransform:"none", marginLeft:'1vw', borderColor:'black', outline:'none'}}>
-                                    <p  style={{fontSize: mobile ? '1.1rem' : '0.9rem', fontFamily: OPENSANS, fontWeight:"600", marginBottom:0,color: index == 1 ? 'white' : 'black'}}>Requests sent</p>
+                                    <p  style={{fontSize: mobile ? '1.1rem' : '0.9rem', fontFamily: OPENSANS, fontWeight:"600", marginBottom:0,color: index == 1 ? 'white' : 'black'}}>Requests sent ({requestsSent.length})</p>
                                 </Button>
                             </div>
                             }
@@ -217,10 +230,10 @@ export default function MyRequestsScreen(){
                     {mobile &&
                     <div style={{flexDirection:'row', display:'flex', width:'100%',paddingLeft:'5%'}}>
                         <Button onClick={()=> setIndex(0)} size="small" variant={ index == 0 ? "contained" : 'outlined'} style={{backgroundColor: index == 0 ? 'black' : 'white', textTransform:"none",  borderColor:'black', outline:'none'}}>
-                            <p  style={{fontSize: mobile ? '1rem' : '0.9rem', fontFamily: OPENSANS, fontWeight:"600", marginBottom:0,color: index == 0 ? 'white' : 'black'}}>Requests received</p>
+                            <p  style={{fontSize: '0.9rem', fontFamily: OPENSANS, fontWeight:"600", marginBottom:0,color: index == 0 ? 'white' : 'black'}}>Requests received ({requestsReceived.length})</p>
                         </Button>
                         <Button onClick={()=> setIndex(1)} variant={ index == 1 ? "contained" : 'outlined'} size="small" style={{backgroundColor: index == 1 ? 'black' : 'white',  textTransform:"none", marginLeft: mobile ? '2vw' : '1vw', borderColor:'black', outline:'none'}}>
-                            <p  style={{fontSize: mobile ? '1rem' : '0.9rem', fontFamily: OPENSANS, fontWeight:"600", marginBottom:0,color: index == 1 ? 'white' : 'black'}}>Requests sent</p>
+                            <p  style={{fontSize: '0.9rem', fontFamily: OPENSANS, fontWeight:"600", marginBottom:0,color: index == 1 ? 'white' : 'black'}}>Requests sent ({requestsSent.length})</p>
                         </Button>
                     </div>
                     }
@@ -312,50 +325,7 @@ export default function MyRequestsScreen(){
                     
                 </div>
             </div>
-            {/* <div style={{ display:'flex', justifyContent:'space-between', flexDirection:'column', height:'80vh', width:"90vw"}}>
-                <div>
-                {HOWITWORKS.map((item, index) => {
-                    return(
-                        <div style={{flexDirection:'row', display:'flex', marginTop: index == 0 ? 0 : '3vh' }}>
-                            <div style={{}}>
-                                <p style={{marginBottom:0, fontWeight:'500', fontSize:'1.8rem'}}>{index+1}</p>
-                            </div>
-                            <div style={{marginLeft:'4vw'}}>
-                                <p style={{marginBottom:0, fontWeight:'500', fontSize:'1.6rem'}}>{Object.keys(item)}</p>
-                                <p style={{marginBottom:0, fontWeight:'400', fontSize:'0.9rem', color: MEDIUMGREY}}>{Object.values(item)}</p>
-                            </div>
-                        </div>
-                    )
-                })}
-                </div>
-                <div style={{height: '20vh', width:'100%',  alignItems:'center', display:'flex', flexDirection:'row', justifyContent:'space-between'}}>
-                    <p style={{marginBottom:0, fontSize:'1.2rem', fontWeight:'500'}}>Still have a question?</p>
-                    <Button variant="contained" style={{backgroundColor: 'black', textTransform:'none', height:'5vh', outline:'none'}}>
-                        <p style={{marginBottom:0, fontWeight:'500' }}>Contact us</p>
-                    </Button>
-                </div>
-            </div> */}
-            {/* <div style={{width: '90vw', height:'90vh', marginLeft:'auto', marginRight:'auto', textAlign:'center' }}>
-                <p style={{fontFamily: OPENSANS, fontWeight:'600', fontSize:"2rem"}}>How does it work?</p>
-                <div style={{flexDirection:'row', display:'flex', marginTop:'10vh', textAlign:'center'}}>
-                    {HOWITWORKS.map((item)=> {
-                        return(
-                        <div style={{width:'22.5vw', height:'auto',paddingRight:'2vw', flexDirection:'column',}}>
-                            <img src={item.img}  style={{height:'15vh', }}/> 
-                            <p style={{fontFamily: OPENSANS, fontWeight:'600', fontSize:'1.4rem', marginTop:'2vh'}}>{item.name}</p>
-                            <p style={{fontFamily: OPENSANS}}>{item.content}</p>
-                        </div>
-                        )
-                    })}
-                </div>
-            </div> */}
-            <div>
-                {/* <p>Hey Ally,</p>
-                <p>Thank you for posting on Crib!</p>
-                <p>Timmo just requested to book your sublease from 6/19/23 to 8/30/23. The number of occupants is 1. And this is a bio provided by him.</p>
-                <p>"bio"</p>
-                <button style={{border:'none', backgroundColor: '#2D6674', paddingLeft:'10px', paddingRight:'10px', paddingTop:'5px', paddingBottom:'5px', borderRadius:"5px",color:'white', fontSize:'1.2rem'}}>View request</button> */}
-            </div>
+           
             <div style={{width: '90vw', height:'auto', marginLeft:'auto', marginRight:'auto', textAlign:'center', marginTop: mobile ? '10vh' : "15vh", flexDirection: mobile ? 'column' : 'row', display:'flex', justifyContent:'space-between', paddingBottom:'10vh' }}>
                 <p style={{fontFamily: OPENSANS, fontWeight:'600', fontSize:"2rem", textAlign: mobile ? 'center' : 'left'}}>Your questions, <br/>answered.</p>
                 <div style={{width: mobile ? '100%' : '50%', textAlign: mobile ? 'left' : 'center' }}>

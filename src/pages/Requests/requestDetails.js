@@ -282,7 +282,7 @@ export default function RequestDetailsScreen(props){
                 </Stepper>
                 </div>
                 <Button onClick={()=>navigate(`/detailsMessage/${subleaseStatus._id}`)} style={{backgroundColor: 'black', outline: 'none', color:'white', height: mobile ? '6vh' : '5vh', textTransform:'none', width: mobile ? '100%' : "80%", marginTop:'5vh'}}>
-                    <p style={{marginBottom:0}}>Message</p>
+                    <p style={{marginBottom:0}}>Message subtenant</p>
                 </Button>
             </div>
             <div style={{width: mobile ? '100%' : '60vw', height: mobile ? 'auto' : "90vh", display:'flex', flexDirection:'column', justifyContent: mobile ? 'space-between' : 'flex-start', paddingLeft: mobile ? 0 : "2vw"}}>

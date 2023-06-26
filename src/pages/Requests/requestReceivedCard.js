@@ -45,6 +45,7 @@ export default function RequestReceivedCards(props){
 
     const [emailVerificationModalVis, setEmailVerificationModalVis] = useState(false)
     const [emailVerificationPage, setEmailVerificationPage] = useState(0)
+    const [verificationCode, setVerificationCode] = useState("")
 
     useEffect(()=> {
         getToken()
@@ -54,6 +55,7 @@ export default function RequestReceivedCards(props){
     async function getToken(){
         let uid = localStorage.getItem("uid")
         let at = localStorage.getItem("accessToken")
+        console.log(at)
         await fetch('https://crib-llc.herokuapp.com/users/' + uid, {
             method: 'GET',
             headers: {
@@ -123,9 +125,6 @@ export default function RequestReceivedCards(props){
     //Modal 
     const [acceptRequestModalVis, setAcceptRequestModalVis] = useState(false)
 
-    useEffect(()=>{
-
-    }, [])
    
 
     function getAge(dob){
@@ -146,31 +145,7 @@ export default function RequestReceivedCards(props){
         const accessToken = localStorage.getItem("accessToken");
         const USERID = localStorage.getItem("uid")        
         setNameEmailConfirmModalVis(false)
-        // if(USERID != null && accessToken != null){
-        //     fetch('https://crib-llc.herokuapp.com/users/' + USERID, {
-        //         method: 'PUT',
-        //         headers: {
-        //             Accept: 'application/json',
-        //             'Content-Type': 'application/json',
-        //             'Authorization': 'Bearer ' + accessToken,
-        //         },
-        //         body: JSON.stringify({
-        //             "email": editEmail,
-        //             "firstName": editFirstName,
-        //             "lastName": editLastName
-        //         })
-        //     })
-        //     .then((response) => {
-        //         if(response.status == 200){
-        //             setNameEmailConfirmModalVis(false)
-        //             navigate(0)
-        //         }
-        //     }
-        //     )
-        //     .catch(e => {
-        //         console.log("ERROR --- EDITEDUCATION --- UPDATE")
-        //     })
-        // }
+       
 
         setLoading(true)
         setPrepareContractModalVis(true)
@@ -200,6 +175,8 @@ export default function RequestReceivedCards(props){
             setLoading(false)
             if(res.status == 200){
                 let data = await res.json()
+                setNameEmailConfirmModalVis(false)
+                setEmailVerificationModalVis(false)
                 setContractSent(true)
             }
         })
@@ -219,7 +196,98 @@ export default function RequestReceivedCards(props){
 
     function handleRequestAccept(){
     //    setAcceptRequestModalVis(true)
-        setNameEmailConfirmModalVis(true)
+        if(!userData.emailVerified){
+            setEmailVerificationModalVis(true)
+        }
+        else{
+            setNameEmailConfirmModalVis(true)
+        }
+       
+        // setNameEmailConfirmModalVis(true)
+    }
+
+    function sendVerificationEmail(){
+        setLoading(true)
+        fetch('https://crib-llc.herokuapp.com/users/sendEmailVerification', {
+            method:'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                "email": editEmail
+            })
+        })
+        .then(async res => {
+            setLoading(false)
+            if(res.status == 200){
+                
+                setEmailVerificationPage(1)
+            }
+            else{
+                alert("Invalid email, please try again or enter a different email.")
+               
+            }
+        })
+        .catch( e => {
+            alert("Invalid email. Please enter a valid email before verification.")
+            
+        })
+    }
+
+    function verifyEmail(){
+        console.log("hello")
+        let USERID = localStorage.getItem("uid")
+        let at = localStorage.getItem("accessToken")
+        if(verificationCode.length != 6){
+            alert("Please enter a valid verification code")
+            return
+        }
+        setLoading(true)
+        fetch('https://crib-llc.herokuapp.com/users/verifyEmailVerifcationCode', {
+            method:'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                "email": editEmail,
+                "code": verificationCode,
+                "userId": userData._id
+            })
+        })
+        .then(async res => {
+            setLoading(false)
+            if(res.status == 200){
+                
+                await fetch('https://crib-llc.herokuapp.com/users/' + USERID, {
+                    method: 'PUT',
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + at,
+                    },
+                    body: JSON.stringify({"email": editEmail})
+                })
+                .then((response) => {
+                    if(response.status == 200){
+                        setEmailVerificationModalVis(false)
+                        setNameEmailConfirmModalVis(true)
+                    }
+                })
+                .catch( e => {
+                    
+                })
+                
+            }
+            else{
+                alert("Invalid code, please try again.")
+                setLoading(false)
+                setVerificationCode("")
+            }
+        })
+        .catch( e => console.log("Error"))
+
     }
 
 
@@ -335,83 +403,6 @@ export default function RequestReceivedCards(props){
                 </div>
                 }
             </div>
-            {/* <img src={propData.imgList[0]} style={{width:'100%', height:'15vw', borderTopLeftRadius:MEDIUMROUNDED, borderTopRightRadius: MEDIUMROUNDED}} /> */}
-                {/* <div style={{display:'flex', flexDirection:'row', justifyContent:'space-between', alignItems:'center'}}>
-                    <p style={{fontSize:"0.8rem", fontWeight:'500', marginBottom:0, fontFamily: OPENSANS}}>Requested expires in 3 hours</p>
-                    <p style={{fontSize:"0.8rem", marginBottom:0, fontFamily: OPENSANS, textDecorationLine:'underline'}}>Need help?</p>
-                </div>
-                <div style={{flexDirection:'row', display:'flex', alignItems:'center', marginTop:'2vh' }}>
-                    <img src={subtenantData.profilePic} style={{height:'10vh', width: '10vh', borderRadius:'5vh'}}/> 
-                    <div style={{paddingLeft:'1vw',display:'flex', flex:1, justifyContent:'space-between',  flexDirection:"column", }}>
-                        <div style={{flexDirection:'column',}}>
-                            <p style={{fontSize:"0.9rem", fontWeight:'600', marginBottom:0, fontFamily: OPENSANS}}>{subtenantData.firstName} {subtenantData.lastName}</p>
-                            <div style={{display:'flex', flexDirection:'row'}}>
-                                <p style={{fontSize:"0.8rem", fontWeight:'500', marginBottom:0, fontFamily: OPENSANS}}>{subtenantData.gender}</p>
-                                <p style={{fontSize:"0.8rem", fontWeight:'500', marginBottom:0, marginLeft:'2vw', fontFamily: OPENSANS}}>{getAge(subtenantData.dob)}</p>
-                            </div>
-                        </div>
-                        {subtenantData.school != undefined && subtenantData.school.trim() != "" &&
-                        <div style={{flexDirection:'row', display:'flex', alignItems:'center', marginTop:'0.5vh'}}>
-                            <SchoolIcon style={{color:'black', fontSize:'0.9rem'}} />
-                            <p style={{fontSize:"0.8rem", fontWeight:'500', marginBottom:0, fontFamily: OPENSANS, marginLeft:'1vw'}}>{subtenantData.school.trim()}</p>
-                        </div>
-                        }
-                        {subtenantData.occupation != undefined && subtenantData.occupation.trim() != "" &&
-                        <div style={{flexDirection:'row', display:'flex', alignItems:'center', marginTop:'0.5vh'}}>
-                            <WorkIcon style={{color:'black', fontSize:'0.9rem'}} />
-                            <p style={{fontSize:"0.8rem", fontWeight:'500', marginBottom:0, fontFamily: OPENSANS, marginLeft:'1vw'}}>{subtenantData.occupation.trim()}</p>
-                        </div>
-                        }
-                    </div>
-                    
-                </div>
-                <div style={{flexDirection:'row', display:'flex', marginTop:'2vh'}}>
-                    <div style={{flexDirection:'row', display:'flex',alignItems:'center'}}>
-                        <PermPhoneMsg style={{fontSize: mobile ? '4vw' : '1vw'}}/>
-                        <p style={{marginTop:'auto', marginBottom:0, marginLeft: mobile ? '2vw' : '0.5vw', fontFamily:OPENSANS, fontWeight:'500', fontSize:"0.9rem"}}>Phone verified</p>
-                    </div>
-                    <div style={{flexDirection:'row', display:'flex',alignItems:'center', marginLeft:'2vw' }}>
-                        <MarkEmailRead style={{fontSize:'1vw'}}/>
-                        <p style={{marginTop:'auto', marginBottom:0, marginLeft:'0.5vw', fontFamily:OPENSANS, fontWeight:'500', fontSize:"0.9rem",}}>Email verified</p>
-                    </div>
-                </div>
-                <div>
-                    <div style={{flexDirection:'row', display:'flex', marginTop:'2vh'}}>
-                        <div>
-                            <p style={{fontSize: mobile ? '1.1rem' : '0.9rem', fontFamily: OPENSANS, fontWeight:"600", marginBottom:5}}>Move in</p>
-                            <p style={{fontSize:  mobile ? '0.9rem' : '0.8rem', fontFamily: OPENSANS, fontWeight:"400", marginBottom:5}} >{new Date(subleaseData.requestStart).toLocaleDateString().split(","[0])}</p>
-                        </div>
-                        <div style={{marginLeft:'2vw'}}>
-                            <p style={{fontSize: mobile ? '1.1rem' : '0.9rem', fontFamily: OPENSANS, fontWeight:"600", marginBottom:5}}>Move out</p>
-                            <p style={{fontSize:  mobile ? '0.9rem' : '0.8rem', fontFamily: OPENSANS, fontWeight:"400", marginBottom:5}} >{new Date(subleaseData.requestEnd).toLocaleDateString().split(","[0])}</p>
-                        </div>
-                    </div>
-                    <div style={{flexDirection:'row', display:'flex', marginTop:'2vh'}}>
-                        <div>
-                            <p style={{fontSize: mobile ? '1.1rem' : '0.9rem', fontFamily: OPENSANS, fontWeight:"600", marginBottom:5}}>Security deposit</p>
-                            <p style={{fontSize:  mobile ? '0.9rem' : '0.8rem', fontFamily: OPENSANS, fontWeight:"400", marginBottom:5}}>$1800</p>
-                        </div>
-                        <div style={{marginLeft:'2vw'}}>
-                            <p style={{fontSize: mobile ? '1.1rem' : '0.9rem', fontFamily: OPENSANS, fontWeight:"600", marginBottom:5}}>Rent</p>
-                            <p style={{fontSize:  mobile ? '0.9rem' : '0.8rem', fontFamily: OPENSANS, fontWeight:"400", marginBottom:5}}>$1800 /month</p>
-                        </div>
-                    </div>
-                    <div style={{marginTop:'2vh'}}>
-                        <p style={{fontSize:mobile ? '1.1rem' : '0.9rem', fontFamily: OPENSANS, fontWeight:"600", marginBottom:5}}>Number of occupants : {subleaseData.numOfOccupants}</p>
-                    </div>
-                    <div style={{marginTop:'2vh'}}>
-                        <p style={{fontSize:'1rem', fontFamily: OPENSANS, fontWeight:"600", marginBottom:5}}>Description</p>
-                        <p style={{fontSize:'0.8rem', fontFamily: OPENSANS, fontWeight:"500", marginBottom:5}} >Hello my name is Isaac, I am looking for a sublease for my summer inernship. I want to be close to Manhattan if possible and I want to live in a studio.</p>
-                    </div>
-                    <div style={{flexDirection:'row', display:'flex', justifyContent:'space-between', marginTop:'2vh'}}>
-                        <Button onClick={()=> setMessageModal(true)} varaint='outlined' style={{flexDirection:'row', display:'flex',borderWidth:'1px', borderColor:'black', borderStyle:'solid',color:'black', height:'5vh', textTransform:'none', marginTop : '2vh', outline: 'none', width:'45%'}}>
-                            <p style={{marginBottom:0, fontWeight:'500', }}>Reject</p>
-                        </Button>
-                        <Button onClick={()=> setAcceptRequestModalVis(true)}varaint='contained' style={{flexDirection:'row', display:'flex', backgroundColor: 'black', color:'white', height:'5vh', textTransform:'none', marginTop : '2vh', outline: 'none',  width:'45%'}}>
-                            <p style={{marginBottom:0, fontWeight:'500', }}>Approve</p>
-                        </Button>
-                    </div>
-                </div> */}
         <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
@@ -464,82 +455,7 @@ export default function RequestReceivedCards(props){
           </div>
         </Fade>
       </Modal>
-        <Modal
-        aria-labelledby="request-accept-modal"
-        aria-describedby="accept-subtenant-request"
-        open={nameEmailConfirmModalVis}
-        onClose={()=>setNameEmailConfirmModalVis(false)}
-        closeAfterTransition
-        slotProps={{
-        backdrop: {
-            timeout: 500,
-        },
-        }}
-        >
-            <Fade in={nameEmailConfirmModalVis}>
-                <div 
-                    style={{
-                    position: 'absolute',
-                    top: '30%',
-                    left: '50%',
-                    transform: 'translate(-50%, -30%)',
-                    height:'auto',
-                    backgroundColor:'white',
-                    padding: mobile ? '4vw' : '2vw',
-                    borderRadius: MEDIUMROUNDED,
-                    display:'flex',
-                    flexDirection:'column',
-                    width: mobile ? '90vw' : '40vw',
-                    
-                    }}>
-                    { userData != null && acceptPage == 0 ?
-                    <>
-                        <p style={{fontSize:'1.2rem', fontFamily: OPENSANS, color: 'black', fontWeight:'600', marginBottom:5}}>Confirm legal name and email</p>
-                        <p style={{fontSize:'0.9rem', fontFamily: OPENSANS, color: MEDIUMGREY, marginBottom:0}}>Please check if these information are correct before we prepare your sublease contract.</p>
-                        <div style={{marginTop:'4vh'}}>
-                            <p style={{fontSize:'1rem', fontFamily: OPENSANS, color: 'black', fontWeight:'600'}}>Legal name: <span style={{fontWeight:'400'}}>{userData.firstName} {userData.lastName}</span></p>
-                            <p style={{fontSize:'1rem', fontFamily: OPENSANS, color: 'black', fontWeight:'600', marginBottom:0}}>Email: <span style={{fontWeight:'400'}}>{userData.email}</span></p>
-                        </div>
-                        <div style={{marginTop: '5vh', display:'flex', flexDirection:'row'}}>
-                            <Button onClick={()=> setAcceptPage(1)} variant='outlined' style={{borderColor:'black', outline:'none', textTransform:'none', height:'5vh'}}>
-                               
-                                <p style={{marginBottom:0, fontWeight:'500', fontSize:'0.9rem', fontFamily: OPENSANS, color:'black'}}>Edit</p>
-                                
-                            </Button>
-                            <Button onClick={updateNameEmail} variant='contained' style={{backgroundColor:'black', outline:'none', textTransform:'none', height:'5vh', marginLeft:'2vh'}}>
-                               
-                                <p style={{marginBottom:0, fontWeight:'500', fontSize:'0.9rem', fontFamily: OPENSANS, color:'white'}}>Confirm</p>
-                                
-                            </Button>
-                        </div>
-                    </>
-                    :
-                    userData != null && acceptPage == 1 &&
-                    <>
-                        <p style={{fontSize:'1.2rem', fontFamily: OPENSANS, color: 'black', fontWeight:'600', marginBottom:5}}>Enter legal name and email</p>
-                        <p style={{fontSize:'0.9rem', fontFamily: OPENSANS, color: MEDIUMGREY, marginBottom:0}}>Please check if these information are correct before we prepare your sublease contract.</p>
-                        <div style={{marginTop:'4vh',}}>
-                            <div style={{display:'flex', flexDirection:'row',  justifyContent:'space-between'}}>
-                                <TextField label="First name" value={editFirstName} onChange={(val)=> setEditFirstName(val.target.value)} style={{width:'48%'}}/>
-                                <TextField label="Last name" value={editLastName} onChange={(val)=> setEditLastName(val.target.value)} style={{ width:'48%'}}/>
-                            </div>
-                            <div style={{marginTop:'2vh'}}>
-                                <TextField fullWidth label="Email" value={editEmail} onChange={(val)=> setEditEmail(val.target.value)}/>
-                            </div>
-                        </div>
-                        <div style={{marginTop: '5vh', display:'flex', flexDirection:'row'}}>
-                            <Button onClick={()=> setAcceptPage(0)} variant='outlined' style={{borderColor:'black', outline:'none', textTransform:'none', height:'5vh'}}>
-                               <p style={{marginBottom:0, fontWeight:'500', fontSize:'0.9rem', fontFamily: OPENSANS, color:'black'}}>Back</p>
-                           </Button>
-                            <Button onClick={updateNameEmail} variant='contained' style={{backgroundColor:'black', outline:'none', textTransform:'none', height:'5vh', marginLeft:'1vw'}}>
-                                <p style={{marginBottom:0, fontWeight:'500', fontSize:'0.9rem', fontFamily: OPENSANS, color:'white'}}>Confirm</p>       
-                            </Button>
-                        </div>
-                    </>
-                    }
-                </div>
-            </Fade>
-        </Modal>
+        
         {/* Email Confirmation Modal */}
         <Modal
             aria-labelledby="transition-modal-title"
@@ -572,25 +488,23 @@ export default function RequestReceivedCards(props){
                 }}>
                 { emailVerificationPage == 0 ?
                     <>
-                        <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize:'1.3rem', marginBottom: 5,}}>Let's confirm your email first</p>
-                        {/* <p style={{fontWeight:'400', fontFamily: OPENSANS, fontSize:'0.9rem', marginBottom: '2vh',}}>We will send a verification code to your email</p>
-                        <div style={{display:'flex', flexDirection:'column', justifyContent:'space-between', alignItems:"center", }}>
-                            <TextField value={confirmationEmail} onChange={(val)=>setConfirmationEmail(val.target.value)} label="Email" fullWidth style={{marginTop:"4vh"}}/>
-                            <Button onClick={sendEmailVerification} variant="contained" fullWidth style={{backgroundColor:'black', textTransform:'none', fontSize:'0.9rem', height:'6vh', marginBottom:0, outline:'none', marginTop:"2vh"}}>
-                                <p style={{marginBottom:0}}>Continue</p>
-                            </Button>
-                        </div> */}
+                        <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize:'1.3rem', marginBottom: 5,}}>Let's verify your email first</p>
+                        <p style={{fontWeight:'400', fontFamily: OPENSANS, fontSize:'0.9rem', marginBottom: '2vh',}}>We will send a verification code to your email, please double check if this email is correct.</p>
+                        <TextField value={editEmail} onChange={(val)=>setEditEmail(val.target.value)} label="Email" fullWidth style={{marginTop:"4vh"}}/>
+                        <Button disabled={loading} onClick={sendVerificationEmail} variant="contained" fullWidth style={{backgroundColor:'black', textTransform:'none', fontSize:'0.9rem', height:'6vh', marginBottom:0, outline:'none', marginTop:"2vh"}}>
+                            <p style={{marginBottom:0}}>Get code</p>
+                        </Button>
                     </>
                     :
                     <>
                         <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize:'1.3rem', marginBottom: 5,}}>Enter verification code</p>
-                        {/* <p style={{fontWeight:'400', fontFamily: OPENSANS, fontSize:'0.9rem', marginBottom: '2vh',}}>If you didn't receive an email, please check spam/junk for confirmation code</p>
+                        <p style={{fontWeight:'400', fontFamily: OPENSANS, fontSize:'0.9rem', marginBottom: '2vh',}}>If you didn't receive an email, please check spam/junk for confirmation code</p>
                         <div style={{display:'flex', flexDirection:'column', justifyContent:'space-between', alignItems:"center", }}>
                             <TextField label="6 digit code" type="number" value={verificationCode} onChange={(val)=> setVerificationCode(val.target.value)} fullWidth style={{marginTop:"4vh"}}/>
-                            <Button onClick={verifyEmail} variant="contained" fullWidth style={{backgroundColor:'black', textTransform:'none', fontSize:'0.9rem', height:'6vh', marginBottom:0, outline:'none', marginTop:"2vh"}}>
+                            <Button disabled={loading} onClick={verifyEmail} variant="contained" fullWidth style={{backgroundColor:'black', textTransform:'none', fontSize:'0.9rem', height:'6vh', marginBottom:0, outline:'none', marginTop:"2vh"}}>
                                 <p style={{marginBottom:0}}>Verify</p>
                             </Button>
-                        </div> */}
+                        </div>
                         <p onClick={()=>setEmailVerificationPage(0)} style={{fontWeight:'400', fontSize:'0.9rem', marginTop:'2vh', cursor:'pointer'}}>Edit email</p>
                     </>
 
@@ -637,9 +551,84 @@ export default function RequestReceivedCards(props){
                         <>
                             <p style={{fontSize:'1.2rem', fontFamily: OPENSANS, color: 'black', fontWeight:'600', marginBottom:5}}>Preparing your sublease contract...</p>
                             <p style={{fontSize:'0.9rem', fontFamily: OPENSANS, color: MEDIUMGREY, marginBottom:0}}>Please do not close this window, this might take 30 seconds.</p>
-                            <Lottie animationData={PreparingContractAnim} style={{width: mobile ? '50vw' : '35vw', marginTop:'6vh'}}/>
+                            <Lottie animationData={PreparingContractAnim} style={{width: mobile ? '70vw' : '35vw', marginTop:'6vh', marginLeft:"auto", marginRight:'auto'}}/>
                         </>
                         }
+                </div>
+            </Fade>
+        </Modal>
+        <Modal
+        aria-labelledby="request-accept-modal"
+        aria-describedby="accept-subtenant-request"
+        open={nameEmailConfirmModalVis}
+        onClose={()=>setNameEmailConfirmModalVis(false)}
+        closeAfterTransition
+        slotProps={{
+        backdrop: {
+            timeout: 500,
+        },
+        }}
+        >
+            <Fade in={nameEmailConfirmModalVis}>
+                <div 
+                    style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    height:'auto',
+                    backgroundColor:'white',
+                    padding: mobile ? '4vw' : '2vw',
+                    borderRadius: MEDIUMROUNDED,
+                    display:'flex',
+                    flexDirection:'column',
+                    width: mobile ? '90vw' : '40vw',
+                    
+                    }}>
+                    { userData != null && acceptPage == 0 ?
+                    <>
+                        <p style={{fontSize:'1.2rem', fontFamily: OPENSANS, color: 'black', fontWeight:'600', marginBottom:5}}>Confirm legal name</p>
+                        <p style={{fontSize:'0.9rem', fontFamily: OPENSANS, color: MEDIUMGREY, marginBottom:0}}>Please check if these information are correct before we prepare your sublease contract. This information CANNOT be changed after contract is created</p>
+                        <div style={{marginTop:'4vh'}}>
+                            <p style={{fontSize:'1rem', fontFamily: OPENSANS, color: 'black', fontWeight:'600'}}>Legal name: <span style={{fontWeight:'400'}}>{userData.firstName} {userData.lastName}</span></p>
+                        </div>
+                        <div style={{marginTop: '5vh', display:'flex', flexDirection:'row'}}>
+                            <Button onClick={()=> setAcceptPage(1)} variant='outlined' style={{borderColor:'black', outline:'none', textTransform:'none', height:'5vh'}}>
+                               
+                                <p style={{marginBottom:0, fontWeight:'500', fontSize:'0.9rem', fontFamily: OPENSANS, color:'black'}}>Edit</p>
+                                
+                            </Button>
+                            <Button onClick={updateNameEmail} variant='contained' style={{backgroundColor:'black', outline:'none', textTransform:'none', height:'5vh', marginLeft:'2vh'}}>
+                               
+                                <p style={{marginBottom:0, fontWeight:'500', fontSize:'0.9rem', fontFamily: OPENSANS, color:'white'}}>Confirm</p>
+                                
+                            </Button>
+                        </div>
+                    </>
+                    :
+                    userData != null && acceptPage == 1 &&
+                    <>
+                        <p style={{fontSize:'1.2rem', fontFamily: OPENSANS, color: 'black', fontWeight:'600', marginBottom:5}}>Enter legal name</p>
+                        <p style={{fontSize:'0.9rem', fontFamily: OPENSANS, color: MEDIUMGREY, marginBottom:0}}>Please double check this information are correct before we prepare your sublease contract.</p>
+                        <div style={{marginTop:'4vh',}}>
+                            <div style={{display:'flex', flexDirection:'row',  justifyContent:'space-between'}}>
+                                <TextField label="First name" value={editFirstName} onChange={(val)=> setEditFirstName(val.target.value)} style={{width:'48%'}}/>
+                                <TextField label="Last name" value={editLastName} onChange={(val)=> setEditLastName(val.target.value)} style={{ width:'48%'}}/>
+                            </div>
+                            {/* <div style={{marginTop:'2vh'}}>
+                                <TextField fullWidth label="Email" value={editEmail} onChange={(val)=> setEditEmail(val.target.value)}/>
+                            </div> */}
+                        </div>
+                        <div style={{marginTop: '5vh', display:'flex', flexDirection:'row'}}>
+                            <Button onClick={()=> setAcceptPage(0)} variant='outlined' style={{borderColor:'black', outline:'none', textTransform:'none', height:'5vh'}}>
+                               <p style={{marginBottom:0, fontWeight:'500', fontSize:'0.9rem', fontFamily: OPENSANS, color:'black'}}>Back</p>
+                           </Button>
+                            <Button onClick={updateNameEmail} variant='contained' style={{backgroundColor:'black', outline:'none', textTransform:'none', height:'5vh', marginLeft:'1vw'}}>
+                                <p style={{marginBottom:0, fontWeight:'500', fontSize:'0.9rem', fontFamily: OPENSANS, color:'white'}}>Confirm</p>       
+                            </Button>
+                        </div>
+                    </>
+                    }
                 </div>
             </Fade>
         </Modal>

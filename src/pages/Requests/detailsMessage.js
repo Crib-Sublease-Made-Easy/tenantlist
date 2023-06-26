@@ -12,6 +12,7 @@ export default function DetailsMessageScreen(){
     const [message, setMessage] = useState("")
     const [convo, setConvo] = useState([])
     const [uid, setUid] = useState("")
+    const [loading, setLoading] = useState(false)
     const [scrolling, setScrolling] = useState(false)
     
     const convosRef = useRef(null)
@@ -73,6 +74,7 @@ export default function DetailsMessageScreen(){
         
             scrollToBottom()
         }
+        setLoading(false)
         
     }
 
@@ -85,7 +87,7 @@ export default function DetailsMessageScreen(){
         if(message == ""){
             return
         }
-        
+        setLoading(true)
         await fetch('https://crib-llc.herokuapp.com/req_messages', {
             method: 'POST',
             headers: {
@@ -142,8 +144,12 @@ export default function DetailsMessageScreen(){
                     placeholder: 'Enter message',
                     endAdornment: 
                     <InputAdornment>
-                     <Button onClick={handleSendMessage} variant="contained" style={{backgroundColor:'black', outline:'none', color:'white', textTransform:'none', height: mobile ? '6vh' : '5vh',  }}>
+                     <Button disabled={loading} onClick={handleSendMessage} variant="contained" style={{backgroundColor:'black', outline:'none', color:'white', textTransform:'none', height: mobile ? '6vh' : '5vh',  }}>
+                        {loading ?
+                         <p style={{marginBottom:0, color:'white', fontFamily: OPENSANS, fontWeight:'500',  }}>...</p>
+                         :
                         <p style={{marginBottom:0, color:'white', fontFamily: OPENSANS, fontWeight:'500',  }}>Send</p>
+                        }
                     </Button>
                     </InputAdornment>,
                 }}/>

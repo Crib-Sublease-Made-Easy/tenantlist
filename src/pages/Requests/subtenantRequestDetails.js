@@ -215,7 +215,7 @@ export default function SubtenantRequestDetailsScreen(props){
                 <div style={{height:'10vh', width:'100%', display:'flex', alignItems:'center'}}>
                     <ArrowBackIcon onClick={()=>navigate("/myRequests")} style={{fontSize: mobile ? '1.2rem' : '1.5vw', cursor:'pointer'}}/>
                 </div>
-                {subleaseStatus != null &&
+                {/* {subleaseStatus != null &&
                 <div style={{width: mobile ? '90vw' : '25vw', height: mobile ? '8vh' : '10vh', backgroundColor:'white', boxShadow:'0px 0px 20px 1px rgba(33, 33, 33, 0.1)', borderRadius: MEDIUMROUNDED, display:'flex', alignItems:'center', padding: mobile ? '2.5vw' : '1.5vw', flexDirection:"row"}} >
                  
                     {activeStep == 0 ? 
@@ -229,11 +229,10 @@ export default function SubtenantRequestDetailsScreen(props){
                     :
                     <CheckCircleIcon style={{fontSize:'1.5rem', color:'green'}}/>
                     }
-                  
                     <p style={{marginBottom:0, fontSize:'0.9rem', marginLeft: mobile ? '2vw' : '1vw', fontWeight:'600', fontFamily: OPENSANS, }}>{getReminder()}</p>
-                                        
+                                     
                 </div>
-                }
+                } */}
                 <Stepper 
                 sx={{
                     marginTop: mobile ? '3vh' : '5vh',
@@ -273,7 +272,7 @@ export default function SubtenantRequestDetailsScreen(props){
                     ))}
                 </Stepper>
                 <Button onClick={()=>navigate(`/detailsMessage/${subleaseStatus._id}`)} style={{backgroundColor: 'black', outline: 'none', color:'white', height: mobile ? '6vh' : '5vh', textTransform:'none', width: mobile ? '100%' : "80%", marginTop:'5vh'}}>
-                    <p style={{marginBottom:0}}>Message</p>
+                    <p style={{marginBottom:0}}>Message tenant</p>
                 </Button>
             </div>
             <div style={{width: mobile ? '90vw' : '60vw', height:"90vh", display:'flex', flexDirection:'column', justifyContent:'space-between', paddingTop: mobile && '5vh', marginTop: mobile && '5vh',  borderTopWidth: mobile ? '1px' :0, borderTopColor: LIGHTGREY, borderTopStyle:"solid" }}>
@@ -303,14 +302,14 @@ export default function SubtenantRequestDetailsScreen(props){
                         }
                     </div>  
                     }
-                    <p style={{marginBottom:0, fontSize:'1rem', fontWeight:'400',}}>Expires in {getHourToExpire()} hours</p>
+                    {/* <p style={{marginBottom:0, fontSize:'1rem', fontWeight:'400',}}>Expires in {getHourToExpire()} hours</p> */}
                 </div>
                 :
                 activeStep == 0 ?
                 <div style={{height: '15vh', width:'100%', display:'flex', flexDirection:'row', justifyContent:'space-between', alignItems:'center',paddingLeft: mobile ? 0 : "2vw",}}>
                    <div style ={{flexDirection:'row', display:'flex'}}>
                         <WatchLaterIcon style={{fontSize:'1.5rem', color: 'gold'}}/>
-                        <p style={{marginBottom:0, fontSize:'1rem', fontWeight:'500',marginLeft:'1vw', width:'40vw'}}>Waiting for tenant to sign sublease contract</p>
+                        <p style={{marginBottom:0, fontSize:'1rem', fontWeight:'500',marginLeft:'1vw', width:'40vw'}}>Waiting for tenant to sign sublease contract </p>
                     </div> 
                 </div>
                 :

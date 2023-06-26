@@ -103,6 +103,7 @@ const refreshAccessToken = async () => {
           try {
             if(response.accessToken != undefined ?? response.accessToken != null){
               localStorage.setItem("accessToken", response.accessToken)
+              console.log(response.accessToken)
               setLoggedIn(true)
             }
             

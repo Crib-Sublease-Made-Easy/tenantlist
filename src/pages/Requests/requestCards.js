@@ -29,7 +29,7 @@ export default function RequestCards(props){
         <div style={{ height:'auto', borderRadius:MEDIUMROUNDED,}}>
             <p style={{fontSize: '0.8rem', fontWeight:'500', marginBottom:0,fontFamily: OPENSANS, color: MEDIUMGREY}}>Requested on {new Date(subleaseData.createdAt).toLocaleDateString().split(",")[0]}</p>
             <div style={{marginTop:'1vh'}}>
-                <img src={propData.imgList[0]} style={{width:'100%', height: '20vw', borderRadius: MEDIUMROUNDED, objectFit:'cover',  cursor:'pointer',}} />
+                <img src={propData.imgList[0]} style={{width:'100%', height: mobile ? '80vw' : '20vw', borderRadius: MEDIUMROUNDED, objectFit:'cover',  cursor:'pointer',}} />
                 <div style={{paddingTop:'1vh'}}>
                     <p style={{fontSize: '0.9rem', fontWeight:'600', marginBottom:0,fontFamily: OPENSANS}}>{propData.loc.streetAddr}</p>
                     <p style={{fontSize: '0.8rem', fontWeight:'400', marginBottom:0,fontFamily: OPENSANS,}}>{propData.type} posted by {tenantData.firstName}</p>

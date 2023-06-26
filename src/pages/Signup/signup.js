@@ -409,9 +409,9 @@ export default function SingupScreen(){
             signupStep == 1 ?
             <div>
                 <SingupSubheading style={{marginTop:'2vh'}}>Upload a profile picture</SingupSubheading>
-                <SingupText>Please ensure your face can be clearly seen in the image to get a better result</SingupText>
+                <SingupText>Please ensure your face can be clearly seen in the image for a better result</SingupText>
                 <div  style={{flexDirection:'column', display:'flex', justifyContent:'center', alignItems:'center'}}>
-                    <img onClick={handleImageClick} src={profImg} style={{width:'15vw', height:'15vw', backgroundColor:'#E0E0E0', borderRadius:'7.5vw', marginTop:'3vh', objectFit:'cover', cursor:'pointer'}}/>
+                    <img onClick={handleImageClick} src={profImg} style={{width: mobile ? '50vw' : '15vw', height: mobile ? '50vw' : '15vw', backgroundColor:'#E0E0E0', borderRadius: mobile ? '25vw' : '7.5vw', marginTop:'3vh', objectFit:'cover', cursor:'pointer'}}/>
                     <input onChange={handleImageChange} ref={hiddenFileInput} className="mt-5" style={{display:'none'}} type="file" accept="image/*" />
                     {/* <Button onClick={handleImageClick} variant="contained" style={{backgroundColor:PRIMARYCOLOR}}sx={{textTransform:'none', marginTop:3}}>Upload Profile Pic</Button> */}
                     <Button onClick={handleSubmit} fullWidth style={{marginTop: '5vh', backgroundColor: PRIMARYCOLOR,color: 'white', textTransform:'none', height: '6vh', textAlign:'center', outline:'none'}}>
