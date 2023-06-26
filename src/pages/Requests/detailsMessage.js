@@ -1,9 +1,9 @@
 import { Button, InputAdornment, TextField } from "@mui/material"
 import { createRef, useContext, useEffect, useRef, useState } from "react"
 import { useParams } from "react-router-dom"
-import { EXTRALIGHT, OPENSANS } from "../../sharedUtils"
+import { EXTRALIGHT, MEDIUMGREY, OPENSANS, SUBTEXTCOLOR } from "../../sharedUtils"
 import { UserContext } from "../../UserContext"
-import { animateScroll } from "react-scroll";
+import AnnouncementIcon from '@mui/icons-material/Announcement';
 
 export default function DetailsMessageScreen(){
     const {id} = useParams()
@@ -91,7 +91,11 @@ export default function DetailsMessageScreen(){
     
     return(
         <div style={{width:'100vw', height:'auto', paddingLeft:'5vw', paddingRight:'5vw'}}>
-            <div id="messageContainer" ref={convosRef} style={{ overflow:'scroll', height: mobile ? '60vh' : '70vh'}}>
+            <div style={{minHeight:'5vh', paddingTop:'1vh', paddingBottom:'1vh', width:'100%', display:'flex', flexDirection:'row', alignItems:'center'}}>
+                <AnnouncementIcon style={{color:MEDIUMGREY, fontSize: '1.2rem'}} />
+                <p style={{marginLeft:'1vw', color: SUBTEXTCOLOR, fontWeight:"500", marginBottom:0}}>For you own and the other user's safety, please communicate only on Crib platform. </p>
+            </div>
+            <div id="messageContainer" ref={convosRef} style={{ overflow:'scroll', height: mobile ? '55vh' : '65vh'}}>
                 {
                     convo.map((item, index) => {
                         

@@ -138,7 +138,7 @@ export default function SingupScreen(){
     }
 
     async function signupStep1(phoneNumber){
-        console.log("INSIDE STEP 1")
+        setLoading(true)
         await fetch('https://crib-llc.herokuapp.com/users/OTP/step1', {
             method: 'POST',
             headers: {
@@ -160,6 +160,7 @@ export default function SingupScreen(){
                 }
                 else{
                     alert("Invalid phone number or email.")
+                    setLoading(false)
                     setSignupStep(signupStep-1)
                 }
             }
@@ -168,6 +169,7 @@ export default function SingupScreen(){
             }
             else{
                 alert("An error has occured. Please try again later!")
+                setLoading(false)
                 setSignupStep(0)
             }
         })
@@ -288,7 +290,7 @@ export default function SingupScreen(){
                        
 
                 })
-                .catch( e => {
+                .catch( e => {  
                     console.log(e)
                     alert("Error occured. Please try again later!")
                     
@@ -407,7 +409,7 @@ export default function SingupScreen(){
             signupStep == 1 ?
             <div>
                 <SingupSubheading style={{marginTop:'2vh'}}>Upload a profile picture</SingupSubheading>
-                <SingupText>We strive to create a safe subleasing space for everyone. Please upload an image of yourself for better results.</SingupText>
+                <SingupText>Please ensure your face can be clearly seen in the image to get a better result</SingupText>
                 <div  style={{flexDirection:'column', display:'flex', justifyContent:'center', alignItems:'center'}}>
                     <img onClick={handleImageClick} src={profImg} style={{width:'15vw', height:'15vw', backgroundColor:'#E0E0E0', borderRadius:'7.5vw', marginTop:'3vh', objectFit:'cover', cursor:'pointer'}}/>
                     <input onChange={handleImageChange} ref={hiddenFileInput} className="mt-5" style={{display:'none'}} type="file" accept="image/*" />

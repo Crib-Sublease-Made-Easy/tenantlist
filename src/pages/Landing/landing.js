@@ -3,7 +3,7 @@ import React from 'react';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import TennatCard from "../../TenantCard/tenantCard";
-import {Box, Checkbox, Menu, MenuItem, IconButton, TextField, Autocomplete, Grid, Typography } from "@mui/material";
+import {Box, Checkbox, Menu, MenuItem, IconButton, TextField, Autocomplete, Grid, Typography, FormControl, InputLabel, Select } from "@mui/material";
 import { UserContext } from "../../UserContext"
 import { Button } from "@mui/material";
 import Slider from '@mui/material/Slider';
@@ -29,7 +29,7 @@ import SearchingAnim from './searching.json'
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import TuneIcon from '@mui/icons-material/Tune';
-import { MEDIUMGREY, MEDIUMROUNDED, OPENSANS } from "../../sharedUtils";
+import { MEDIUMGREY, MEDIUMROUNDED, OPENSANS, SUBTEXTCOLOR } from "../../sharedUtils";
 
 import Fade from '@mui/material/Fade';
 
@@ -92,7 +92,16 @@ export default function LandingPage(props){
 
     //Subtenant form modal prompt 
     const [subtenantFormModalVis, setSubtenantFormModalVis] = useState(false)
+    const [subtenantFormPage, setSubtenantFormPage] = useState(0)
 
+    const [subtenantFormLocation, setSubtenantFormLocation] = useState("")
+    const [subtenantFormType, setSubtenantFormType] = useState(null)
+    const [subtenantFormBudget, setSubtenantFormBudget] = useState(0)
+    const [subtenantFormStartDate, setSubtenantFormStartDate] = useState(null)
+    const [subtenantFormEndDate, setSubtenantFormEndDate] = useState(null)
+    const [subtenantFormBio, setSubtenantFormBio] = useState("")
+
+    const [subtenantFormSuccessModal, setSubtenantFormSuccessModal] = useState(false)
 
 
 
@@ -183,12 +192,20 @@ export default function LandingPage(props){
         setLoading(true)
         console.log(searchLocation)
         let loc = location == undefined ? searchLocation : location
+        if(loc == undefined){
+            return
+        }
+        console.log(loc)
         fetch('https://maps.googleapis.com/maps/api/geocode/json?address=' + loc + '&key=AIzaSyBbZGuUw4bqWirb1UWSzu9R6_r13rPj-eI', {
             method: 'GET'
                          }).then(res => res.json()).then(async jsonresp => {
-                            console.log("RESSSS", jsonresp.results[0].geometry.location)
+                            console.log("RESSSS",)
+                            console.log("RESULTS", jsonresp.results)
+                            if(jsonresp.results == null || jsonresp.results == undefined || jsonresp.results.length == 0){
+                                return [-74.0059728, 40.7127753]
+                            }
                             let coor = [jsonresp.results[0].geometry.location.lng, jsonresp.results[0].geometry.location.lat]
-                          
+                            console.log(coor)
                             return coor
                      
                         }).then( async coor => {
@@ -277,7 +294,7 @@ export default function LandingPage(props){
         setNYProps(tempProps.sort((a,b) => a.propertyInfo.price - b.propertyInfo.price))
         setLoading(false)
         tenantListRef.current.scrollIntoView(true)
-        window.scrollTo({
+        window?.scrollTo({
             top: 0,
             left: 0,
             behavior: "smooth",
@@ -291,7 +308,7 @@ export default function LandingPage(props){
         setNYProps(tempProps.sort((a,b) => new Date(a.propertyInfo.availableFrom).getTime() - new Date(b.propertyInfo.availableFrom).getTime()))
         setLoading(false)
         tenantListRef.current.scrollIntoView(true)
-        window.scrollTo({
+        window?.scrollTo({
             top: 0,
             left: 0,
             behavior: "smooth",
@@ -366,7 +383,7 @@ export default function LandingPage(props){
         let lat = p.propertyInfo.loc[1]
         let lng = p.propertyInfo.loc[0]
         setGMCenter({lat, lng})
-        window.scrollTo({
+        window?.scrollTo({
             top: 0,
             left: 0,
             behavior: "smooth",
@@ -374,8 +391,132 @@ export default function LandingPage(props){
     }
 
     function handleSubtenantFormNav(){
-        window.open("https://subtenant-form.herokuapp.com", "_blank")
+        let at = localStorage.getItem("accessToken")
+
+        if(at == null){
+            window.open("https://subtenant-form.herokuapp.com", "_blank")  
+            return
+        }      
+        else{
+            if(subtenantFormPage == 0){
+                setSubtenantFormPage(1)
+            }
+            if(subtenantFormPage == 1){
+                if(subtenantFormLocation.trim().length == 0){
+                    alert("Please enter location.")
+                }
+                else{
+                    setSubtenantFormPage(2)
+                }
+            }    
+        }
     }
+
+    function getAge(dob){
+        let age = Math.floor(dob / (1000*60*60*24*31*12))
+        return age
+    }
+
+    async function handleSubtenantSubmit(){
+        if(subtenantFormLocation.trim() == ""){
+            alert("Plese enter location")
+            return;
+        }
+        if(subtenantFormType == null){
+            alert("Plese enter sublease type")
+            return;
+        }
+        if(subtenantFormStartDate == null){
+            alert("Plese enter request start date")
+            return;
+        }
+        if(subtenantFormEndDate == null){
+            alert("Plese enter request end")
+            return;
+        }
+        if(subtenantFormBio == null){
+            alert("Plese let others know a bit about yourself")
+            return;
+        }
+        // console.log(subtenantFormLocation)
+        // console.log(subtenantFormType)
+        // console.log(subtenantFormBudget)
+        // console.log(subtenantFormStartDate)
+        // console.log(subtenantFormEndDate)
+        // console.log(subtenantFormBio)
+        
+        //Check if the person is a tenant 
+        setLoading(true)
+        let at = localStorage.getItem("accessToken")
+        let uid = localStorage.getItem("uid")
+        //Get the user information first 
+        //Create the subtenant object
+        await fetch('https://crib-llc.herokuapp.com/users/' + uid, {
+        method: 'GET',
+        headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + at,
+        }
+        }) 
+        .then(res => res.json()).then(async userData =>{
+            let age = getAge(userData.dob)
+            console.log(age)
+            fetch('https://maps.googleapis.com/maps/api/geocode/json?address=' + subtenantFormLocation + '&key=AIzaSyBbZGuUw4bqWirb1UWSzu9R6_r13rPj-eI', {
+            method: 'GET'
+            })
+            .then(res => res.json()).then(async jsonresp => {
+            console.log("RESSSS", jsonresp.results[0].geometry.location)
+            let coor = [jsonresp.results[0].geometry.location.lng, jsonresp.results[0].geometry.location.lat]
+            console.log(coor)
+            return coor
+            })
+            .then( async coor => {
+
+                await fetch('https://crib-llc.herokuapp.com/subtenants/create', {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    "name": userData.firstName+ " " +userData.lastName,
+                    "subleaseStart": new Date(subtenantFormStartDate),
+                    "subleaseEnd": new Date(subtenantFormEndDate),
+                    "budget":  subtenantFormBudget,
+                    "bio": subtenantFormBio,
+                    "phoneNumber": userData.phoneNumber,
+                    "age": age,
+                    "gender": userData.gender,
+                    "sharedRoomFlexibility": subtenantFormType == "Studio" || subtenantFormType == "Entire apartment" ? false : true,
+                    "roommatesFlexibility": false,
+                    "location": subtenantFormLocation,
+                    "coords": coor,
+                    "deleted": "false",
+                    "type": subtenantFormType,
+                    "desiredArea": ["Manhattan"]
+                    
+                })
+
+                }).then(res => {
+                    //Successfully created the subtenant object and sent the reqeust
+                    setLoading(false)
+                    setSubtenantFormModalVis(false)
+                    setSubtenantFormSuccessModal(true)
+                })
+                .catch( res => {
+                    //Error occured to close the modal 
+                    setLoading(false)
+                    setSubtenantFormModalVis(false)
+                })
+            })
+            .catch(e=>{
+                console.log("Error")
+                setLoading(false)
+                setSubtenantFormModalVis(false)
+            })    
+        })
+    }
+        
 
     return(
         <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -430,7 +571,7 @@ export default function LandingPage(props){
                             );
 
                             return (
-                            <li {...props}>
+                            <li key={"googleAutocompleteOptions" + option.structured_formatting.main_text_matched_substrings} {...props}>
                                 <Grid container alignItems="center">
                                 <Grid item sx={{ display: 'flex', width: 'auto' }}>
                                     <LocationOnIcon sx={{ color: 'text.secondary' }} />
@@ -796,18 +937,168 @@ export default function LandingPage(props){
                       
                         flexDirection:'column',
                         }}>
-                        <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize:'1.3rem', marginBottom: 5,}}>Let us help you find a sublease!</p>
-                        <p style={{fontWeight:'400', fontFamily: OPENSANS, fontSize:'0.9rem', marginBottom: '2vh',}}>Let us know what kind of sublease you're looking for and we will notify you right away when subleases that fits your needs are posted</p>
+                        {subtenantFormPage == 0 ?
+                        <>
+                            <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize:'1.3rem', marginBottom: 5,}}>Get notified when new subleases are up</p>
+                            <p style={{fontWeight:'400', fontFamily: OPENSANS, fontSize:'0.9rem', marginBottom: '2vh',}}>Let us know your preferences so we can notify you right away when subleases that match your preferences are posted.</p>
 
-                        <img src={NYDayImage}  style={{width:'100%', height:'25vh', borderRadius: MEDIUMROUNDED}}/>
-                        <Button onClick={handleSubtenantFormNav} fullWidth variant="contained" style={{backgroundColor: 'black', outline:'none', textTransform:'none', height: '6vh', marginTop:'4vh'}}>
-                            <p style={{fontFamily: OPENSANS, marginBottom:0, fontWeight:'600', objectFit:'cover'}}>
-                                Yes, I'm in
+                            <img src={NYDayImage}  style={{width:'100%', height:'25vh', borderRadius: MEDIUMROUNDED}}/>
+                            <Button onClick={handleSubtenantFormNav} fullWidth variant="contained" style={{backgroundColor: 'black', outline:'none', textTransform:'none', height: '6vh', marginTop:'4vh'}}>
+                                <p style={{fontFamily: OPENSANS, marginBottom:0, fontWeight:'600', objectFit:'cover'}}>
+                                    Yes, I'm in
+                                </p>
+                            </Button>
+                            <p onClick={()=> setSubtenantFormModalVis(false)} style={{fontFamily: OPENSANS, marginBottom:0, fontWeight:'500', color:'#737373', marginLeft:'auto', marginRight:'auto', marginTop:'2vh', cursor:'pointer', fontSize:"0.9rem"}}>
+                                No, I don't need help
                             </p>
-                        </Button>
-                        <p onClick={()=> setSubtenantFormModalVis(false)} style={{fontFamily: OPENSANS, marginBottom:0, fontWeight:'500', color:'#737373', marginLeft:'auto', marginRight:'auto', marginTop:'2vh', cursor:'pointer', fontSize:"0.9rem"}}>
-                            No, I don't need help
-                        </p>
+                        </>
+                        :
+                        <>
+                            <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize:'1.3rem', marginBottom: 5,}}>What's your preferences</p>
+                            <div style={{marginTop:'2vh'}}>
+                                <Autocomplete
+                                id="google-map-demo"
+                                fullWidth
+                                getOptionLabel={(option) =>
+                                    typeof option === 'string' ? option : option.description
+                                }
+                                filterOptions={(x) => x}
+                                style={{outline:'none', marginBottom:0}}
+                                options={options}
+                                autoComplete
+                                includeInputInList
+                                filterSelectedOptions
+                                value={subtenantFormLocation}
+                                forcePopupIcon={false}
+                                noOptionsText="No locations"
+                                onChange={(event, newValue) => {
+                                    setOptions(newValue ? [newValue, ...options] : options);
+                                    console.log(newValue)
+                                
+                                    if(newValue != null && newValue != undefined){
+                                        setSubtenantFormLocation(newValue.description);
+                                        fetchCribConnectTenants(newValue.description)
+                                    }
+                                    
+                                    
+                                    
+                                }}
+                                onInputChange={(event, newInputValue) => {
+                                    console.log(newInputValue)
+                                    setInputValue(newInputValue);
+                                }}
+                                renderInput={(params) => (
+                                    <TextField {...params} label="Enter location" variant="outlined" />
+                                )}
+                                renderOption={(props, option) => {
+                                    const matches =
+                                    option.structured_formatting.main_text_matched_substrings || [];
+                                    const parts = parse(
+                                    option.structured_formatting.main_text,
+                                    matches.map((match) => [match.offset, match.offset + match.length]),
+                                    );
+
+                                    return (
+                                    <li {...props}>
+                                        <Grid container alignItems="center">
+                                        <Grid item sx={{ display: 'flex', width: 'auto' }}>
+                                            <LocationOnIcon sx={{ color: 'text.secondary' }} />
+                                        </Grid>
+                                        <Grid item sx={{ width: 'calc(100% - 44px)', wordWrap: 'break-word' }}>
+                                            {parts.map((part, index) => (
+                                            <Box
+                                                key={index}
+                                                component="span"
+                                                sx={{ fontWeight: part.highlight ? 'bold' : 'regular' }}
+                                            >
+                                                {part.text}
+                                            </Box>
+                                            ))}
+
+                                            <Typography variant="body2" color="text.secondary">
+                                            {option.structured_formatting.secondary_text}
+                                            </Typography>
+                                        </Grid>
+                                        </Grid>
+                                    </li>
+                                    );
+                                }}
+                                />
+                                <div style={{marginTop:'2vh'}}>
+                                <FormControl fullWidth>
+                                <InputLabel id="bedroom-select">Sublease Type</InputLabel>
+                                <Select
+                                    labelId="bedroom-select"
+                                    fullWidth
+                                    value={subtenantFormType}
+                                    label="Sublease Type"
+                                    onChange={(val)=> setSubtenantFormType(val.target.value)}
+                                >
+                                    <MenuItem value={"Room"}>Room</MenuItem>
+                                    <MenuItem value={"Studio"}>Studio</MenuItem>
+                                    <MenuItem value={"Entire apartment"}>Entire apartment</MenuItem>
+                                </Select>
+                                </FormControl>
+                                </div>
+                                <div style={{marginTop:'4vh'}}>
+                                    <div style={{flexDirection:'row', display:'flex', justifyContent:'space-between'}}>
+                                        <p>Budget per month ($)</p>
+                                        <p>${subtenantFormBudget}</p>
+                                    </div>
+                                <Box>
+                                    <Slider
+                                        min={0}
+                                        max={10000}
+                                        step={100}
+                                        getAriaLabel={() => 'Price range'}
+                                        value={subtenantFormBudget}
+                                        style={{color: PRIMARYCOLOR}}
+                                        onChange={(val) => {
+                                        
+                                            let price = val.target.value
+                                            setSubtenantFormBudget(price)
+
+                                        }}
+                                        valueLabelDisplay="auto"
+                                    />
+                                </Box>
+                                </div>
+                                <div style={{marginTop:'2vh', flexDirection:'row', display:'flex', justifyContent:'space-between'}}>
+                                    <DatePicker
+                                    label="Start date"
+                                    value={dayjs(subtenantFormStartDate)}
+                                    onChange={(event)=>                                
+                                        setSubtenantFormStartDate(event)
+                                    }
+                                    slotProps={{ textField: {error:false, style:{outline:"none"}} }}
+                                    
+                                    />
+                                    <DatePicker
+                                    label="End date"
+                                    value={dayjs(subtenantFormEndDate)}
+                                    onChange={(event)=>                                
+                                        setSubtenantFormEndDate(event)
+                                    }
+                                    slotProps={{ textField: {error:false, style:{outline:"none"}} }}
+                                    
+                                    />
+                                </div>
+                                <div style={{marginTop:'2vh', flexDirection:'row', display:'flex', justifyContent:'space-between'}}>
+                                    <TextField multiline rows={ mobile ? 3 : 5} onChange={val=>setSubtenantFormBio(val.target.value)}  fullWidth label="A bit about yourself" placeholder="Example: Reason of sublease? Your personality? Any important details the tenant should know about you?"/>
+                                </div>
+                            </div>
+
+                          
+                            <Button onClick={handleSubtenantSubmit} fullWidth variant="contained" style={{backgroundColor: 'black', outline:'none', textTransform:'none', height: '6vh', marginTop:'4vh'}}>
+                                <p style={{fontFamily: OPENSANS, marginBottom:0, fontWeight:'600', objectFit:'cover'}}>
+                                    Submit
+                                </p>
+                            </Button>
+                            <p onClick={()=> setSubtenantFormModalVis(false)} style={{fontFamily: OPENSANS, marginBottom:0, fontWeight:'500', color:'#737373', marginLeft:'auto', marginRight:'auto', marginTop:'2vh', cursor:'pointer', fontSize:"0.9rem"}}>
+                                No, I don't need help
+                            </p>
+                        </>
+                        }
 
 
 
@@ -859,6 +1150,45 @@ export default function LandingPage(props){
 
                     
                     </div>
+                </Modal>
+                <Modal
+                    aria-labelledby="subtenant-form"
+                    aria-describedby="subtenant-form"
+                    open={subtenantFormSuccessModal}
+                    onClose={()=> setSubtenantFormSuccessModal(false)}
+                    closeAfterTransition
+                
+                    slotProps={{
+                    backdrop: {
+                        timeout: 500,
+                    },
+                    }}
+                >
+                    <Fade in={subtenantFormSuccessModal}>
+                        <div 
+                            style={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            width: mobile ? '90vw' : '40vw',
+                            height:'auto',
+                            backgroundColor:'white',
+                            padding: mobile ? '4vw' : '2vw',
+                            borderRadius: MEDIUMROUNDED,
+                            display:'flex',
+                        
+                            flexDirection:'column',
+                            }}>
+                                <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize:'1.3rem', marginBottom: 5,}}>We will contact you as soon as we found a suitable subleases!</p>
+                                <p style={{fontWeight:'400', fontFamily: OPENSANS, fontSize:'0.9rem', marginBottom: 0, color: SUBTEXTCOLOR}}>If you need a sublease urgently, please send a message to <a href='tel:+12624428111'>+1(262)-442-8111</a> for further assistance.</p>
+                                <Button onClick={()=> setSubtenantFormSuccessModal(false)} fullWidth variant="contained" style={{backgroundColor: 'black', outline:'none', textTransform:'none', height: '6vh', marginTop:'4vh'}}>
+                                    <p style={{fontFamily: OPENSANS, marginBottom:0, fontWeight:'600', objectFit:'cover'}}>
+                                        Browse available subleases
+                                    </p>
+                                </Button>
+                        </div>
+                    </Fade>
                 </Modal>
                 
                { mobile &&
