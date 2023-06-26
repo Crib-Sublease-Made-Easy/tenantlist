@@ -218,7 +218,8 @@ export default function RequestReceivedCards(props){
     }
 
     function handleRequestAccept(){
-       setAcceptRequestModalVis(true)
+    //    setAcceptRequestModalVis(true)
+        setNameEmailConfirmModalVis(true)
     }
 
 
