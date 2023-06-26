@@ -43,6 +43,9 @@ export default function RequestReceivedCards(props){
 
     const [paymentAmount, setPaymentAmount] = useState(null)
 
+    const [emailVerificationModalVis, setEmailVerificationModalVis] = useState(false)
+    const [emailVerificationPage, setEmailVerificationPage] = useState(0)
+
     useEffect(()=> {
         getToken()
     }, [])
@@ -214,6 +217,13 @@ export default function RequestReceivedCards(props){
         return "$" + total.toFixed(2)
     }
 
+    function handleRequestAccept(){
+        if(!userData.emailVerified || userData.emailVerified == undefined){
+            setEmailVerificationModalVis(true)
+            return
+        }
+    }
+
 
   
     // console.log(props.data)
@@ -320,7 +330,7 @@ export default function RequestReceivedCards(props){
                     <Button onClick={()=>props.rejectRequest()} fullWidth varaint="outlined" style={{borderColor:'black', borderWidth:'1px', borderStyle:'solid', textTransform:'none', outline:'none'}}>
                         <p style={{fontSize: mobile ? '1.1rem' : '0.9rem', fontFamily: OPENSANS, fontWeight:"600", marginBottom:0,color:'black'}}>Reject</p>
                     </Button>
-                    <Button onClick={()=>setNameEmailConfirmModalVis(true)} fullWidth varaint="contained" style={{backgroundColor:'black', borderColor:'black', borderWidth:'1px', borderStyle:'solid', textTransform:'none', marginTop:'2vh', outline:'none'}}>
+                    <Button onClick={handleRequestAccept} fullWidth varaint="contained" style={{backgroundColor:'black', borderColor:'black', borderWidth:'1px', borderStyle:'solid', textTransform:'none', marginTop:'2vh', outline:'none'}}>
                         <p style={{fontSize: mobile ? '1.1rem' : '0.9rem', fontFamily: OPENSANS, fontWeight:"600", marginBottom:0,color:'white'}}>Accept</p>
                     </Button>
 
@@ -529,6 +539,64 @@ export default function RequestReceivedCards(props){
                         </div>
                     </>
                     }
+                </div>
+            </Fade>
+        </Modal>
+        {/* Email Confirmation Modal */}
+        <Modal
+            aria-labelledby="transition-modal-title"
+            aria-describedby="transition-modal-description"
+            open={emailVerificationModalVis}
+            onClose={()=> setEmailVerificationModalVis(false)}
+            closeAfterTransition
+        
+            slotProps={{
+            backdrop: {
+                timeout: 500,
+            },
+            }}
+        >
+            <Fade in={emailVerificationModalVis}>
+            <div 
+                style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: mobile ? '90vw' : '35vw',
+                height:'auto',
+                backgroundColor:'white',
+                padding: mobile ? '4vw' : '2vw',
+                borderRadius: MEDIUMROUNDED,
+                display:'flex',
+                
+                flexDirection:'column',
+                }}>
+                { emailVerificationPage == 0 ?
+                    <>
+                        <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize:'1.3rem', marginBottom: 5,}}>Let's confirm your email first</p>
+                        {/* <p style={{fontWeight:'400', fontFamily: OPENSANS, fontSize:'0.9rem', marginBottom: '2vh',}}>We will send a verification code to your email</p>
+                        <div style={{display:'flex', flexDirection:'column', justifyContent:'space-between', alignItems:"center", }}>
+                            <TextField value={confirmationEmail} onChange={(val)=>setConfirmationEmail(val.target.value)} label="Email" fullWidth style={{marginTop:"4vh"}}/>
+                            <Button onClick={sendEmailVerification} variant="contained" fullWidth style={{backgroundColor:'black', textTransform:'none', fontSize:'0.9rem', height:'6vh', marginBottom:0, outline:'none', marginTop:"2vh"}}>
+                                <p style={{marginBottom:0}}>Continue</p>
+                            </Button>
+                        </div> */}
+                    </>
+                    :
+                    <>
+                        <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize:'1.3rem', marginBottom: 5,}}>Enter verification code</p>
+                        {/* <p style={{fontWeight:'400', fontFamily: OPENSANS, fontSize:'0.9rem', marginBottom: '2vh',}}>If you didn't receive an email, please check spam/junk for confirmation code</p>
+                        <div style={{display:'flex', flexDirection:'column', justifyContent:'space-between', alignItems:"center", }}>
+                            <TextField label="6 digit code" type="number" value={verificationCode} onChange={(val)=> setVerificationCode(val.target.value)} fullWidth style={{marginTop:"4vh"}}/>
+                            <Button onClick={verifyEmail} variant="contained" fullWidth style={{backgroundColor:'black', textTransform:'none', fontSize:'0.9rem', height:'6vh', marginBottom:0, outline:'none', marginTop:"2vh"}}>
+                                <p style={{marginBottom:0}}>Verify</p>
+                            </Button>
+                        </div> */}
+                        <p onClick={()=>setEmailVerificationPage(0)} style={{fontWeight:'400', fontSize:'0.9rem', marginTop:'2vh', cursor:'pointer'}}>Edit email</p>
+                    </>
+
+                }
                 </div>
             </Fade>
         </Modal>

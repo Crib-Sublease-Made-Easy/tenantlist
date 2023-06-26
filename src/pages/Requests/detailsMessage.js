@@ -1,11 +1,12 @@
 import { Button, InputAdornment, TextField } from "@mui/material"
-import { createRef, useContext, useEffect, useRef, useState } from "react"
-import { useParams } from "react-router-dom"
+import { createRef, useContext, useEffect, useRef, useState,  } from "react"
+import { useNavigate, useParams } from "react-router-dom"
 import { EXTRALIGHT, MEDIUMGREY, OPENSANS, SUBTEXTCOLOR } from "../../sharedUtils"
 import { UserContext } from "../../UserContext"
 import AnnouncementIcon from '@mui/icons-material/Announcement';
 
 export default function DetailsMessageScreen(){
+    const navigate = useNavigate()
     const {id} = useParams()
     const {mobile} = useContext(UserContext)
     const [message, setMessage] = useState("")
@@ -16,6 +17,7 @@ export default function DetailsMessageScreen(){
     const convosRef = useRef(null)
 
     useEffect(()=> {
+        
         fetchConvo()
         const interval = setInterval(() => {
             fetchConvo()
@@ -24,8 +26,22 @@ export default function DetailsMessageScreen(){
           return () => clearInterval(interval);
     }, [message])
 
+    
+
+    function checkAuth(){
+        let at = localStorage.getItem("acessToken")
+        let rt = localStorage.getItem("refreshToken")
+        if(at == null && rt != null){
+            window.location.reload()
+        }
+        else if(at == null && rt == null){
+            alert("Please login first.")
+            navigate("/login")
+        }
+    }
+
     async function fetchConvo(){
-      
+        let rt = localStorage.getItem("refreshToken")
         let uid = localStorage.getItem("uid")
         let at = localStorage.getItem("accessToken")
         setUid(uid)
@@ -45,8 +61,9 @@ export default function DetailsMessageScreen(){
                 let data = await res.json();
                 setConvo(data)
                 console.log(data[data.length-1]._id)
-               
-               
+            }
+            if(res.status == 401){
+                checkAuth()
             }
         })
       
