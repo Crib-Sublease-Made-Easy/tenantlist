@@ -218,10 +218,7 @@ export default function RequestReceivedCards(props){
     }
 
     function handleRequestAccept(){
-        if(!userData.emailVerified || userData.emailVerified == undefined){
-            setEmailVerificationModalVis(true)
-            return
-        }
+       setAcceptRequestModalVis(true)
     }
 
 

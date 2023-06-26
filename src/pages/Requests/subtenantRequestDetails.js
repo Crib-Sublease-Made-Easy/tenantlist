@@ -59,8 +59,25 @@ export default function SubtenantRequestDetailsScreen(props){
         getStatus()
     }, [])
 
+    function refreshAccessToken(){
+        let at = localStorage.getItem("accessToken")
+        let rt = localStorage.getItem("refreshToken")
+        if(at == null && rt != null){
+            window.location.reload()
+        }
+        else{
+            alert("Please login")
+            navigate("/login")
+            return
+        }
+    }
+
     async function getStatus(){
         let at = localStorage.getItem("accessToken")
+        if(at == null){
+            refreshAccessToken()
+            return
+        }
         await fetch(`https://crib-llc.herokuapp.com/requests/getOne/${String(id)}`, {
             method: 'GET',
             headers: {
