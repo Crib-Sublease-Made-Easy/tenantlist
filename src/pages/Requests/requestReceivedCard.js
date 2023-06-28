@@ -373,35 +373,26 @@ export default function RequestReceivedCards(props){
                         <p style={{fontSize: mobile ? '1rem' : '1.1rem', fontFamily: OPENSANS, fontWeight:"700", marginBottom:5}}>Total rent receive:</p>
                         <p style={{fontSize: mobile ? '0.9rem' : '1.1rem', fontFamily: OPENSANS, fontWeight:"700", marginBottom:5}}>{getTotal()}</p>
                     </div>
-                    <small>First month’s rent will be paid on move-in day</small>
+                    {/* <small>First month’s rent will be paid on move-in day</small> */}
                 </div>
                 }
             </div>
             <div style={{flexDirection:'column', display:'flex', flex: 1,  paddingLeft: mobile ? 0 : '1.5vw', justifyContent:'space-between',  marginTop: mobile ? '2.5vh' : 0, paddingTop: mobile ? '2.5vh' : 0, borderTopWidth: mobile ? '0.5px' : 0, borderTopColor: LIGHTGREY, borderTopStyle:'solid'}}>
                 <div>
                     <p style={{fontSize:"1rem", marginBottom:0, fontFamily: OPENSANS, fontWeight:'600'}}>Your decision</p>
-                    <small>You will be prompted to sign a sublease contract upon accepting sublease request</small>
+                    <small>Check out if the tenant have sent a message to you</small>
                 </div>
-                {subleaseData.accepted ?
+                
                 <div>
-                    <Button onClick={()=>navigate(`/requestDetails/${subleaseData._id}`, { state : {requestDetails: props.data} })} fullWidth varaint="contained" style={{backgroundColor:'black', borderColor:'black', borderWidth:'1px', borderStyle:'solid', textTransform:'none', marginTop:'2vh', outline:'none'}}>
-                        <p style={{fontSize: mobile ? '1.1rem' : '0.9rem', fontFamily: OPENSANS, fontWeight:"600", marginBottom:0,color:'white'}}>View details</p>
+                    <Button onClick={()=>props.rejectRequest()} fullWidth varaint="outlined" style={{backgroundColor: EXTRALIGHT, borderColor:'black', borderWidth:'1px', borderStyle:'solid', textTransform:'none', marginTop:'2vh', outline:'none'}}>
+                        <p style={{fontSize: mobile ? '1.1rem' : '0.9rem', fontFamily: OPENSANS, fontWeight:"600", marginBottom:0,color:'black'}}>Reject request</p>
                     </Button>
-                    {/* <Button onClick={() => setNameEmailConfirmModalVis(true)} fullWidth varaint="contained" style={{backgroundColor:'black', borderColor:'black', borderWidth:'1px', borderStyle:'solid', textTransform:'none', marginTop:'2vh', outline:'none'}}>
-                        <p style={{fontSize: mobile ? '1.1rem' : '0.9rem', fontFamily: OPENSANS, fontWeight:"600", marginBottom:0,color:'white'}}>View details</p>
-                    </Button> */}
+                    <Button onClick={()=>navigate(`/detailsMessage/${props.data._id}`, {state: {requestDetails:props.data}})} fullWidth varaint="contained" style={{backgroundColor:'black', borderColor:'black', borderWidth:'1px', borderStyle:'solid', textTransform:'none', marginTop:'2vh', outline:'none'}}>
+                        <p style={{fontSize: mobile ? '1.1rem' : '0.9rem', fontFamily: OPENSANS, fontWeight:"600", marginBottom:0,color:'white'}}>Message {subtenantData.firstName}</p>
+                    </Button>
                 </div>
-                :
-                <div style={{marginTop: mobile ? '5vh' : 0}}>
-                    <Button onClick={()=>props.rejectRequest()} fullWidth varaint="outlined" style={{borderColor:'black', borderWidth:'1px', borderStyle:'solid', textTransform:'none', outline:'none'}}>
-                        <p style={{fontSize: mobile ? '1.1rem' : '0.9rem', fontFamily: OPENSANS, fontWeight:"600", marginBottom:0,color:'black'}}>Reject</p>
-                    </Button>
-                    <Button onClick={handleRequestAccept} fullWidth varaint="contained" style={{backgroundColor:'black', borderColor:'black', borderWidth:'1px', borderStyle:'solid', textTransform:'none', marginTop:'2vh', outline:'none'}}>
-                        <p style={{fontSize: mobile ? '1.1rem' : '0.9rem', fontFamily: OPENSANS, fontWeight:"600", marginBottom:0,color:'white'}}>Accept</p>
-                    </Button>
-
-                </div>
-                }
+    
+                
             </div>
         <Modal
         aria-labelledby="transition-modal-title"

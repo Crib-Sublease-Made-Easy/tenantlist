@@ -1,24 +1,30 @@
-import { Button, InputAdornment, TextField } from "@mui/material"
+import { Button, Fade, InputAdornment, Modal, TextField } from "@mui/material"
 import { createRef, useContext, useEffect, useRef, useState,  } from "react"
-import { useNavigate, useParams } from "react-router-dom"
-import { EXTRALIGHT, MEDIUMGREY, OPENSANS, SUBTEXTCOLOR } from "../../sharedUtils"
+import { useLocation, useNavigate, useParams } from "react-router-dom"
+import { EXTRALIGHT, MEDIUMGREY, MEDIUMROUNDED, OPENSANS, SUBTEXTCOLOR } from "../../sharedUtils"
 import { UserContext } from "../../UserContext"
 import AnnouncementIcon from '@mui/icons-material/Announcement';
+import Lottie from "lottie-react";
+import CommunityAnimation from './communityAnimation.json'
+
 
 export default function DetailsMessageScreen(){
     const navigate = useNavigate()
     const {id} = useParams()
     const {mobile} = useContext(UserContext)
+    const {state} = useLocation()
+    const requestDetails = state.requestDetails
     const [message, setMessage] = useState("")
     const [convo, setConvo] = useState([])
     const [uid, setUid] = useState("")
     const [loading, setLoading] = useState(false)
-    const [scrolling, setScrolling] = useState(false)
+    const [userData, setUserData] = useState(null)
+    const [tenantPaymentModalVis, setTenantPaymentModalVis] = useState(false)
     
     const convosRef = useRef(null)
 
     useEffect(()=> {
-        
+        fetchUserData()
         fetchConvo()
         const interval = setInterval(() => {
             fetchConvo()
@@ -27,6 +33,32 @@ export default function DetailsMessageScreen(){
           return () => clearInterval(interval);
     }, [message])
 
+    async function fetchUserData(){
+        
+        let at = localStorage.getItem("accessToken")
+        let uid = localStorage.getItem("uid")
+        setUid(uid)
+        if(at != null && uid != null){
+
+            await fetch('https://crib-llc.herokuapp.com/users/' + uid, {
+            method: 'GET',
+            headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + at,
+            }
+            }) 
+            .then(res => res.json()).then(async userData =>{
+                setUserData(userData)
+            })
+            .catch(e=>{
+              console.log("Error")
+            })
+        } 
+        else{
+            navigate("/login")
+        }
+    }
     
 
     function checkAuth(){
@@ -42,7 +74,7 @@ export default function DetailsMessageScreen(){
     }
 
     async function fetchConvo(){
-        let rt = localStorage.getItem("refreshToken")
+      
         let uid = localStorage.getItem("uid")
         let at = localStorage.getItem("accessToken")
         if(at == null){
@@ -65,14 +97,14 @@ export default function DetailsMessageScreen(){
                 if(res.status == 200){
                     let data = await res.json();
                     setConvo(data)
-                    console.log(data[data.length-1]._id)
+                    
                 }
                 if(res.status == 401){
                     checkAuth()
                 }
             })
         
-            scrollToBottom()
+          
         }
         setLoading(false)
         
@@ -81,8 +113,17 @@ export default function DetailsMessageScreen(){
 
     async function handleSendMessage(){
         
+        
         let at = localStorage.getItem("accessToken")
         let uid = localStorage.getItem("uid")
+
+        //Check if the person paid
+        if(uid == requestDetails.tenantId){
+           if(userData.cribPremium.paymentDetails.status == false){
+            setTenantPaymentModalVis(true)
+            return
+           }
+        }
 
         if(message == ""){
             return
@@ -104,6 +145,9 @@ export default function DetailsMessageScreen(){
        
         setMessage("")
         fetchConvo()  
+        setTimeout(()=> {
+            scrollToBottom()
+        },500)
         
     }
 
@@ -114,6 +158,7 @@ export default function DetailsMessageScreen(){
     }
     
     return(
+        <>
         <div style={{width:'100vw', height:'auto', paddingLeft:'5vw', paddingRight:'5vw'}}>
             <div style={{minHeight:'5vh', paddingTop:'1vh', paddingBottom:'1vh', width:'100%', display:'flex', flexDirection:'row', alignItems:'center'}}>
                 <AnnouncementIcon style={{color:MEDIUMGREY, fontSize: '1.2rem'}} />
@@ -156,6 +201,46 @@ export default function DetailsMessageScreen(){
                
             </div>
         </div>
-
+        <Modal
+        aria-labelledby="subtenant-form"
+        aria-describedby="subtenant-form"
+        open={tenantPaymentModalVis}
+        onClose={()=> setTenantPaymentModalVis(false)}
+        closeAfterTransition
+    
+        slotProps={{
+        backdrop: {
+            timeout: 500,
+        },
+        }}
+    >
+        <Fade in={tenantPaymentModalVis}>
+        <div 
+            style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: mobile ? '90vw' : '40vw',
+            height:'auto',
+            backgroundColor:'white',
+            padding: mobile ? '4vw' : '2vw',
+            borderRadius: MEDIUMROUNDED,
+            display:'flex',
+          
+            flexDirection:'column',
+            }}>
+                <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize:'1.2rem', marginBottom: 5,}}>Get Crib Connect to message interested tenants</p>
+                <p style={{fontWeight:'400', fontFamily: OPENSANS, fontSize:'0.9rem', marginBottom: '2vh', color: "#737373"}}>You will be able to connect with all users who are intersted in subleasing around your area.</p>
+                <Lottie animationData={CommunityAnimation} style={{height:'30vh'}}/>
+                <Button onClick={()=> navigate('/tenantPaymentScreen')} fullWidth variant="contained" style={{backgroundColor: 'black', outline:'none', textTransform:'none', height: '6vh', marginTop:'4vh'}}>
+                    <p style={{fontFamily: OPENSANS, marginBottom:0, fontWeight:'600', objectFit:'cover'}}>
+                        Check out Crib Connect
+                    </p>
+                </Button>
+            </div>
+        </Fade>
+    </Modal>
+    </>
     )
 }

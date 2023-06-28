@@ -21,8 +21,7 @@ import CheckIcon from '@mui/icons-material/Check';
 
 const CRIBPROS = [{name : "Budget friendly", content : "Most of our sublets are on a discounted rent price. Request to book before they're gone.", img: BudgetSVG},
 {name : "Simple process", content: "Crib provides a seamless and efficient process from start to finish. Secure your ideal sublease in no time.", img: LocalSVG},
-{name : "Hassle free", content : "We provide tenants and subtenants with a formalized contract so you don't have to worry about it.", img: HassleFreeSVG},
-{name : "Never get scammed", content: "We hold on to subtenant's security deposit until move-in day. It will be transferred to tenant on move-in day.", img: MoneySVG}]
+]
 
 export default function WelcomePage(){
     const navigate = useNavigate()
@@ -83,9 +82,9 @@ export default function WelcomePage(){
             
             <img src={WelcomeImage2} style={{width: mobile ? '90vw' : '35vw', height: mobile ? '40vh' : '50vh', borderRadius:MEDIUMROUNDED, objectFit:'cover'}}/>
             <div style={{display:'flex', flexDirection:'column', width: mobile ? '90vw' : '35vw', marginTop: mobile ? '4vh' : 0}}>
-                <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize: mobile ? '1.8rem' : '2.4rem', width:'90%'}}>All in one platform,<br/>a <span style={{textDecorationLine:'underline', textDecorationColor: PRIMARYCOLOR}}>new way</span> to sublease</p>
-                <p style={{fontFamily: OPENSANS, fontWeight:'400', }}>Once you found a perfect sublease, we take care of everything until your move-in day, this includes:</p>
-                <div style={{marginTop:'2vh'}}>
+                <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize: mobile ? '1.8rem' : '2.4rem', width:'90%'}}>Sublease safely with<br/><span style={{textDecorationLine:'underline', textDecorationColor: PRIMARYCOLOR}}>verified</span> users</p>
+                <p style={{fontFamily: OPENSANS, fontWeight:'400', }}>We perform phone and email verification on all users, we want to construct a safe and comfortable subleasing space for everyone.</p>
+                {/* <div style={{marginTop:'2vh'}}>
                     <div style={{flexDirection:'row', display:'flex', alignItems:'center', marginBottom:'1vh'}}>
                         <CheckIcon style={{fontSize:'1rem'}}/>
                         <p style={{fontFamily: OPENSANS, fontWeight:'400', color:'black', marginBottom:0, marginLeft:'2vw', fontSize:'1rem' }}>Drafting sublease contract</p>
@@ -98,7 +97,7 @@ export default function WelcomePage(){
                         <CheckIcon style={{fontSize:'1rem'}}/>
                         <p style={{fontFamily: OPENSANS, fontWeight:'400', color:'black', marginBottom:0, marginLeft:'2vw', fontSize:'1rem' }}>Performing background checks</p>
                     </div>
-                </div>
+                </div> */}
             </div>
         </div>
         <div style={{ height: 'auto', width:'100vw', flexDirection: 'column', display:'flex', paddingLeft: '5vw', paddingRight:'5vw', paddingTop: mobile ? '5vh' : '10vh', paddingBottom: mobile ? '5vh' : '10vh', justifyContent:'space-between', alignItems:'center'}}>
@@ -140,14 +139,14 @@ export default function WelcomePage(){
         <div style={{ height: 'auto', width:'100vw', flexDirection: 'column', display:'flex', paddingLeft: '5vw', paddingRight:'5vw', paddingTop: mobile ? '5vh' : '10vh', paddingBottom: mobile ? '5vh' : '10vh', justifyContent:'space-between', alignItems:'center'}}>
 
             <div style={{position:'relative',}}>
-                <div style={{width: mobile ? '90vw' : '37vw'}}>
-                    <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize: mobile ? '1.8rem' : '2.4rem', width:'90%'}}>Why Crib?</p>
-                    <p style={{fontFamily: OPENSANS, fontWeight:'400', }}>Crib makes subleasing easier than ever. By providing an all-in-one platform from browsing, to signing sublease/sublet contract, to paying security deposit, we got you covered to ensure a smooth process.</p>
+                <div style={{width: mobile ? '90vw' : 'auto', marginLeft:'auto', marginRight:'auto'}}>
+                    <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize: mobile ? '1.8rem' : '2.4rem',  textAlign:'center'}}>Why Crib?</p>
+                    <p style={{fontFamily: OPENSANS, fontWeight:'400',textAlign:'center' }}>Crib makes subleasing easier than ever. Talk to verified tenants and preview all sublease details in one go.</p>
                 </div>
                 <div style={{flexDirection: mobile ? 'column' : 'row', display:'flex', marginTop: mobile? '5vh' : '10vh', alignItems: 'center' }}>
                     {CRIBPROS.map((item)=> {
                         return(
-                        <div key={"CribPros" + item.name} style={{width: mobile ? '90vw' : '22.5vw', height:'auto',paddingRight:'2vw', flexDirection:'column', marginTop: mobile ? '5vh' : 0,  textAlign: mobile ? 'center' : 'left'}}>
+                        <div key={"CribPros" + item.name} style={{width: mobile ? '90vw' : 'auto', height:'auto',paddingRight:'2vw', flexDirection:'column', marginTop: mobile ? '5vh' : 0,  textAlign: 'center'}}>
                             <img src={item.img}  style={{height:'15vh', }}/> 
                             <p style={{fontFamily: OPENSANS, fontWeight:'600', fontSize:'1.4rem', marginTop:'2vh'}}>{item.name}</p>
                             <p style={{fontFamily: OPENSANS}}>{item.content}</p>

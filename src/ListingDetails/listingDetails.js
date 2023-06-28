@@ -713,21 +713,21 @@ export default function ListingDetails(){
                                         <p style={{fontFamily:OPENSANS, fontWeight:'500', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>${propData.securityDeposit == undefined || propData.securityDeposit == null ? "0" : propData.securityDeposit}</p>
                                     </div>
                                    
-                                    <div style={{flexDirection:'row', marginTop:'2vh', justifyContent:'space-between', display:'flex'}}>
+                                    {/* <div style={{flexDirection:'row', marginTop:'2vh', justifyContent:'space-between', display:'flex'}}>
                                         <p style={{fontFamily:OPENSANS, fontWeight:'500', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>Toal rent</p>
                                         <p style={{fontFamily:OPENSANS, fontWeight:'500', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>{getRent()}</p>
-                                    </div>
-                                    <div style={{flexDirection:'row', marginTop:'2vh', justifyContent:'space-between', display:'flex'}}>
+                                    </div> */}
+                                    {/* <div style={{flexDirection:'row', marginTop:'2vh', justifyContent:'space-between', display:'flex'}}>
                                         <p style={{fontFamily:OPENSANS, fontWeight:'500', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>Service fees (5% of total rent)</p>
                                         <p style={{fontFamily:OPENSANS, fontWeight:'500', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>{getFees()}</p>
-                                    </div>
+                                    </div> */}
                                 </div>
                                 <div style={{width:'100%', borderTopWidth:'0.5px', borderTopColor: LIGHTGREY, borderTopStyle:'solid', marginTop:'2vh'}}>
                                     <div style={{flexDirection:'row', marginTop:'2vh', justifyContent:'space-between', display:'flex'}}>
                                         <p style={{fontFamily:OPENSANS, fontWeight:'700', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>Total</p>
-                                        <p style={{fontFamily:OPENSANS, fontWeight:'700', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>{getTotalRent()}</p>
+                                        <p style={{fontFamily:OPENSANS, fontWeight:'700', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>{getRent()}</p>
                                     </div>
-                                    <p style={{marginTop:'2vh', fontSize:'0.8rem', fontFamily: OPENSANS}}>No fees required to book, you would only need to pay security deposit and fees once after tenant accepts your request</p>
+                                    <p style={{marginTop:'2vh', fontSize:'0.8rem', fontFamily: OPENSANS}}>No fees required to request. You will be able to message the tenant after you request.</p>
                                 </div>
 
                             </div>
@@ -824,19 +824,19 @@ export default function ListingDetails(){
                                 <p style={{fontFamily:OPENSANS, fontWeight:'500', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>${propData.securityDeposit == undefined || propData.securityDeposit == null ? "0" : propData.securityDeposit}</p>
                             </div>
                             
-                            <div style={{flexDirection:'row', marginTop:'2vh', justifyContent:'space-between', display:'flex'}}>
+                            {/* <div style={{flexDirection:'row', marginTop:'2vh', justifyContent:'space-between', display:'flex'}}>
                                 <p style={{fontFamily:OPENSANS, fontWeight:'500', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>Toal rent</p>
                                 <p style={{fontFamily:OPENSANS, fontWeight:'500', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>{getRent()}</p>
-                            </div>
-                            <div style={{flexDirection:'row', marginTop:'2vh', justifyContent:'space-between', display:'flex'}}>
+                            </div> */}
+                            {/* <div style={{flexDirection:'row', marginTop:'2vh', justifyContent:'space-between', display:'flex'}}>
                                 <p style={{fontFamily:OPENSANS, fontWeight:'500', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>Service fees (5% of total rent)</p>
                                 <p style={{fontFamily:OPENSANS, fontWeight:'500', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>{getFees()}</p>
-                            </div>
+                            </div> */}
                         </div>
                         <div style={{width:'100%', marginTop:'2vh'}}>
                             <div style={{flexDirection:'row', marginTop:'2vh', justifyContent:'space-between', display:'flex'}}>
                                 <p style={{fontFamily:OPENSANS, fontWeight:'700', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>Total</p>
-                                <p style={{fontFamily:OPENSANS, fontWeight:'700', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>{getTotalRent()}</p>
+                                <p style={{fontFamily:OPENSANS, fontWeight:'700', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>{getRent()}</p>
                             </div>
                             <p style={{marginTop:'2vh', fontSize:'0.8rem', fontFamily: OPENSANS}}>No fees required to book, you would only need to pay security deposit and fees once after tenant accepts your request.</p>
                         </div>

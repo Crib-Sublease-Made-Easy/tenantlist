@@ -74,7 +74,6 @@ export default function SubtenantRequestDetailsScreen(props){
 
     async function getStatus(){
         let at = localStorage.getItem("accessToken")
-        console.log("GetStatus + ATTTTT", at)
         if(at == null){
             refreshAccessToken()
             return
@@ -271,9 +270,9 @@ export default function SubtenantRequestDetailsScreen(props){
                     </Step>
                     ))}
                 </Stepper>
-                <Button onClick={()=>navigate(`/detailsMessage/${subleaseStatus._id}`)} style={{backgroundColor: 'black', outline: 'none', color:'white', height: mobile ? '6vh' : '5vh', textTransform:'none', width: mobile ? '100%' : "80%", marginTop:'5vh'}}>
+                {/* <Button onClick={()=>navigate(`/detailsMessage/${subleaseStatus._id}`)} style={{backgroundColor: 'black', outline: 'none', color:'white', height: mobile ? '6vh' : '5vh', textTransform:'none', width: mobile ? '100%' : "80%", marginTop:'5vh'}}>
                     <p style={{marginBottom:0}}>Message tenant</p>
-                </Button>
+                </Button> */}
             </div>
             <div style={{width: mobile ? '90vw' : '60vw', height:"90vh", display:'flex', flexDirection:'column', justifyContent:'space-between', paddingTop: mobile && '5vh', marginTop: mobile && '5vh',  borderTopWidth: mobile ? '1px' :0, borderTopColor: LIGHTGREY, borderTopStyle:"solid" }}>
                 {activeStep == 1 ?
@@ -311,6 +310,9 @@ export default function SubtenantRequestDetailsScreen(props){
                         <WatchLaterIcon style={{fontSize:'1.5rem', color: 'gold'}}/>
                         <p style={{marginBottom:0, fontSize:'1rem', fontWeight:'500',marginLeft:'1vw', width:'40vw'}}>Waiting for tenant to sign sublease contract </p>
                     </div> 
+                    <Button onClick={()=>navigate(`/detailsMessage/${subleaseStatus._id}`)} style={{backgroundColor: 'black', outline: 'none', color:'white', height: mobile ? '6vh' : '5vh', textTransform:'none', width: mobile ? '100%' : "80%",}}>
+                        <p style={{marginBottom:0}}>Message tenant</p>
+                    </Button>
                 </div>
                 :
                 <div style={{height: '15vh', width:'100%', display:'flex', flexDirection:'row', justifyContent:'space-between', alignItems:'center',paddingLeft: mobile ? 0 : "2vw",}}>

@@ -34,6 +34,7 @@ import MySubleaseScreen from './pages/MySublease/mySublease';
 import SubtenantRequestDetailsScreen from './pages/Requests/subtenantRequestDetails';
 import HowItWorksScreen from './pages/HowItWorks/howitworks';
 import DetailsMessageScreen from './pages/Requests/detailsMessage';
+import TenantPaymentScreen from './TenantPayment/tenantPayment'
 const appId = 'EF181665-2473-42C6-9376-A340AF716169';
 
 
@@ -103,7 +104,7 @@ const refreshAccessToken = async () => {
           try {
             if(response.accessToken != undefined ?? response.accessToken != null){
               localStorage.setItem("accessToken", response.accessToken)
-              console.log(response.accessToken)
+           
               setLoggedIn(true)
             }
             
@@ -182,6 +183,8 @@ const connectSendbird = async (UID) => {
         <Route path="/mySublease" element={ <MySubleaseScreen/> } />
         <Route path="/howitworks" element={ <HowItWorksScreen/> } />
         <Route path="/detailsMessage/:id" element={ <DetailsMessageScreen/> } />
+        <Route path="/tenantPaymentScreen" element={ <TenantPaymentScreen/> } />
+
 
 
         {

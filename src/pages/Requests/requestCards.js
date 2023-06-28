@@ -14,12 +14,7 @@ export default function RequestCards(props){
    
 
     function handleSubtenantButtonClick(){
-        if(!subleaseData.accepted){
-            return
-        }
-        else{
-            navigate(`/subtenantRequestDetails/${props.data._id}`, { state : {requestDetails: props.data} })
-        }
+        navigate(`/detailsMessage/${props.data._id}`, {state: {requestDetails:props.data}})
     }
 
   
@@ -39,7 +34,7 @@ export default function RequestCards(props){
                         <p style={{fontSize:'0.8rem', fontFamily: OPENSANS, fontWeight:"400", marginBottom:5}}><span style={{fontWeight:'500'}}>Rent:</span> ${propData.price} /month</p>
                     </div>
                     <Button onClick={handleSubtenantButtonClick} fullWidth varaint='contained' style={{backgroundColor: subleaseData.accepted ? PRIMARYCOLOR : 'black', color:'white', height: mobile ? '6vh' : '5vh', textTransform:'none', marginTop:'2vh',}}>
-                        {!subleaseData.accepted ?
+                        {/* {!subleaseData.accepted ?
                         <p style={{marginBottom:0, fontWeight:'500',}}>Waiting for tenant's decision...</p>
                         :
                         subleaseData.tenantSignedContract && subleaseData.paid == false && !subleaseData.subtenantSignedContract ?
@@ -52,7 +47,8 @@ export default function RequestCards(props){
                         <p style={{marginBottom:0, fontWeight:'500',}}>Pay security deposit and fees</p>
                         :
                         <p style={{marginBottom:0, fontWeight:'500',}}>View progress</p>
-                        }
+                        } */}
+                        <p style={{marginBottom:0, fontWeight:'500',}}>Message tenant</p>
                     </Button>
                 </div>
             </div>

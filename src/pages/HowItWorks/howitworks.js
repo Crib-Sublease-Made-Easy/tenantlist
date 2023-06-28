@@ -54,7 +54,7 @@ export default function HowItWorksScreen(){
                     </div>
                 </div>
             </div>
-            <div style={{width:'100%', paddingTop:'5vh', paddingBottom:'10vh', flexDirection: mobile ? 'column' : 'row', display:'flex', alignItems:'center'}}>
+            {/* <div style={{width:'100%', paddingTop:'5vh', paddingBottom:'10vh', flexDirection: mobile ? 'column' : 'row', display:'flex', alignItems:'center'}}>
                 <div style={{width: mobile ?'100%' : '50%', alignItems:'center', display:'flex', flexDirection:'column' }}>
                     <div style={{width: mobile ? '100%' : '35vw'}}>
                         <p style={{fontFamily: OPENSANS, fontWeight:'600',fontSize: mobile ? '1.4rem' : '1.6rem',}}>3. Sublease contract</p>
@@ -102,7 +102,7 @@ export default function HowItWorksScreen(){
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> */}
             
         </div>
     )

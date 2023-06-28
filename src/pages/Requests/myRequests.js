@@ -38,8 +38,8 @@ const HOWITWORKS =
 
  const CRIBPROS = [{name : "Saves you time", content : "Stop responding to 'Is this available?'. Only engage when tenants made up their mind to book.", img: SaveTimeSVG },
 {name : "Verified subtenants", content: "All users are phone number verified. Plus, they can choose to be verified through email and ID.", img: PrivacySVG},
-{name : "Comprehensive contract", content : "We provide a comprehensive contract for you so you don't have a generate one that doesn't work.", img: ContractSVG},
-{name : "Security deposit", content: "Crib handles security deposit until successful move-in, so you can be rest assured.", img:MoneySVG }]
+{name : "Preview all details", content : "Preview all details in one go. If you still have a question or wants extra information, just message the other user right away.", img: ContractSVG},
+{name : "Find the sublease for you", content: "Find and filter the perfect sublease that fits your needs during your stay.  ", img:MoneySVG }]
 
 
 const TIPSTOSUBLEASE = [
@@ -304,7 +304,7 @@ export default function MyRequestsScreen(){
             <div style={{position:'relative', width:'90vw', marginLeft:"auto", marginRight:'auto', marginTop: '15vh'}}>
                 <div style={{width: mobile ? '90vw' : '40vw'}}>
                     <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize: mobile ? '1.8rem' : '2.2rem', marginBottom:'1vh'}}>What's next?</p>
-                    <p style={{fontFamily: OPENSANS, fontWeight:'400', }}>Crib's 5 step proces streamlines subleasing like never before. Our all-in-one platform assists you from start to finish to make it easy, efficient, and seamless. It doesn't get easier than this!</p>
+                    <p style={{fontFamily: OPENSANS, fontWeight:'400', }}>Crib's 2 step procces streamlines subleasing like never before. Our all-in-one platform assists you from start to finish to make it easy, efficient, and seamless. It doesn't get easier than this!</p>
                 </div>
                 <Button onClick={()=> navigate("/howItWorks")} variant="contained" style={{backgroundColor:'black', outline:'none', color:'white', height: mobile ?'6vh' : '5vh', textTransform:'none'}}>
                     <p style={{fontFamily: OPENSANS, marginBottom:0, fontWeight:'500'}}>How it works</p>
@@ -326,7 +326,7 @@ export default function MyRequestsScreen(){
                 </div>
             </div>
            
-            <div style={{width: '90vw', height:'auto', marginLeft:'auto', marginRight:'auto', textAlign:'center', marginTop: mobile ? '10vh' : "15vh", flexDirection: mobile ? 'column' : 'row', display:'flex', justifyContent:'space-between', paddingBottom:'10vh' }}>
+            {/* <div style={{width: '90vw', height:'auto', marginLeft:'auto', marginRight:'auto', textAlign:'center', marginTop: mobile ? '10vh' : "15vh", flexDirection: mobile ? 'column' : 'row', display:'flex', justifyContent:'space-between', paddingBottom:'10vh' }}>
                 <p style={{fontFamily: OPENSANS, fontWeight:'600', fontSize:"2rem", textAlign: mobile ? 'center' : 'left'}}>Your questions, <br/>answered.</p>
                 <div style={{width: mobile ? '100%' : '50%', textAlign: mobile ? 'left' : 'center' }}>
                     <Accordion style={{ borderBottomWidth:'1px', borderBottomColor:'#e0e0e0', borderBottomStyle:'solid', paddingTop:'1vh', paddingBottom:'1vh', boxShadow:'none'}}>
@@ -434,7 +434,7 @@ With Crib, subleasing becomes a breeze. Experience the convenience and efficienc
                     </Accordion>
                     
                 </div>
-            </div>
+            </div> */}
             <Modal
                 aria-labelledby="transition-modal-title"
                 aria-describedby="transition-modal-description"
