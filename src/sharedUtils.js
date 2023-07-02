@@ -138,9 +138,6 @@ export const GetIcon = (color, size, name) => {
 export const AMENITIESLIST =
 
     [
-    { name: 'Utilities_Included', library: 'MaterialCommunityIcons', color: '#fa4b4b', icon: 'power-plug' },
-    { name: 'Wifi', library: 'Ionicon', color: '#00d14d', icon: 'wifi' },
-    { name: 'Mattress', library: 'MaterialCommunityIcons', color: '#57b2f7', icon: 'bed' },
     { name: 'Pet_Friendly', library: 'FontAwesome', color: '#57b2f7', icon: "paw" },
     { name: "Garages", library: 'MaterialCommunityIcons', color: '#fa4b4b', icon: "garage"},
     { name: 'Swimming_Pool', library: 'MaterialCommunityIcons',color: '#f79c40', icon: "pool" },

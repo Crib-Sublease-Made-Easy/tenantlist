@@ -1,6 +1,6 @@
-import { TextField, Button, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import { TextField, Button, FormControl, InputLabel, Select, MenuItem, Checkbox, InputAdornment } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
-import { PRIMARYCOLOR, MEDIUMGREY, OPENSANS } from "../../sharedUtils";
+import { PRIMARYCOLOR, MEDIUMGREY, OPENSANS, LIGHTGREY } from "../../sharedUtils";
 import { SingupSubheading, SingupText } from "./signupStyle";
 import { DatePicker } from "@mui/x-date-pickers"
 
@@ -22,9 +22,16 @@ import 'react-phone-input-2/lib/style.css'
 
 import SendBird from 'sendbird'
 
+import SearchIcon from '@mui/icons-material/Search';
+import BedIcon from '@mui/icons-material/Bed';
+import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import InstagramIcon from '@mui/icons-material/Instagram';
+import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
+
 const appId = 'EF181665-2473-42C6-9376-A340AF716169';
 const sb = new SendBird({ appId: appId});
 
+const PURPOSEOFSUBLEASINGOPTIONS = ["Travel", "Internship", "Work", "Others"]
 
 export default function SingupScreen(){
     const navigate = useNavigate()
@@ -37,6 +44,16 @@ export default function SingupScreen(){
     const [countryCode, setCountryCode] = useState("")
     const [gender, setGender] = useState(null)
     const [dob, setDob] = useState(null)
+    const [purposeOfSubleasing, setPurposeOfSubleasing] = useState(null)
+    const [findingPosting, setFindingPosting] = useState(null)
+    const [student, setStudent] = useState(false)
+    const [school, setSchool] = useState("")
+    const [schoolEmail, setSchoolEmail] = useState("")
+    const [occupation, setOccupation] = useState("")
+    const [linkedIn, setLinkedIn] = useState("")
+    const [instagram, setInstagram] = useState("")
+    const [wechat, setWechat] = useState("")
+
 
     const hiddenFileInput = useRef(null);
     const [profImg, setProfImg] = useState(null)
@@ -95,6 +112,39 @@ export default function SingupScreen(){
             setSignupStep(2)
         }
         if(signupStep == 2){
+            if(purposeOfSubleasing == null){
+                alert("Please select your purpose of subleasing.")
+                return;
+            }
+            if(student){
+                if(school.trim() == ""){
+                    alert("Please specify your school.")
+                    return;
+                }
+                if(schoolEmail.trim() == ""){
+                    alert("Please specify your school email.")
+                    return;
+                }
+            }
+            if(occupation.trim() == ""){
+                alert("Please specify your occupation.")
+                return;
+            }
+            setSignupStep(signupStep+1)
+        }
+        if(signupStep == 3){
+            if(findingPosting == null){
+                alert("Please specify if you're finding or posting subleases.")
+                return
+            }
+            setSignupStep(signupStep+1)
+        }
+        if(signupStep == 4){
+            setSignupStep(signupStep+1)
+        }
+        
+        
+        if(signupStep == 5){
             if(phoneNumberwCC.trim() == ""){
                 alert("Please enter a valid phone number")
                 return;
@@ -128,7 +178,7 @@ export default function SingupScreen(){
                 }
             })
         }
-        if(signupStep == 3){
+        if(signupStep == 6){
             if(OTPCode.length != 6){
                 alert("Please enter a valid OTP")
                 return;
@@ -180,6 +230,7 @@ export default function SingupScreen(){
 
     function signupStep2(id){
         console.log("STEP2");
+        console.log("AUTHY ID IS" , id)
         fetch('https://crib-llc.herokuapp.com/users/OTP/step2', {
             method: 'POST',
             headers: {
@@ -208,12 +259,21 @@ export default function SingupScreen(){
         }) 
     }
     async function signupStep3(){ 
-
+        console.log("inside step 3 ")
         let countryCodelength = countryCode.toString().length
          
         let phoneNumber = phoneNumberwCC.substring(countryCodelength, phoneNumberwCC.toString().length)
 
         setLoading(true)
+        console.log( student)
+        console.log(findingPosting)
+        console.log(purposeOfSubleasing)
+        console.log(schoolEmail)
+        console.log(occupation)
+        console.log(school)
+        console.log(wechat)
+        console.log(linkedIn)
+        console.log(instagram)
         try{
             const formData = new FormData();
 
@@ -221,18 +281,30 @@ export default function SingupScreen(){
             formData.append("lastName", lastName);  
             formData.append("dob", new Date(dob).getTime());      
             formData.append("gender", gender);
-            formData.append("phoneNumber", phoneNumber);                       
-            formData.append("occupation", "")
-            formData.append("school", "");                       
+            formData.append("phoneNumber", phoneNumber);                                  
             formData.append("email", email);      
             formData.append("token", OTPCode);      
             formData.append("authy_id", authyID);      
             // formData.append("oneSignalUserId", oneSignalUserId);    
-            formData.append("type", "Both")  
             formData.append("countryCode",countryCode)  
+
+            //New add
+            formData.append("student", student)
+            formData.append("type", findingPosting)  
+            formData.append("purposeOfSubleasing", purposeOfSubleasing)
+            formData.append("schoolEmail", schoolEmail)
+            formData.append("occupation", occupation)
+            formData.append("school", school)
+            formData.append("wechat", wechat)
+            formData.append("linkedIn", linkedIn)
+            formData.append("instagram", instagram)
+          
+
 
     
             formData.append("userImage", profileImage);
+
+            console.log("FORM DATA", formData)
 
             fetch('https://crib-llc.herokuapp.com/website/users/OTP/step3', {
                     method: 'POST',
@@ -272,7 +344,12 @@ export default function SingupScreen(){
                                             setTimeout(()=> {
                                                 setLoggedIn(true)
                                                 setLoading(false)
-                                                navigate("/discoverSubleases")
+                                                if(findingPosting == "Finding"){
+                                                    navigate("/discoverSubleases")
+                                                }
+                                                else{
+                                                    navigate("/propertyPosting")
+                                                }
                                             }, 2500)
 
                                         } else {
@@ -297,8 +374,9 @@ export default function SingupScreen(){
                 })
             
         }
-        catch{
-            alert("Error. Please try again later!")
+        catch(e){ 
+            console.log(e)
+            alert("catch error")
         }
          setLoading(false)
         
@@ -357,11 +435,11 @@ export default function SingupScreen(){
 
     return(
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <div style={{width: mobile ? '100vw' :'40vw', marginLeft:'auto', marginRight:'auto', paddingTop:'2vh', overflowY: 'scroll', height:'90vh', paddingLeft:'5vw', paddingRight:'5vw'}}>
+        <div style={{width: mobile ? '100vw' :'45vw', marginLeft:'auto', marginRight:'auto', paddingTop:'2vh', overflowY: 'scroll', height:'90vh', paddingLeft:'5vw', paddingRight:'5vw'}}>
             {/* <div style={{flexDirection:'row', display:'flex', justifyContent:'flex-start',}}>
                 <KeyboardArrowLeftIcon style={{color: MEDIUMGREY,fontSize:30}} />
             </div> */}
-            { signupStep != 0  && signupStep != 3 &&
+            { signupStep != 0 &&
             <small onClick={()=> setSignupStep(signupStep -1)} style={{textDecorationLine:'underline', color: MEDIUMGREY, cursor:'pointer'}}>Back</small>
             }
             { signupStep == 0 ?
@@ -409,7 +487,7 @@ export default function SingupScreen(){
             signupStep == 1 ?
             <div>
                 <SingupSubheading style={{marginTop:'2vh'}}>Upload a profile picture</SingupSubheading>
-                <SingupText>Please ensure your face can be clearly seen in the image for a better result</SingupText>
+                <SingupText>Please upload an image of yourself to guarantee the best result. Over 90% of tenants are more willing to sublease to a subtenant if their face is clearly shown in the image</SingupText>
                 <div  style={{flexDirection:'column', display:'flex', justifyContent:'center', alignItems:'center'}}>
                     <img onClick={handleImageClick} src={profImg} style={{width: mobile ? '50vw' : '15vw', height: mobile ? '50vw' : '15vw', backgroundColor:'#E0E0E0', borderRadius: mobile ? '25vw' : '7.5vw', marginTop:'3vh', objectFit:'cover', cursor:'pointer'}}/>
                     <input onChange={handleImageChange} ref={hiddenFileInput} className="mt-5" style={{display:'none'}} type="file" accept="image/*" />
@@ -429,6 +507,138 @@ export default function SingupScreen(){
             </div>
             :
             signupStep == 2 ?
+            <div>
+                <SingupSubheading style={{marginTop:'2vh'}}>Let others know a bit about you</SingupSubheading>
+                <SingupText>No one likes to sublease to a stranger, let’s build trust by first letting tenants know a bit about yourself</SingupText>
+                <div>
+                    <div style={{marginTop: '4vh'}}>
+                        <FormControl fullWidth>
+                        <InputLabel id="demo-age-select-label">Purpose of subleasing</InputLabel>
+                        <Select
+                            labelId="demo-age-select-label"
+                            id="demo-simple-select"
+                            value={purposeOfSubleasing}
+                            label="Purpose of subleasing"
+                            onChange={(val)=> setPurposeOfSubleasing(val.target.value)}
+                            
+                        >
+                            {
+                                PURPOSEOFSUBLEASINGOPTIONS.map((item)=>{
+                                    return(
+                                        <MenuItem value={`${item}`}>{item}</MenuItem>
+                                    )
+                                })
+                            }
+                            
+                        </Select>
+                        </FormControl>
+                    </div>
+                    <div style={{marginTop: '4vh', display:"flex", flexDirection:'row', justifyContent:"space-between", alignItems:'center'}}>
+                        <p style={{color:"black", marginBottom:0}}>Are you a student?</p>
+                        <Checkbox checked={student} onChange={()=> setStudent(!student)} style={{color: PRIMARYCOLOR}}/>
+                    </div>
+                    {student &&
+                    <div style={{marginTop: '4vh'}}>
+                        <TextField value={school} onChange={(val)=> setSchool(val.target.value)} fullWidth label="Where do you go to school?" />
+                        <div style={{marginTop:'2vh'}}>
+                            <TextField value={schoolEmail} onChange={(val)=> setSchoolEmail(val.target.value)} fullWidth label="Enter school email" />
+                        </div>
+                    </div>
+                    }
+                    <div style={{marginTop: '4vh'}}>
+                        <TextField fullWidth value={occupation} onChange={(val)=> setOccupation(val.target.value)}  label="What is your occupation?" />
+                    </div>
+                    <Button onClick={handleSubmit} fullWidth style={{marginTop: '4vh', backgroundColor: PRIMARYCOLOR,color: 'white', textTransform:'none', height: '6vh', textAlign:'center', outline:'none'}}>
+                        <p  state={{firstName:firstName, lastName: lastName, dob:dob, gender: gender}}  style={{fontWeight:'600', textTransform:'none', color:'white', marginBottom:0, display: 'flex', flex: 1,  justifyContent:'center'}}>Continue</p>
+                    </Button>
+                   
+                </div>
+            </div>
+            :
+            signupStep == 3 ?
+            <div>
+                <SingupSubheading style={{marginTop:'2vh'}}>Are you...</SingupSubheading>
+                <div style={{marginTop:"4vh", display:'flex', flexDirection:'row', alignItems:"center", justifyContent:'space-between' }}>
+                    <Button onClick={()=> setFindingPosting("Finding")} variant={findingPosting == "Finding" ? "contained" : "outlined"} style={{justifyContent:'center', display:'flex', alignItems:'center', textTransform:'none', backgroundColor:"white", borderColor: LIGHTGREY, flexDirection:'column', width:'47.5%', outlineColor: MEDIUMGREY, borderWidth: findingPosting == "Finding" ? '2px' : 0, borderColor: PRIMARYCOLOR, borderStyle:'solid'}}>
+                        <SearchIcon style={{fontSize:'7rem', color: '#737373'}} />
+                        <p style={{color:MEDIUMGREY, marginBottom:0, fontSize:'1rem', fontWeight:"600", fontFamily: OPENSANS}}>Finding a sublease</p>
+                    </Button>
+                    <Button onClick={()=> setFindingPosting("Posting")}  variant={findingPosting == "Posting" ? "contained" : "outlined"} style={{justifyContent:'center', display:'flex', alignItems:'center', textTransform:'none', backgroundColor:"white", borderColor: LIGHTGREY, flexDirection:'column', width:'47.5%',  outlineColor: MEDIUMGREY, borderWidth: findingPosting == "Posting" ? '2px' : 0, borderColor: PRIMARYCOLOR, borderStyle:'solid'}}>
+                        <BedIcon style={{fontSize:'7rem', color: '#737373'}} />
+                        <p style={{color:MEDIUMGREY, marginBottom:0, fontSize:'1rem', fontWeight:"600", fontFamily: OPENSANS}}>Posting a sublease</p>
+                    </Button>
+
+                </div>
+                    
+                    
+                <Button onClick={handleSubmit} fullWidth style={{marginTop: '4vh', backgroundColor: PRIMARYCOLOR,color: 'white', textTransform:'none', height: '6vh', textAlign:'center', outline:'none'}}>
+                    <p  state={{firstName:firstName, lastName: lastName, dob:dob, gender: gender}}  style={{fontWeight:'600', textTransform:'none', color:'white', marginBottom:0, display: 'flex', flex: 1,  justifyContent:'center'}}>Continue</p>
+                </Button>
+                
+                
+            </div>
+            :
+            signupStep == 4 ?
+            <div>
+                <SingupSubheading style={{marginTop:'2vh'}}>If social media is your thing</SingupSubheading>
+                <p style={{fontFamily: OPENSANS, color: "#737373" , fontSize:"0.9rem"}}>Showing users your social media presence greatly increase trusts between you and them.</p>
+                <div>
+                    <p style={{color:MEDIUMGREY, marginBottom:0, fontSize:'0.9rem', fontWeight:"600", fontFamily: OPENSANS}}>LinkedIn</p>
+                    <div style={{marginTop:'1vh'}}>
+                        <TextField 
+                            fullWidth
+                            onChange={(val)=> setLinkedIn(val.target.value)}
+                            InputProps={{
+                                placeholder: 'Linkedin handle',
+                                startAdornment: 
+                                <InputAdornment style={{paddingRight:'1vw'}}>
+                                    <LinkedInIcon style={{color: MEDIUMGREY, fontSize:'1.5rem'}} />
+                                </InputAdornment>,
+                            }}
+                        />      
+                    </div>    
+                </div>
+                <div style={{marginTop:'4vh'}}>
+                    <p style={{color:MEDIUMGREY, marginBottom:0, fontSize:'0.9rem', fontWeight:"600", fontFamily: OPENSANS}}>Instagram</p>
+                    <div style={{marginTop:'1vh'}}>
+                        <TextField 
+                            onChange={(val)=> setInstagram(val.target.value)}
+                            fullWidth
+                            InputProps={{
+                                placeholder: 'Instagram handle',
+                                startAdornment: 
+                                <InputAdornment style={{paddingRight:'1vw'}}>
+                                    <InstagramIcon style={{color: MEDIUMGREY, fontSize:'1.5rem'}} />
+                                </InputAdornment>,
+                            }}
+                        />      
+                    </div>
+                </div>
+                <div style={{marginTop:'4vh'}}>
+                    <p style={{color:MEDIUMGREY, marginBottom:0, fontSize:'0.9rem', fontWeight:"600", fontFamily: OPENSANS}}>WeChat</p>
+                    <div style={{marginTop:'1vh'}}>
+                        <TextField 
+                            onChange={(val) => setWechat(val.target.value)}
+                            fullWidth
+                            InputProps={{
+                                placeholder: 'WeChat username',
+                                startAdornment: 
+                                <InputAdornment style={{paddingRight:'1vw'}}>
+                                    <QuestionAnswerIcon style={{color: MEDIUMGREY, fontSize:'1.5rem'}} />
+                                </InputAdornment>,
+                            }}
+                        />      
+                    </div>
+                </div>
+                        
+                <Button onClick={handleSubmit} fullWidth style={{marginTop: '4vh', backgroundColor: PRIMARYCOLOR,color: 'white', textTransform:'none', height: '6vh', textAlign:'center', outline:'none'}}>
+                    <p  state={{firstName:firstName, lastName: lastName, dob:dob, gender: gender}}  style={{fontWeight:'600', textTransform:'none', color:'white', marginBottom:0, display: 'flex', flex: 1,  justifyContent:'center'}}>Continue</p>
+                </Button>
+                   
+               
+            </div>
+            :
+            signupStep == 5 ?
             <div>
                 <SingupSubheading style={{marginTop:'2vh'}}>Enter your phone number</SingupSubheading>
                 <SingupText>We will send you a verification code to your number.</SingupText>
@@ -467,7 +677,7 @@ export default function SingupScreen(){
                 </div>
             </div>
             
-            }
+        }
             
         </div>
         </LocalizationProvider>

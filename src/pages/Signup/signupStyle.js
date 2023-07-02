@@ -9,8 +9,10 @@ export const SingupTitle = styled.p`
 `
 
 export const SingupText = styled.p`
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-family: ${OPENSANS};
+    color: #737373
+    margin-bottom:0;
 `
 
 export const SingupSubheading = styled.p`
