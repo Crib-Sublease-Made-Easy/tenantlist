@@ -328,7 +328,7 @@ export default function PropertyPostingScreen(){
             navigate("/login")
             return
         }
-        
+        console.log(userData)
         if(userData.postedProperties.length != 0){
             alert("Users can only post 1 property.")
             return
@@ -460,11 +460,11 @@ export default function PropertyPostingScreen(){
             
         }
         if(postingPage == 7){
-            if(!utilitiesIncluded && utilitiesFee.trim() == ""){
+            if(!utilitiesIncluded && utilitiesFee.trim() == 0){
                 alert("Please enter average monthly utlities fee.")
                 return
             }
-            if(!wifiIncluded && wifiFee.trim() == ""){
+            if(!wifiIncluded && wifiFee.trim().length == 0){
                 alert("Please enter monthly wifi fee.")
                 return
             }
@@ -619,7 +619,7 @@ export default function PropertyPostingScreen(){
         if(utilitiesIncluded){
             propertyAmenities.push("Utilities_Included")
         }
-        if(wifiFee){
+        if(wifiIncluded){
             propertyAmenities.push("Wifi")
         }
         if(inUnitWasherDryer){
@@ -627,6 +627,19 @@ export default function PropertyPostingScreen(){
         }
 
         let location = propertyLocation.structured_formatting.main_text +","+ propertyLocation.structured_formatting.secondary_text
+
+        // console.log("type", propertyType)
+        // console.log("streetAddr", propertyLocation.structured_formatting.main_text)
+        // console.log("secondaryTxt", propertyLocation.structured_formatting.secondary_text);         
+        // console.log("price", propertyPrice);
+        // console.log("description", propertyDescription);
+        // console.log("privateBathroom", privateBathroom)
+        // console.log("utilitiesFee", Number(utilitiesFee))
+        // console.log("wifiFee", Number(wifiFee))
+        // console.log("WDLocation", washerDryerLocation)
+        // console.log("numberOfRoommates", propertyNumberOfRoommates)
+        // console.log("messageToSubtenant", propertyToSubtenantMessage)
+        
 
         await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address='${location}'&key=AIzaSyBbZGuUw4bqWirb1UWSzu9R6_r13rPj-eI`,{
             method:"GET"
@@ -644,8 +657,8 @@ export default function PropertyPostingScreen(){
             postingData.append("description", propertyDescription);
             postingData.append("availableFrom", new Date(propertyStartDate).getTime());
             postingData.append("availableTo", new Date(propertyEndDate).getTime());
-            postingData.append("bed",propertyNumberBedroom);
-            postingData.append("bath",propertyNumberBathroom);
+            postingData.append("bed",proeprtyNumberOfBeds);
+            postingData.append("bath",proeprtyNumberOfBaths);
             postingData.append("timePosted", new Date())
             postingData.append("title", "Name");
             propertyAmenities.forEach(element => {
@@ -656,10 +669,10 @@ export default function PropertyPostingScreen(){
                 postingData.append("rentPaymentMethod", element);
             });
             postingData.append("privateBathroom", privateBathroom)
-            postingData.append("utilitiesFee", utilitiesFee)
-            postingData.append("wifiFee", wifiFee)
+            postingData.append("utilitiesFee", Number(utilitiesFee))
+            postingData.append("wifiFee", Number(wifiFee))
             postingData.append("WDLocation", washerDryerLocation)
-            postingData.append("numberOfRoommates", propertyNumberOfRoommates)
+            postingData.append("numberOfRoommates", propertyNumberOfRoommates == null ? 0 : propertyNumberOfRoommates)
             postingData.append("messageToSubtenant", propertyToSubtenantMessage)
            
             postingData.append("roommates", propertyRoomates);
@@ -704,15 +717,16 @@ export default function PropertyPostingScreen(){
                     setPostingSuccessModal(true)
                 }
                 else{
+                    console.log(response.status)
                     alert("An error occured. Please try again later!")
-                    navigate("/")
+                    // navigate("/")
                    
                 }
                
             })
             .catch(e => {
                 setLoading(false)
-                navigate("/")
+                // navigate("/")
                 alert(e)
             })
             
@@ -1517,7 +1531,9 @@ export default function PropertyPostingScreen(){
                         <p style={{marginBottom:0, fontSize: '1.4rem', fontFamily: OPENSANS, fontWeight:'600',}}>Image gallery</p>
                         <div style={{width: mobile ? '90vw' :  '30vw', height: mobile ? '90vw' :  '100vw', borderRadius: MEDIUMROUNDED, backgroundColor: EXTRALIGHT, borderWidth:'1px', borderStyle:'solid', borderColor: LIGHTGREY, position:'relative', marginTop:'2vh', flexDirection:'column' }}>
                             <img src={reviewSelectedImage} style={{width: mobile ? '90vw' :  '30vw', height: mobile ? '90vw' :  '30vw',  borderRadius: MEDIUMROUNDED, }} />
-                            <IconButton style={{outline:'none', position:'absolute', top: '2vh', right:'2vw', backgroundColor:'white'}} onClick={()=>handleReviewEditNav(3)}>
+                            {/* <IconButton style={{outline:'none', position:'absolute', top: '2vh', right:'2vw', backgroundColor:'white'}} onClick={()=>handleReviewEditNav(3)}> */}
+                            <IconButton style={{outline:'none', position:'absolute', top: '2vh', right:'2vw', backgroundColor:'white'}} onClick={()=>setLoading(false)}>
+
                                 <EditNoteIcon style={{fontSize: mobile ? '6vw' : '2vw', color: MEDIUMGREY}} />
                             </IconButton>
                         </div>

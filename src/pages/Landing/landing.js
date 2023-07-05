@@ -213,68 +213,74 @@ export default function LandingPage(props){
                             await fetch(`https://crib-llc.herokuapp.com/properties/getAllNewYorkPosting?&page=0&latitude=${coor[1]}&longitude=${coor[0]}`)
                             .then((res) => {return res.json()})
                             .then( async data => {
-                               
-                    
-                                //Sort Crib Connect users first 
-                                data.sort( (a,b) => b.userInfo.cribConnectUser - a.userInfo.cribConnectUser)
-                    
-                                setNYProps(data.filter((prop) => {
-                                    if(!queensDL){
-                                        let sa = prop.propertyInfo.loc.secondaryTxt;
-                                        let spaceless_sa = sa.toLowerCase().replace(" ", "");
-                                        if(spaceless_sa.indexOf("queens") != -1){
-                                            return false
-                                        }
-                                       
-                                    }
-                                    if(!brooklynDL){
-                                        let sa = prop.propertyInfo.loc.secondaryTxt;
-                                        let spaceless_sa = sa.toLowerCase().replace(" ", "");
-                                        if(spaceless_sa.indexOf("brooklyn") != -1){
-                                            return false
-                                        }
-                                      
-                                    }
-                                    if(!jerseyDL){
-                                        let sa = prop.propertyInfo.loc.secondaryTxt;
-                                        let spaceless_sa = sa.toLowerCase().replace(" ", "");
-                                        if(spaceless_sa.indexOf("nj") != -1 || spaceless_sa.indexOf("jersey") != -1){
-                                            return false
-                                        }
-                                    }
+                                console.log(data)
+                                if(data.propertiesFound == "none"){
+                                    setNYProps([])
                                     
-                                    if(!manhattanDL){
-                                        let sa = prop.propertyInfo.loc.secondaryTxt;
-                                        let spaceless_sa = sa.toLowerCase().replace(" ", "");
-                                        if(spaceless_sa.indexOf("nj") == -1 && spaceless_sa.indexOf("jersey") == -1 && spaceless_sa.indexOf("brooklyn") == -1 && spaceless_sa.indexOf("queens") == -1){
-                                            return false
-                                        }
-                                    }
-                                    if(!roomType){
-                                        let type = prop.propertyInfo.type;
-                                        if(type == "Room"){
-                                            return false
-                                        }
-                                    }
-                                    if(!studioType){
-                                        let type = prop.propertyInfo.type;
-                                        if(type == "Studio"){
-                                            return false
-                                        }
-                                    }
-                                    if(!apartmentType){
-                                        let type = prop.propertyInfo.type;
-                                        if(type == "Apartment" || type == "Entire apartment"){
-                                            return false
-                                        }
-                                    }
-                                    if(prop.propertyInfo.price > price){
-                                      return false
-                                    }
+                                }
+                                else{
+                                    data.sort( (a,b) => b.userInfo.cribConnectUser - a.userInfo.cribConnectUser)
                     
-                                    return true
-                                }))
+                                    setNYProps(data.filter((prop) => {
+                                        if(!queensDL){
+                                            let sa = prop.propertyInfo.loc.secondaryTxt;
+                                            let spaceless_sa = sa.toLowerCase().replace(" ", "");
+                                            if(spaceless_sa.indexOf("queens") != -1){
+                                                return false
+                                            }
+                                           
+                                        }
+                                        if(!brooklynDL){
+                                            let sa = prop.propertyInfo.loc.secondaryTxt;
+                                            let spaceless_sa = sa.toLowerCase().replace(" ", "");
+                                            if(spaceless_sa.indexOf("brooklyn") != -1){
+                                                return false
+                                            }
+                                          
+                                        }
+                                        if(!jerseyDL){
+                                            let sa = prop.propertyInfo.loc.secondaryTxt;
+                                            let spaceless_sa = sa.toLowerCase().replace(" ", "");
+                                            if(spaceless_sa.indexOf("nj") != -1 || spaceless_sa.indexOf("jersey") != -1){
+                                                return false
+                                            }
+                                        }
+                                        
+                                        if(!manhattanDL){
+                                            let sa = prop.propertyInfo.loc.secondaryTxt;
+                                            let spaceless_sa = sa.toLowerCase().replace(" ", "");
+                                            if(spaceless_sa.indexOf("nj") == -1 && spaceless_sa.indexOf("jersey") == -1 && spaceless_sa.indexOf("brooklyn") == -1 && spaceless_sa.indexOf("queens") == -1){
+                                                return false
+                                            }
+                                        }
+                                        if(!roomType){
+                                            let type = prop.propertyInfo.type;
+                                            if(type == "Room"){
+                                                return false
+                                            }
+                                        }
+                                        if(!studioType){
+                                            let type = prop.propertyInfo.type;
+                                            if(type == "Studio"){
+                                                return false
+                                            }
+                                        }
+                                        if(!apartmentType){
+                                            let type = prop.propertyInfo.type;
+                                            if(type == "Apartment" || type == "Entire apartment"){
+                                                return false
+                                            }
+                                        }
+                                        if(prop.propertyInfo.price > price){
+                                          return false
+                                        }
+                        
+                                        return true
+                                    }))
+                                }
+                                //Sort Crib Connect users first 
                                 setLoading(false)
+                                
                     
                             } )
                         })

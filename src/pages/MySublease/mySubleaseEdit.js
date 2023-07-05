@@ -159,6 +159,7 @@ export default function MySubleaseEditScreen(){
             return
         }
         let toChange = {}
+        console.log(item)
         if(item == "Type"){
             toChange = {"type": subleaseType}
         }
@@ -172,6 +173,7 @@ export default function MySubleaseEditScreen(){
             toChange ={"description": subleaseDescription}
         }
         else if(item == "Amenities"){
+            console.log("Changing amenities")
             toChange ={"amenities": subleaseAmenities}
         }
         
@@ -641,7 +643,7 @@ export default function MySubleaseEditScreen(){
                                             })}
                                         </div>
                                                             
-                                        <Button fullWidth onClick={()=> update("Description")} variant="contained" style={{backgroundColor:'black', outline:'none', textTransform:'none', height: '5vh', marginTop:'6vh'}}>
+                                        <Button fullWidth onClick={()=> update("Amenities")} variant="contained" style={{backgroundColor:'black', outline:'none', textTransform:'none', height: '5vh', marginTop:'6vh'}}>
                                             <p style={{marginBottom:0}}>Update</p>
                                         </Button>
                                         

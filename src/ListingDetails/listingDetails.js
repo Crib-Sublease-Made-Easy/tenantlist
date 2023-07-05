@@ -21,6 +21,8 @@ import PermPhoneMsgIcon from '@mui/icons-material/PermPhoneMsg';
 import MarkEmailReadIcon from '@mui/icons-material/MarkEmailRead';
 import GppGoodIcon from '@mui/icons-material/GppGood';
 import Diversity3Icon from '@mui/icons-material/Diversity3';
+import ShowerIcon from '@mui/icons-material/Shower';    
+import LocalLaundryServiceIcon from '@mui/icons-material/LocalLaundryService';
 
 import GoogleMap from 'google-maps-react-markers';
 import { Button, Checkbox, FormControl, InputLabel, MenuItem, Select, TextField } from "@mui/material";
@@ -35,7 +37,7 @@ import { UserContext } from "../UserContext"
 import { CheckBox } from "@mui/icons-material";
 
 export default function ListingDetails(){
-    const {mobile} = useContext(UserContext)
+    const {mobile, setLoggedIn} = useContext(UserContext)
 
     //Navigate
     const navigate = useNavigate()
@@ -69,6 +71,7 @@ export default function ListingDetails(){
     const imgListRef = useRef(null)
     const { id } = useParams()
     useEffect(()=>{
+        refreshAccessToken()
         fetchProp()
         fetchUserData()
     },[])
@@ -96,30 +99,79 @@ export default function ListingDetails(){
         } 
     }
 
+    const refreshAccessToken = async () => {
+        try{
+            const rt = localStorage.getItem("refreshToken")
+            const id = localStorage.getItem("uid");
+                
+            //If refresh token is undefined, meaning user have not logged in
+            if (rt != undefined && id != undefined) {
+            
+            
+            
+            await fetch('https://crib-llc.herokuapp.com/tokens/accessRefresh', {
+                method: 'POST',
+                headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + rt
+                }
+            }).then(async e => {
+                const response = await e.json();
+                if(e.status == 200){
+                console.log("Successfully refreshed the accessToken")
+                try {
+                    if(response.accessToken != undefined ?? response.accessToken != null){
+                    localStorage.setItem("accessToken", response.accessToken)
+                    
+                    setLoggedIn(true)
+                    }
+                    
+                } catch (err) {
+                    alert(err)
+                }
+                }
+                else if(e.status == 401){
+                    setLoggedIn(false)
+                    localStorage.clear()
+                    alert("Please log in.")
+                    navigate("/login")
+                    return
+                }
+                else{
+                    setLoggedIn(false)
+                    localStorage.clear()
+                    alert("Please log in.")
+                    navigate("/login")
+                    return
+                }
+            })
+            .catch ( e => {
+                console.log("failing")
+                alert(e)
+            })
+            }
+            else{
+                console.log("Refresh Token is undefined. User is not logged in.")
+            }
+        }
+        catch{
+            console.log("ERROR --- APP --- REFRESHTOKEN")
+        }
+    }
+
     const onGoogleApiLoaded = ({ map, maps }) => {
         GoogleMapRef.current = map
         setMapReady(true)
     }
 
     async function requestToBook(){
-        
-        let at = localStorage.getItem("accessToken")
-
-        if(at == null){
-            alert("Please login to message tenant.")
-            navigate("/login")
+        if(requestStart == null){
+            alert("Please select a sublease start date.")
             return
         }
-
-        if(requestStart == null || requestEnd == null){
-            alert("Please select start and end date.")
-           
-            return
-        }
-
-        if(requestMessage.trim() == ""){
-            alert("Please enter a request message.")
-        
+        if(requestEnd == null){
+            alert("Please select a sublease end date.")
             return
         }
         let requestS = new Date(requestStart).getTime()
@@ -140,11 +192,51 @@ export default function ListingDetails(){
            
             return;
         }
-        if(userData.emailVerified == undefined || userData.emailVerified == false){
-            setRequestConfirmationModalVis(true)
-            return
-        }
-        setRequestDetailsConfirmationModalVis(true)
+        console.log("before" , new Date(requestStart).getTime())
+        navigate(`/requestConfirm/${propData._id}/${new Date(requestStart).getTime()}/${new Date(requestEnd).getTime()}/${numberOfOccupants}`)
+        
+        // let at = localStorage.getItem("accessToken")
+
+        // if(at == null){
+        //     alert("Please login to message tenant.")
+        //     navigate("/login")
+        //     return
+        // }
+
+        // if(requestStart == null || requestEnd == null){
+        //     alert("Please select start and end date.")
+           
+        //     return
+        // }
+
+        // if(requestMessage.trim() == ""){
+        //     alert("Please enter a request message.")
+        
+        //     return
+        // }
+        // let requestS = new Date(requestStart).getTime()
+        // let subleaseS = new Date(propData.availableFrom).getTime()
+        
+        // if(requestS < new Date().getTime() || (requestS < subleaseS && subleaseS - requestS > 1000*60*60*24)){
+        //     alert("Sublease unavailable on requested start date!")
+       
+        //     return;
+        // }
+
+        // let requestE = new Date(requestEnd).getTime()
+        // let subleaseE = new Date(propData.availableTo).getTime()
+       
+
+        // if(requestE > subleaseE || (requestE - subleaseE > 1000*60*60*24)){
+        //     alert("Sublease unavailable on requested end date!")
+           
+        //     return;
+        // }
+        // if(userData.emailVerified == undefined || userData.emailVerified == false){
+        //     setRequestConfirmationModalVis(true)
+        //     return
+        // }
+        // setRequestDetailsConfirmationModalVis(true)
     }
 
     async function sendSubleaseRequest(){
@@ -184,30 +276,6 @@ export default function ListingDetails(){
         },1500)
     }
 
-    async function smsSubtenantMessageToTenant(){
-        let uid = localStorage.getItem("uid")
-        // console.log(uid)
-        // console.log(tenantData.id)
-        // console.log(new Date(requestStart))
-        // console.log(new Date(requestEnd))
-        await fetch('https://crib-llc.herokuapp.com/web/smsSubtenantInterestToUser', {
-            method: 'POST',
-            headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-            },
-            body:JSON.stringify({
-                "tenantID": tenantData.id,
-                "subtenantID": uid,
-                "requestStart": new Date(requestStart),
-                "requestEnd": new Date(requestEnd)
-            })
-        })
-        .catch(e => console.log(e))
-
-    }
-
-
     async function addRequestSend(){
         let USERID = localStorage.getItem("uid")
 
@@ -239,8 +307,6 @@ export default function ListingDetails(){
                 alert("Error occured. Please try again later.")
             }
         })
-        
-
     }
 
     // if(res.status == 200){
@@ -357,6 +423,7 @@ export default function ListingDetails(){
             if(res.status == 200){
                 let data = await res.json()
                 setPropData(data.propertyInfo)
+                console.log(data.propertyInfo)
                 setTenantData(data.userInfo)
             }
         })
@@ -417,6 +484,15 @@ export default function ListingDetails(){
         }
     }
 
+    function getPaymentMethod(){
+        let ret = ""
+
+        propData.rentPaymentMethod.forEach(item =>{
+            ret = ret + item + ", "
+        })
+        return ret.substring(0, ret.length-2)
+    }
+
     function handleNav(route){
         setRequestSuccessModal(false)
         navigate(route)
@@ -438,6 +514,20 @@ export default function ListingDetails(){
         else{
             requestToBook()
         }
+    }
+
+    function handleMessageTenantClick(){
+        navigate(`/messageTenant/${propData._id}`)
+    }
+
+    function getRentPaymentMethods(){
+        let s = ""
+
+        propData.rentPaymentMethod.forEach(item => {
+            s = s + item + ", "
+        })
+
+        return s.substring(0, s.length-2)
     }
 
     function getArea(){
@@ -467,13 +557,15 @@ export default function ListingDetails(){
                 <div style={{position:'relative',  display:'block', width: mobile ? '100vw' : 'auto', height: mobile ? '78vh' : '90vh', paddingTop: mobile ? 0 : '3vh', overflow:'scroll', }}>
                     
                     <div style={{paddingTop:15, paddingBottom:15, width:'90vw', marginLeft:'auto', marginRight:'auto'}}>
-                        <p onClick={()=> navigate("/discoverSubleases")} style={{textDecorationLine:'underline', fontFamily: OPENSANS, fontWeight:'600', color: MEDIUMGREY, fontSize:'0.9rem'}}>Browse other listings</p>
-
+                        <div style={{flexDirection:'row', display:'flex', justifyContent:'space-between'}}>
+                            <p onClick={()=> navigate("/discoverSubleases")} style={{textDecorationLine:'underline', fontFamily: OPENSANS, fontWeight:'600', color: MEDIUMGREY, fontSize:'0.9rem', cursor:"pointer"}}>Browse other listings</p>
+                            <p style={{fontWeight:'500', fontFamily: OPENSANS, color:PRIMARYCOLOR}}>{propData.numberOfViews == 0 ? 1 : propData.numberOfViews} user views</p>
+                        </div>
                         <p style={{fontWeight:'700', fontFamily: OPENSANS, fontSize:'1.5rem', marginBottom: 5}}>{propData.type} in {getArea()}</p>
                         <div style={{flexDirection:'row', display:'flex', justifyContent:'space-between', alignItems:'center'}}>
                             <div style={{flexDirection: mobile ? 'column-reverse' : 'row', display:'flex'}}>
                                 <p style={{fontWeight:'500', fontFamily: OPENSANS,}}>Available from: {new Date(propData.availableFrom).getTime() < new Date().getTime() ? "Now" : new Date(propData.availableFrom).toLocaleString().split(",")[0]} - {new Date(propData.availableTo).toLocaleString().split(",")[0]}</p>
-                                <p style={{fontWeight:'500', fontFamily: OPENSANS, color:MEDIUMGREY,  marginLeft: mobile ? 0 :'2vw',}}>{propData.loc.streetAddr}</p>
+                                <p style={{fontWeight:'500', fontFamily: OPENSANS, color:MEDIUMGREY,  marginLeft: mobile ? 0 :'2vw', textDecorationLine:'underline'}}>{propData.loc.streetAddr}</p>
                             </div>
                             <div style={{flexDirection:'row', display:'flex'}}>
                                 {/* <div style={{flexDirection:'row', display:'flex'}}>
@@ -490,12 +582,12 @@ export default function ListingDetails(){
                            
                         </div>
                     </div>
-                    <ul ref={imgListRef} style={{flexDirection:'row', display: 'flex',   width: mobile ? '100vw' : '90vw',  paddingLeft:0, borderRadius: mobile ? 0 : MEDIUMROUNDED, marginLeft:'auto', marginRight:'auto',  overflow:'scroll', msOverflowStyle:'none'}}>
+                    <ul ref={imgListRef} style={{flexDirection:'row', display: 'flex',   width: mobile ? '100vw' : '90vw',  paddingLeft:0, borderRadius: mobile ? 0 : MEDIUMROUNDED, marginLeft:'auto', marginRight:'auto',  overflow:'scroll', msOverflowStyle:'none', listStyle:'none'}}>
                         {
                             propData.imgList.map((item, index)=> {
                                 return(
                                     <li>
-                                        <img key={item + index} src={item} style={{width: mobile ? '100vw' : '40vh', maxHeight: '100vw', marginLeft: index == 0 ? 0  : '0.5vw'}}/>
+                                        <img key={item + index} src={item} style={{width: mobile ? '100vw' : '40vh', height:'40vh' , marginLeft: index == 0 ? 0  : '0.5vw', objectFit:'cover'}}/>
                                     </li>
                                 )
                             })
@@ -503,23 +595,30 @@ export default function ListingDetails(){
                     </ul>
                     <div style={{width:'90vw', marginLeft:'auto', marginRight:'auto', flexDirection:'row', display:'flex'}}>
                         <div style={{width: mobile ? '100%' : '50%'}}>
-                            <div style={{ paddingTop: '2vh', paddingBottom:'4vh',  borderBottomStyle:'solid', borderBottomWidth:0.5, borderColor:'#E0E0E0', flexDirection:'row'}}>
+                            <div style={{ paddingTop: '3vh', paddingBottom:'5vh',  borderBottomStyle:'solid', borderBottomWidth:0.5, borderColor:'#E0E0E0', flexDirection:'row'}}>
                                 <div style={{flexDirection:'row', justifyContent:'space-between', display:'flex'}}>
                                     <div style={{marginTop:'auto', marginBottom:'auto'}}>
-                                        <p style={{fontWeight:'700', fontFamily: OPENSANS, fontSize:'1.2rem', marginBottom: 10}}>Current tenant, {tenantData.firstName}</p>
-                                        <div style={{flexDirection:'row', display:'flex'}}>
-                                            <div style={{flexDirection:'row', display:'flex',alignItems:'center'}}>
-                                                <PermPhoneMsgIcon style={{fontSize:mobile ? '3.5vw' : '1.25vw'}}/>
-                                                <p style={{marginTop:'auto', marginBottom:'auto', marginLeft:  mobile ? '1vw' : '0.5vw', fontFamily:OPENSANS, fontWeight:'500', fontSize:mobile ? '0.9rem' : '1rem'}}>Phone verified</p>
-                                            </div>
-                                            <div style={{flexDirection:'row', display:'flex',alignItems:'center', marginLeft:'2vw'}}>
-                                                <MarkEmailReadIcon style={{fontSize: mobile ? '3.5vw' : '1.25vw'}}/>
-                                                <p style={{marginTop:'auto', marginBottom:'auto', marginLeft: mobile ? '1vw' : '0.5vw', fontFamily:OPENSANS, fontWeight:'500', fontSize:mobile ? '0.9rem' : '1rem'}}>Email verified</p>
-                                            </div>
-                                        </div>
+                                        <p style={{fontWeight:'700', fontFamily: OPENSANS, fontSize:'1.3rem', marginBottom: 10}}>Current tenant, {tenantData.firstName}</p>
+                                        <p style={{fontWeight:'500', fontFamily: OPENSANS, fontSize:'0.9rem',marginBottom: 10, color: "#737373"}}>{tenantData.school}</p>
+                                        <p style={{fontWeight:'500', fontFamily: OPENSANS, fontSize:'0.9rem', marginBottom: 0, color: "#737373"}}>{tenantData.occupation}</p>
                                     </div>
-                                    <img src={tenantData.profilePic} style={{height:mobile ? '8vh' : '10vh', width: mobile ? '8vh' : '10vh', borderRadius: mobile ? '4vh' : '5vh'}} />
+                                    <img src={tenantData.profilePic} style={{height:mobile ? '8vh' : '10vh', width: mobile ? '8vh' : '10vh', borderRadius: mobile ? '4vh' : '5vh', objectFit:'cover'}} />
                                 </div>
+                                <div style={{flexDirection:'row', display:'flex', marginTop:'4vh'}}>
+                                    <div style={{flexDirection:'row', display:'flex',alignItems:'center', borderRadius: MEDIUMROUNDED, backgroundColor: EXTRALIGHT, padding:'1vh', borderColor: LIGHTGREY, borderWidth:'1px', borderStyle:'solid'}}>
+                                        <PermPhoneMsgIcon style={{fontSize:mobile ? '3.5vw' : '1rem'}}/>
+                                        <p style={{marginTop:'auto', marginBottom:'auto', marginLeft:  mobile ? '1vw' : '0.5vw', fontFamily:OPENSANS, fontWeight:'500', fontSize:mobile ? '0.9rem' : '0.9rem'}}>Phone verified</p>
+                                    </div>
+                                    <div style={{flexDirection:'row', display:'flex',alignItems:'center', borderRadius: MEDIUMROUNDED, backgroundColor: EXTRALIGHT, padding:'1vh', borderColor: LIGHTGREY, borderWidth:'1px', borderStyle:'solid', marginLeft:'1vw'}}>
+                                        <MarkEmailReadIcon style={{fontSize: mobile ? '3.5vw' : '1rem'}}/>
+                                        <p style={{marginTop:'auto', marginBottom:'auto', marginLeft: mobile ? '1vw' : '0.5vw', fontFamily:OPENSANS, fontWeight:'500', fontSize:mobile ? '0.9rem' : '0.9rem'}}>Email verified</p>
+                                    </div>
+                                </div>
+                                <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize:'1.2rem', marginTop:'4vh', marginBottom:10}}>Message to subtenant</p>
+                                <p style={{fontWeight:'500', fontFamily: OPENSANS, fontSize:'0.9rem',marginBottom: 0, color: "#737373"}}>
+                                    {propData.messageToSubtenant}
+                                </p>
+
                             </div>
                             
 
@@ -531,18 +630,34 @@ export default function ListingDetails(){
                             </div>
                             } */}
 
-                            <div style={{ paddingTop: '4vh', paddingBottom:'5vh',  borderBottomStyle:'solid', borderBottomWidth:0.5, borderColor:'#E0E0E0', flexDirection:'row'}}>
-                                <p style={{fontWeight:'700', fontFamily: OPENSANS, fontSize:'1.2rem', marginBottom: 10}}>Description</p>
-                                <p style={{marginBottom: 0, fontFamily:OPENSANS}}>
+                            <div style={{ paddingTop: '5vh', paddingBottom:'5vh',  borderBottomStyle:'solid', borderBottomWidth:0.5, borderColor:'#E0E0E0', flexDirection:'row'}}>
+                                <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize:'1.2rem', marginBottom: 10}}>Sublease description</p>
+                                <p style={{fontWeight:'500', fontFamily: OPENSANS, fontSize:'0.9rem',marginBottom: 0, color: "#737373"}}>
                                     {propData.description}
                                 </p>
                             </div>
 
-                            <div style={{ paddingTop: '4vh', paddingBottom:'4vh',  borderBottomStyle:'solid', borderBottomWidth:0.5, borderColor:'#E0E0E0', flexDirection:'row'}}>
-                                <p style={{fontWeight:'700', fontFamily: OPENSANS, fontSize:'1.2rem', marginBottom: 10}}>Sublease details</p>
-                               
+                            <div style={{ paddingTop: '5vh', paddingBottom:'5vh',  borderBottomStyle:'solid', borderBottomWidth:0.5, borderColor:'#E0E0E0', flexDirection:'row'}}>
+                                <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize:'1.2rem', marginBottom: 10}}>Sublease details</p>
+                                <p style={{fontWeight:'500', fontFamily: OPENSANS, fontSize:'0.9rem',marginBottom: 0, color: "#737373"}}>
+                                    Subtenants will have access to:
+                                </p>
+                                <div style={{flexDirection:'row', display:'flex', alignItems:'center', marginTop:'4vh'}}>
+                                    <div style={{flexDirection:'column', display:'flex', borderWidth:'1px', borderColor: LIGHTGREY, borderStyle:'solid', borderRadius: MEDIUMROUNDED, padding:'1vh'}}>
+                                        <KingBedIcon style={{fontSize:'2.5rem', color:"black"}}/>
+                                        <p style={{fontWeight:'500', fontFamily: OPENSANS, fontSize:'0.9rem',marginBottom: 0, color: "#737373"}}>
+                                           {Number(propData.bed) == 0 ? "No" : Number(propData.bed)} beds 
+                                        </p>
+                                    </div>
+                                    <div style={{flexDirection:'column', display:'flex', borderWidth:'1px', borderColor:LIGHTGREY, borderStyle:'solid', borderRadius: MEDIUMROUNDED, padding:'1vh', marginLeft:'2vh'}}>
+                                        <ShowerIcon style={{fontSize:'2.5rem', color:"black"}}/>
+                                        <p style={{fontWeight:'500', fontFamily: OPENSANS, fontSize:'0.9rem',marginBottom: 0, color: "#737373"}}>
+                                            {propData.privateBathroom || propData.numberOfRoommates == 0 ? "A private bathroom" : "A shared bathroom"}
+                                        </p>
+                                    </div>
+                                </div>
                                 
-                                <div style={{flexDirection: mobile ? 'column' : 'row', display:'flex', paddingTop:'1vh', paddingBottom:'1vh', alignItems:'center', width:'80%', justifyContent:'space-between'}}>
+                                <div style={{flexDirection: mobile ? 'column' : 'row', display:'flex', paddingTop:'1vh', paddingBottom:'1vh', alignItems:'center', width:'80%', justifyContent:'space-between', marginTop:'4vh'}}>
                                     <div style={{flexDirection:'row', display:'flex', width:mobile ? '100%' : '40%', alignItems:'center'}}>
                                         <GppGoodIcon style={{color:'black', fontSize:mobile ? '5vw' : '2.5vw', color: MEDIUMGREY}} />
                                         <div style={{marginLeft: mobile ? '3vw' : '1vw', marginTop:'auto', marginBottom:'auto',}}>
@@ -553,8 +668,8 @@ export default function ListingDetails(){
                                     <div style={{flexDirection:'row', display:'flex', width:mobile ? '100%' : '40%', alignItems:'center', marginTop: mobile ? '2vh' : 0}}>
                                         <KingBedIcon style={{color:'black', fontSize:mobile ? '5vw' : '2.5vw',  color: MEDIUMGREY}} />
                                         <div style={{marginLeft:mobile ? '3vw' : '1vw', marginTop:'auto', marginBottom:'auto',}}>
-                                            <p style={{ fontFamily: OPENSANS, fontWeight:'500', marginBottom:0}}>{propData.amenities.includes("Mattress") ? "Furnished" : "Not furnished"}</p>
-                                            <p style={{ fontFamily: OPENSANS, fontWeight:'500', fontSize:"0.8rem", marginBottom:0}}>{propData.amenities.includes("Mattress") ? "Mattress included" : "Mattress not included"}</p>
+                                            <p style={{ fontFamily: OPENSANS, fontWeight:'500', marginBottom:0}}>{Number(propData.bed) == 0 ? "Not Furnished" : "Furnished"}</p>
+                                            <p style={{ fontFamily: OPENSANS, fontWeight:'500', fontSize:"0.8rem", marginBottom:0}}>{Number(propData.bed) == 0 ? "Mattress not included" : "Mattress included"}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -563,31 +678,61 @@ export default function ListingDetails(){
                                         <BoltIcon style={{color:'black', fontSize:mobile ? '5vw' : '2.5vw', color: MEDIUMGREY}} />
                                         <div style={{marginLeft:mobile ? '3vw' : '1vw', marginTop:'auto', marginBottom:'auto',}}>
                                             <p style={{ fontFamily: OPENSANS, fontWeight:'500', marginBottom:0}}>Utilities</p>
-                                            <p style={{ fontFamily: OPENSANS, fontWeight:'500', fontSize:"0.8rem", marginBottom:0}}>{propData.amenities.includes("Utilities_Included") ? "Utilities included" : "Utilities not included"}</p>
+                                            <p style={{ fontFamily: OPENSANS, fontWeight:'500', fontSize:"0.8rem", marginBottom:0}}>{propData.amenities.includes("Utilities_Included") ? "Utilities included" : Number(propData.utilitiesFee) == 0 ? "Message tenant" : `Around $${propData.utilitiesFee} /month` }</p>
                                         </div>
                                     </div>
                                     <div style={{flexDirection:'row', display:'flex', width:mobile ? '100%' : '40%', alignItems:'center',  marginTop: mobile ? '2vh' : 0}}>
                                         <Diversity3Icon style={{color:'black', fontSize:mobile ? '5vw' : '2.5vw',  color: MEDIUMGREY}} />
                                         <div style={{marginLeft:mobile ? '3vw' : '1vw', marginTop:'auto', marginBottom:'auto',}}>
-                                            <p style={{ fontFamily: OPENSANS, fontWeight:'500', marginBottom:0}}>{propData.roommates ? "Roommates" : "No roommates"}</p>
+                                            <p style={{ fontFamily: OPENSANS, fontWeight:'500', marginBottom:0}}>{propData.roommates ? `${propData.numberOfRoommates == 0 || propData.numberOfRoommates == 1 ? `1 Roommate` : `${propData.numberOfRoommates} Roommates`}` : "No roommates"}</p>
                                             <p style={{ fontFamily: OPENSANS, fontWeight:'500', fontSize:"0.8rem", marginBottom:0}}>{propData.roommates ? propData.roommatesGender == "Both" ? "Male and female" : `${propData.roommatesGender} roommate` : "All to yourself"}</p>
                                         </div>
                                     </div>
                                 </div>
-                                <div style={{flexDirection:'row', display:'flex', width:mobile ? '100%' : '40%', alignItems:'center',  marginTop: mobile ? '2vh' : 0}}>
-                                    <WifiIcon  style={{color:'black', fontSize:mobile ? '5vw' : '2.5vw', color: MEDIUMGREY}} />
-                                    <div style={{marginLeft:mobile ? '3vw' : '1vw', marginTop:'auto', marginBottom:'auto',}}>
-                                        <p style={{ fontFamily: OPENSANS, fontWeight:'500', marginBottom:0}}>Wifi</p>
-                                        <p style={{ fontFamily: OPENSANS, fontWeight:'500', fontSize:"0.8rem", marginBottom:0}}>{propData.amenities.includes("Wifi") ? "Wifi included" : "Wifi not included"}</p>
+                                <div style={{flexDirection: mobile ? 'column' : 'row', justifyContent:'space-between', display:'flex', paddingTop:'1vh', paddingBottom:'1vh', alignItems:'center', width:'80%'}}>
+                                    <div style={{flexDirection:'row', display:'flex', width:mobile ? '100%' : '40%', alignItems:'center',  marginTop: mobile ? '2vh' : 0}}>
+                                        <WifiIcon  style={{color:'black', fontSize:mobile ? '5vw' : '2.5vw', color: MEDIUMGREY}} />
+                                        <div style={{marginLeft:mobile ? '3vw' : '1vw', marginTop:'auto', marginBottom:'auto',}}>
+                                            <p style={{ fontFamily: OPENSANS, fontWeight:'500', marginBottom:0}}>Wifi</p>
+                                            <p style={{ fontFamily: OPENSANS, fontWeight:'500', fontSize:"0.8rem", marginBottom:0}}>{propData.amenities.includes("Wifi") ? `Wifi included` : Number(propData.wifiFee) == 0 ? "Message tenant" : `$${propData.wifiFee} /month`}</p>
+                                        </div>
+                                    </div>
+                                    <div style={{flexDirection:'row', display:'flex', width:mobile ? '100%' : '40%', alignItems:'center',  marginTop: mobile ? '2vh' : 0}}>
+                                        <LocalLaundryServiceIcon style={{color:'black', fontSize:mobile ? '5vw' : '2.5vw',  color: MEDIUMGREY}} />
+                                        <div style={{marginLeft:mobile ? '3vw' : '1vw', marginTop:'auto', marginBottom:'auto',}}>
+                                            <p style={{ fontFamily: OPENSANS, fontWeight:'500', marginBottom:0}}>Washer & Dryer</p>
+                                            <p style={{ fontFamily: OPENSANS, fontWeight:'500', fontSize:"0.8rem", marginBottom:0}}>{propData.amenities.includes("Washer_Dryer") ? "In-unit" : propData.WDLocation}</p>
+                                        </div>
                                     </div>
                                 </div>
+                                
                             </div>
 
+                            <div style={{ paddingTop: '4vh', paddingBottom:'4vh',  borderBottomStyle:'solid', borderBottomWidth:0.5, borderColor:'#E0E0E0', flexDirection:'row'}}>
+                                <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize:'1.2rem', marginBottom: 10}}>Rent payment details</p>
+                                <p style={{fontWeight:'500', fontFamily: OPENSANS, fontSize:'0.9rem', color: "#737373"}}>
+                                - {" "}
+                                {propData.rentPaymentTime == null ? 
+                                    "Please message tenant for rent payment time"
+                                :
+                                propData.rentPaymentTime == "Other" ?
+                                    `Rent payment method provided by tenant: ${propData.otherRentPaymentMethod}` 
+                                :
+                                propData.rentPaymentTime == "Beginning" ?
+                                    "Rent is paid in the beginning of each month"
+                                :
+                                    "Rent is paid in the end of each month"
+                                    }
+                                </p>
+                                <p style={{fontWeight:'500', fontFamily: OPENSANS, fontSize:'0.9rem',marginBottom: 0, color: "#737373"}}>
+                                    - {" "} {propData.rentPaymentMethod.length == 0 ? "please message tenant for preferred payment method" : `tenent preferred to receive rent through ${getPaymentMethod()}`}
+                                </p>
+                            </div>
                            
                            
                            
                             <div style={{ paddingTop: '4vh', paddingBottom:'6vh',  borderBottomStyle:'solid', borderBottomWidth:0.5, borderColor:'#E0E0E0', flexDirection:'row'}}>
-                                <p style={{fontWeight:'700', fontFamily: OPENSANS, fontSize:'1.2rem', marginBottom: 10}}>Location</p>
+                                <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize:'1.2rem', marginBottom: 10}}>Location</p>
                                 <div style={{paddingTop:'2vh'}}>
                                     <div style={{height: '25vh', width: mobile ? '90vw' : '45vw', borderRadius: MEDIUMROUNDED, backgroundColor:'#E0E0E0', overflow:'hidden'}}>
                                     {propData != null &&
@@ -613,8 +758,8 @@ export default function ListingDetails(){
                                     </div>
                                 </div>
                             </div>
-                            <div style={{ paddingTop: '4vh', paddingBottom:'5vh', flexDirection:'row'}}>
-                                <p style={{fontWeight:'700', fontFamily: OPENSANS, fontSize:'1.3rem', marginBottom: 10}}>Amenities</p>
+                            <div style={{ paddingTop: '4vh', paddingBottom:'5vh', flexDirection:'row',  borderBottomStyle:'solid', borderBottomWidth:0.5, borderColor:'#E0E0E0',}}>
+                                <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize:'1.3rem', marginBottom: 10}}>Amenities</p>
                                 <div style={{ width:mobile ? '100%' : '45vw', columnCount: 2}}>
                                 {   propData.amenities.length != 0 ?
                                     propData.amenities.map((item)=>{
@@ -633,6 +778,20 @@ export default function ListingDetails(){
                                 </div>
                                 
                             </div>
+                            <div style={{ paddingTop: '4vh', paddingBottom:'5vh', flexDirection:'row'}}>
+                                <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize:'1.3rem', marginBottom: 10}}>Still have a questions?</p>
+                                <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize:'1.1rem', marginBottom: 10, color: SUBTEXTCOLOR}}>Contact {tenantData.firstName}</p>
+                                <div style={{ width:mobile ? '100%' : '40vw'}}>
+                                    <p style={{fontWeight:'400', fontFamily: OPENSANS, fontSize:'1rem', marginBottom: 10, color: SUBTEXTCOLOR}}>To ensure a safe subleasing experience and to protect your payment, never transfer money or communicate outside of the Crib website.</p>
+                                </div>
+                                <Button onClick={handleMessageTenantClick} style={{backgroundColor: 'black', textTransform:'none', marginTop:'2vh', height:'6vh', outline: 'none'}}>
+                                    {loading ?
+                                    <Lottie animationData={WhiteLoadingAnimation} style={{display:'flex', flex:1, color:'white', height:'6vh', preserveAspectRatio: 'xMidYMid slice'}}/>
+                                    :
+                                    <p style={{marginBottom:0, color:'white', fontWeight:'500'}}>Message current tenant</p> 
+                                    }
+                                </Button>
+                            </div>
                             {
                                 mobile &&
                                 <div style={{width:'100%', height:'10vh'}}/>
@@ -643,10 +802,10 @@ export default function ListingDetails(){
 
                         <div style={{ width:'50%', display:mobile ? 'none' : 'block', flexDirection:'row', paddingTop: '2vh', borderWidth:1, borderColor: MEDIUMGREY,}}>
                             <div style={{width:'70%', borderRadius: 15,  boxShadow:'0px 0px 20px 1px rgba(33, 33, 33, 0.1)', backgroundColor:'white', padding: 25, display:'block',marginLeft:'auto' }}>
-                                <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize:'1.3rem', marginBottom: '3vh'}}>Send {tenantData.firstName} a request to sublease</p>
+                                <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize:'1.3rem', marginBottom: '2vh'}}>Send {tenantData.firstName} a request to sublease</p>
+                                <p style={{fontWeight:'500', fontFamily: OPENSANS, fontSize:'1.2rem', marginBottom: '2vh', }}>${propData.price}/month</p>
                                 <div style={{flexDirection:'row', justifyContent:'space-between', display:'flex'}}>
                                     <p style={{fontWeight:'500', fontFamily: OPENSANS, fontSize:'0.9rem', marginBottom: 5,}}>Available from:  {new Date(propData.availableFrom).getTime() < new Date().getTime() ? "Now" : new Date(propData.availableFrom).toLocaleString().split(",")[0]} - {new Date(propData.availableTo).toLocaleString().split(",")[0]}</p>
-                                    <p style={{fontWeight:'500', fontFamily: OPENSANS, fontSize:'0.9rem', marginBottom: 5, color:PRIMARYCOLOR}}>${propData.price}/month</p>
                                 </div>
                                 <div style={{flexDirection:'row', display:'flex', marginTop:'4vh', justifyContent:'space-between'}}>
                                     <div style={{width:'47.5%'}}>
@@ -656,7 +815,7 @@ export default function ListingDetails(){
                                         onChange={(event)=>                                
                                             setRequestStart(event)
                                         }
-                                        slotProps={{ textField: {error:false, size:"small" } }}
+                                        slotProps={{ textField: {error:false, } }}
                                         />
                                     </div>
                                     <div style={{width:'47.5%'}}>
@@ -664,7 +823,7 @@ export default function ListingDetails(){
                                         label="End date"
                                         value={dayjs(requestEnd)}
                                         onChange={(event)=> setRequestEnd(event)}
-                                        slotProps={{ textField: {error:false, size:"small" } }}
+                                        slotProps={{ textField: {error:false, } }}
                                         />
                                     </div>
                                 </div>
@@ -675,7 +834,7 @@ export default function ListingDetails(){
                                             labelId="number-of-occupants"
                                             value={numberOfOccupants}
                                             label="Number of Occupants"
-                                            size="small"
+                                           
                                             onChange={(val)=> setNumberOfOccupants(val.target.value)}
                                         >
                                             <MenuItem value={1}>1</MenuItem>
@@ -688,15 +847,34 @@ export default function ListingDetails(){
                                         </Select>
                                     </FormControl>
                                 </div>
-                                <div style={{marginTop:'2vh'}}>
+                                {/* <div style={{marginTop:'2vh'}}>
                                     <TextField value={requestMessage} onChange={(val) => setRequestMessage(val.target.value)} helperText={`The more detailed the better`} multiline fullWidth label={`Tell ${tenantData.firstName} a bit about yourself`} rows={2} />
-                                </div>
+                                </div> */}
 
                                 <div>
                                     
 
                                 </div>
 
+            
+                                <div style={{marginTop:'2vh'}}>
+                                    <div style={{flexDirection: 'row', }}>
+                                        <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize:'1.3rem', marginBottom: 10}}>Payment summary</p>
+                                    </div>
+                                    <div style={{flexDirection:'row', marginTop:'2vh', justifyContent:'space-between', display:'flex'}}>
+                                        <p style={{fontFamily:OPENSANS, fontWeight:'500', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>Security deposit</p>
+                                        <p style={{fontFamily:OPENSANS, fontWeight:'500', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>${propData.securityDeposit == undefined || propData.securityDeposit == null ? "0" : propData.securityDeposit}</p>
+                                    </div>
+                                   
+                                    <div style={{flexDirection:'row', marginTop:'2vh', justifyContent:'space-between', display:'flex'}}>
+                                        <p style={{fontFamily:OPENSANS, fontWeight:'500', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>Toal rent</p>
+                                        <p style={{fontFamily:OPENSANS, fontWeight:'500', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>{getRent()}</p>
+                                    </div>
+                                    {/* <div style={{flexDirection:'row', marginTop:'2vh', justifyContent:'space-between', display:'flex'}}>
+                                        <p style={{fontFamily:OPENSANS, fontWeight:'500', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>Service fees (5% of total rent)</p>
+                                        <p style={{fontFamily:OPENSANS, fontWeight:'500', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>{getFees()}</p>
+                                    </div> */}
+                                </div>
                                 <Button onClick={requestToBook} fullWidth style={{backgroundColor: PRIMARYCOLOR, textTransform:'none', marginTop:'3vh', height:'6vh', outline: 'none'}}>
                                     {loading ?
                                     <Lottie animationData={WhiteLoadingAnimation} style={{display:'flex', flex:1, color:'white', height:'6vh', preserveAspectRatio: 'xMidYMid slice'}}/>
@@ -704,31 +882,14 @@ export default function ListingDetails(){
                                     <p style={{marginBottom:0, color:'white', fontWeight:'600'}}>Request to book</p> 
                                     }
                                 </Button>
-                                <div style={{marginTop:'2vh'}}>
-                                    <div style={{flexDirection: 'row', }}>
-                                        <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize:'1.3rem', marginBottom: 10}}>Rent summary</p>
-                                    </div>
-                                    <div style={{flexDirection:'row', marginTop:'2vh', justifyContent:'space-between', display:'flex'}}>
-                                        <p style={{fontFamily:OPENSANS, fontWeight:'500', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>Security deposit</p>
-                                        <p style={{fontFamily:OPENSANS, fontWeight:'500', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>${propData.securityDeposit == undefined || propData.securityDeposit == null ? "0" : propData.securityDeposit}</p>
-                                    </div>
-                                   
-                                    {/* <div style={{flexDirection:'row', marginTop:'2vh', justifyContent:'space-between', display:'flex'}}>
-                                        <p style={{fontFamily:OPENSANS, fontWeight:'500', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>Toal rent</p>
-                                        <p style={{fontFamily:OPENSANS, fontWeight:'500', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>{getRent()}</p>
-                                    </div> */}
-                                    {/* <div style={{flexDirection:'row', marginTop:'2vh', justifyContent:'space-between', display:'flex'}}>
-                                        <p style={{fontFamily:OPENSANS, fontWeight:'500', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>Service fees (5% of total rent)</p>
-                                        <p style={{fontFamily:OPENSANS, fontWeight:'500', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>{getFees()}</p>
-                                    </div> */}
-                                </div>
-                                <div style={{width:'100%', borderTopWidth:'0.5px', borderTopColor: LIGHTGREY, borderTopStyle:'solid', marginTop:'2vh'}}>
+                                <p style={{marginTop:'2vh', fontSize:'0.8rem', fontFamily: OPENSANS, textAlign:'center', marginBottom:0}}>No fees required to request.</p>
+                                {/* <div style={{width:'100%', borderTopWidth:'0.5px', borderTopColor: LIGHTGREY, borderTopStyle:'solid', marginTop:'2vh'}}>
                                     <div style={{flexDirection:'row', marginTop:'2vh', justifyContent:'space-between', display:'flex'}}>
                                         <p style={{fontFamily:OPENSANS, fontWeight:'700', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>Total</p>
                                         <p style={{fontFamily:OPENSANS, fontWeight:'700', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>{getRent()}</p>
                                     </div>
                                     <p style={{marginTop:'2vh', fontSize:'0.8rem', fontFamily: OPENSANS}}>No fees required to request. You will be able to message the tenant after you request.</p>
-                                </div>
+                                </div> */}
 
                             </div>
                         </div>
@@ -811,8 +972,31 @@ export default function ListingDetails(){
                                 </FormControl>
                             </div>
                             <div style={{marginTop:'2vh'}}>
-                                <TextField value={requestMessage} onChange={(val) => setRequestMessage(val.target.value)} helperText={`The more detailed the better`} multiline fullWidth label={`Tell ${tenantData.firstName} a bit about yourself`} rows={2} />
+                                <TextField value={requestMessage} onChange={(val) => setRequestMessage(val.target.value)} helperText={`The more detailed the better`} multiline fullWidth label={`Tell ${tenantData.firstName} a bit about yourself`} rows={6} />
                             </div>
+                        </div>
+                        <div style={{paddingTop:'4vh', paddingBottom:'4vh', borderBottomWidth:'1px', borderBottomColor: LIGHTGREY, borderBottomStyle:'solid'}}>
+                           
+                            <p style={{fontWeight:'600', fontFamily: OPENSANS, fontSize:'1.4rem',}}>Payment details:</p>
+                            <div style={{flexDirection:'column', display:'flex', justifyContent:'space-between', marginTop:'2vh'}}>
+                                <p style={{fontWeight:'400', fontFamily: OPENSANS, fontSize:'0.9rem', marginBottom: 0}}>
+                                {propData.rentPaymentTime == null ?
+                                    "- Please message tenant to ask about when is rent paid"
+                                    :
+                                    `- ${propData.rentPaymentTime == "Other" ? `Following is tenant's preferred rent payemnt time: ${propData.otherRentPaymentMethods}` : `Rent is paid in the ${propData.rentPaymentTime.toLowerCase()} of each month`}`
+                                
+                                }
+                                </p>
+                                <p style={{fontWeight:'400', fontFamily: OPENSANS, fontSize:'0.9rem', marginBottom: 0, marginTop:'1vh'}}>
+                                    {
+                                    propData.rentPaymentMethod.length == 0 ?
+                                    "- Please message tenant for preferred rent payment method"
+                                    :
+                                    `- Tenant's preferred rent payment method: ${getRentPaymentMethods()}`
+                                    }
+                                </p>
+                            </div>
+                           
                         </div>
                         
                         <div style={{paddingTop:'4vh', paddingBottom:'4vh', borderBottomWidth:'1px', borderBottomColor: LIGHTGREY, borderBottomStyle:'solid'}}>
@@ -835,10 +1019,10 @@ export default function ListingDetails(){
                         </div>
                         <div style={{width:'100%', marginTop:'2vh'}}>
                             <div style={{flexDirection:'row', marginTop:'2vh', justifyContent:'space-between', display:'flex'}}>
-                                <p style={{fontFamily:OPENSANS, fontWeight:'700', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>Total</p>
+                                <p style={{fontFamily:OPENSANS, fontWeight:'700', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>Total rent</p>
                                 <p style={{fontFamily:OPENSANS, fontWeight:'700', marginBottom:0, color: MEDIUMGREY, fontSize:'0.9rem'}}>{getRent()}</p>
                             </div>
-                            <p style={{marginTop:'2vh', fontSize:'0.8rem', fontFamily: OPENSANS}}>No fees required to book, you would only need to pay security deposit and fees once after tenant accepts your request.</p>
+                            <p style={{marginTop:'2vh', fontSize:'0.8rem', fontFamily: OPENSANS}}>No fees required to request to book. The total rent amount is shown for your convenience.</p>
                         </div>
                     </>
                    

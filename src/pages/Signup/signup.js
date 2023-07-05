@@ -652,7 +652,11 @@ export default function SingupScreen(){
                     />
                     <small>By pressing continue, you are agreeing to our <a target="_blank" href="termsOfServices" style={{color:'black', textDecorationLine:'underline'}}>terms of services</a> and <a target="_blank" href="/privacy" style={{color:'black', textDecorationLine:'underline'}}>privacy</a> policy listed.</small>
                     <Button onClick={handleSubmit} fullWidth style={{marginTop: '4vh', backgroundColor: PRIMARYCOLOR,color: 'white', textTransform:'none', height: '6vh', textAlign:'center', outline:'none'}}>
-                        <p  state={{firstName:firstName, lastName: lastName, dob:dob, gender: gender}}  style={{fontWeight:'600', textTransform:'none', color:'white', marginBottom:0, display: 'flex', flex: 1,  justifyContent:'center'}}>Continue</p>
+                        {loading ?
+                        <Lottie autoPlay animationData={WhiteLoadingAnimation} style={{display:'flex', flex:1, color:'white', height:'7vh', preserveAspectRatio: 'xMidYMid slice'}}/>
+                        :
+                        <p  style={{fontWeight:'600', textTransform:'none', color:'white', marginBottom:0, display: 'flex', flex: 1,  justifyContent:'center'}}>Continue</p>
+                        }                    
                     </Button>
                    
                 </div>

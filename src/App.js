@@ -35,6 +35,8 @@ import SubtenantRequestDetailsScreen from './pages/Requests/subtenantRequestDeta
 import HowItWorksScreen from './pages/HowItWorks/howitworks';
 import DetailsMessageScreen from './pages/Requests/detailsMessage';
 import TenantPaymentScreen from './TenantPayment/tenantPayment'
+import RequestSubleaseConfirmScreen from './ListingDetails/requestConfirm';
+import MessageTenantScreen from './ListingDetails/messageTenant';
 const appId = 'EF181665-2473-42C6-9376-A340AF716169';
 
 
@@ -88,7 +90,7 @@ const refreshAccessToken = async () => {
     //If refresh token is undefined, meaning user have not logged in
     if (rt != undefined && id != undefined) {
       
-      connectSendbird(id)
+    
     
       await fetch('https://crib-llc.herokuapp.com/tokens/accessRefresh', {
         method: 'POST',
@@ -184,7 +186,8 @@ const connectSendbird = async (UID) => {
         <Route path="/howitworks" element={ <HowItWorksScreen/> } />
         <Route path="/detailsMessage/:id" element={ <DetailsMessageScreen/> } />
         <Route path="/tenantPaymentScreen" element={ <TenantPaymentScreen/> } />
-
+        <Route path="/requestConfirm/:id/:startDate/:endDate/:numberOfOccupants" element={ <RequestSubleaseConfirmScreen/> } />
+        <Route path="/messageTenant/:id" element={ <MessageTenantScreen/> } />
 
 
         {
