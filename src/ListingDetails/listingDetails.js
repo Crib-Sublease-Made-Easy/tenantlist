@@ -166,6 +166,12 @@ export default function ListingDetails(){
     }
 
     async function requestToBook(){
+        let at = localStorage.getItem("accessToken")
+        if(at == null){
+            alert("Please login or sign up first.")
+            navigate("/login")
+            return
+        }
         if(requestStart == null){
             alert("Please select a sublease start date.")
             return
@@ -504,7 +510,7 @@ export default function ListingDetails(){
             if(at == null){
                 alert("Please login or sign up first.")
                 navigate("/login")
-                
+                return
             }
             else{
                 setMobilePage(1)
@@ -517,6 +523,12 @@ export default function ListingDetails(){
     }
 
     function handleMessageTenantClick(){
+        let at = localStorage.getItem("accessToken")
+        if(at == null){
+            alert("Please login or sign up first.")
+            navigate("/login")
+            return
+        }
         navigate(`/messageTenant/${propData._id}`)
     }
 
