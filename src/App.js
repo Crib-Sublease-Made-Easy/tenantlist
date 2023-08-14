@@ -70,7 +70,7 @@ function App() {
   const [price, setPrice] = useState(10000)
 
   useEffect(()=>{
-    refreshAccessToken()
+    // refreshAccessToken()
     getDeviceWidth()
     reportWebVitals()
 },[])
